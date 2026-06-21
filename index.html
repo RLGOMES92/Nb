@@ -372,7 +372,9 @@ const { useState, useEffect, useCallback, useRef } = React;
 ══════════════════════════════════════════ */
 const SUPABASE_URL = "SUA_SUPABASE_URL_AQUI";
 const SUPABASE_ANON_KEY = "SUA_SUPABASE_ANON_KEY_AQUI";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = (SUPABASE_URL && !SUPABASE_URL.includes('SUA_SUPABASE_URL_AQUI') && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes('SUA_SUPABASE_ANON_KEY_AQUI'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 /* ══════════════════════════════════════════
    CATÁLOGO PADRÃO (editável em runtime)
@@ -1435,7 +1437,7 @@ function TelaOrcamento({catalogo, setCatalogo, toast}) {
 /* ══════════════════════════════════════════
    DASHBOARD E FLUXOS INTERNOS (BLOQUEADOS)
 ══════════════════════════════════════════ */
-function AppInterno({ session, onSignOut, toasts, toast }) {
+function AppInterno({ session, onSignOut, toasts, toast, offlineMode }) {
   const [tela, setTela] = useState('orcamento');
   const [catalogo, setCatalogoBruto] = useState(() => loadLS('nb_catalogo', CATALOGO_INICIAL));
 
@@ -1469,10 +1471,17 @@ function AppInterno({ session, onSignOut, toasts, toast }) {
           <button className="topbar-btn" onClick={resetCatalogo} title="Restaurar catálogo padrão">
             🔄
           </button>
-          <button className="topbar-btn" style={{background:'rgba(239,68,68,0.2)', color:'#fca5a5'}} onClick={onSignOut}>
-            🚪 Sair
-          </button>
+          {!offlineMode && (
+            <button className="topbar-btn" style={{background:'rgba(239,68,68,0.2)', color:'#fca5a5'}} onClick={onSignOut}>
+              🚪 Sair
+            </button>
+          )}
         </div>
+        {offlineMode && (
+          <div style={{marginLeft:'16px', fontSize:12, color:'#fde68a', fontWeight:700}}>
+            Modo offline ativado
+          </div>
+        )}
       </div>
 
       {tela==='orcamento' && <TelaOrcamento catalogo={catalogo} setCatalogo={setCatalogo} toast={toast}/>}
@@ -1487,8 +1496,9 @@ function AppInterno({ session, onSignOut, toasts, toast }) {
    APP ROOT (Garante a Trava de Segurança)
 ══════════════════════════════════════════ */
 function App() {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const offlineMode = !supabase;
+  const [session, setSession] = useState(offlineMode ? {} : null);
+  const [loading, setLoading] = useState(offlineMode ? false : true);
   const [isSignUp, setIsSignUp] = useState(false);
   
   const [email, setEmail] = useState('');
@@ -1496,9 +1506,13 @@ function App() {
   const { toasts, toast } = useToast();
 
   useEffect(() => {
+    if (offlineMode) return;
+
     // Busca sessão ativa ao carregar
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setLoading(false);
+    }).catch(() => {
       setLoading(false);
     });
 
@@ -1508,12 +1522,16 @@ function App() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [offlineMode]);
 
   const handleAuth = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       toast('Preencha todos os campos.', 'error');
+      return;
+    }
+    if (offlineMode) {
+      toast('Supabase não configurado. O modo offline está ativo.', 'info');
       return;
     }
     
@@ -1531,8 +1549,9 @@ function App() {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    if (supabase) await supabase.auth.signOut();
     toast('Você saiu do sistema.', 'info');
+    if (!offlineMode) setSession(null);
   };
 
   if (loading && !session) {
@@ -1543,8 +1562,8 @@ function App() {
     );
   }
 
-  // Se o usuário não estiver autenticado, exibe a tela de Login/Cadastro
-  if (!session) {
+  // Se o usuário não estiver autenticado e Supabase estiver configurado, exibe a tela de Login/Cadastro
+  if (!session && !offlineMode) {
     return (
       <div>
         <div className="topbar">
