@@ -9,7 +9,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
   <style>
     :root {
       --navy:       #0f2744;
@@ -44,8 +43,6 @@
       background: var(--bg); color: var(--text);
       min-height: 100vh; font-size: 14px; line-height: 1.5;
     }
-
-    /* ── TOPBAR ── */
     .topbar {
       background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
       padding: 0 20px; height: 56px;
@@ -63,55 +60,33 @@
       height: 34px; padding: 0 14px; border-radius: 8px; border: none;
       font-size: 12px; font-weight: 600; cursor: pointer;
       color: rgba(255,255,255,.7); background: rgba(255,255,255,.1);
-      transition: all .2s;
+      transition: all .2s; position: relative;
     }
-    .topbar-btn:hover, .topbar-btn.active {
-      background: rgba(255,255,255,.2); color: white;
-    }
+    .topbar-btn:hover, .topbar-btn.active { background: rgba(255,255,255,.2); color: white; }
     .topbar-btn.active { background: rgba(255,255,255,.25); color: white; }
+    .notif-dot {
+      position: absolute; top: 4px; right: 4px;
+      width: 8px; height: 8px; background: var(--danger);
+      border-radius: 50%; border: 1.5px solid var(--navy);
+    }
 
-    /* ── TELA DE LOGIN / DE BLOQUEIO ── */
-    .auth-container {
-      display: flex; align-items: center; justify-content: center;
-      min-height: calc(100vh - 56px); padding: 20px;
+    /* ── ALERT BANNER ── */
+    .alert-banner {
+      background: linear-gradient(135deg, #7c2d12, #dc2626);
+      color: white; padding: 10px 20px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      font-size: 12px; font-weight: 600;
     }
-    .auth-card {
-      background: white; border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 32px;
-      box-shadow: var(--shadow-md); max-width: 400px; width: 100%;
+    .alert-banner.warn {
+      background: linear-gradient(135deg, #92400e, #d97706);
     }
-    .auth-header { text-align: center; margin-bottom: 24px; }
-    .auth-logo {
-      width: 50px; height: 50px; background: linear-gradient(135deg, var(--navy), var(--electric));
-      border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
-      font-size: 24px; color: white; margin-bottom: 12px;
+    .alert-item {
+      background: rgba(255,255,255,.15); border-radius: 6px;
+      padding: 4px 10px; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; gap: 5px; white-space: nowrap;
     }
-    .auth-title { font-size: 20px; font-weight: 800; color: var(--navy); }
-    .auth-subtitle { font-size: 12px; color: var(--slate); margin-top: 4px; }
-    .auth-footer-link {
-      text-align: center; margin-top: 16px; font-size: 12px; color: var(--slate);
-    }
-    .auth-link { color: var(--electric); font-weight: 600; cursor: pointer; background: none; border: none; font-size: 12px; }
-    .auth-link:hover { text-decoration: underline; }
 
-    /* ── NAV TABS (tela) ── */
-    .screen-tabs {
-      background: white; border-bottom: 2px solid var(--border);
-      display: flex; padding: 0 20px; gap: 0;
-    }
-    .screen-tab {
-      padding: 14px 20px; border: none; background: none;
-      font-size: 13px; font-weight: 600; color: var(--slate);
-      cursor: pointer; border-bottom: 3px solid transparent;
-      margin-bottom: -2px; transition: all .2s; display: flex; align-items: center; gap: 6px;
-    }
-    .screen-tab.active { color: var(--electric); border-bottom-color: var(--electric); }
-    .screen-tab:hover:not(.active) { color: var(--text-mid); }
-
-    /* ── LAYOUT ── */
     .main { max-width: 820px; margin: 0 auto; padding: 20px 16px 80px; }
-
-    /* ── CARD ── */
     .card {
       background: white; border: 1px solid var(--border);
       border-radius: var(--radius-lg); padding: 20px;
@@ -126,17 +101,12 @@
       background: linear-gradient(135deg, var(--navy), var(--electric));
       border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px;
     }
-
-    /* ── FORMS ── */
     .form-row { display: grid; gap: 10px; margin-bottom: 10px; }
     .form-row.c2 { grid-template-columns: 1fr 1fr; }
     .form-row.c3 { grid-template-columns: 1fr 1fr 1fr; }
     .form-row.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .label {
-      font-size: 11px; font-weight: 700; color: var(--text-mid);
-      text-transform: uppercase; letter-spacing: .4px;
-    }
+    .label { font-size: 11px; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .4px; }
     .label .req { color: var(--danger); }
     .input {
       height: 40px; border: 1.5px solid var(--border); border-radius: var(--radius);
@@ -146,6 +116,7 @@
     .input:focus { border-color: var(--electric); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
     .input.err { border-color: var(--danger); }
     .input[readonly] { background: var(--bg); color: var(--slate); cursor: default; }
+    textarea.input { height: auto; padding: 10px 11px; resize: vertical; line-height: 1.5; }
     .ferr { font-size: 11px; color: var(--danger); }
     .fhint { font-size: 11px; color: var(--slate-light); }
     select.input {
@@ -155,8 +126,6 @@
     }
     .input-group { display: flex; gap: 8px; }
     .input-group .input { flex: 1; }
-
-    /* ── BUTTONS ── */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 5px;
       height: 38px; padding: 0 16px; border-radius: var(--radius);
@@ -164,23 +133,13 @@
       transition: all .2s; white-space: nowrap;
     }
     .btn:disabled { opacity: .45; cursor: not-allowed; }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--electric), #1e40af);
-      color: white; box-shadow: 0 2px 8px rgba(37,99,235,.3);
-    }
+    .btn-primary { background: linear-gradient(135deg, var(--electric), #1e40af); color: white; box-shadow: 0 2px 8px rgba(37,99,235,.3); }
     .btn-primary:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
-    .btn-success {
-      background: linear-gradient(135deg, var(--success), #059669);
-      color: white; box-shadow: 0 2px 8px rgba(16,185,129,.25);
-    }
+    .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: white; box-shadow: 0 2px 8px rgba(16,185,129,.25); }
     .btn-success:hover:not(:disabled) { filter: brightness(1.05); transform: translateY(-1px); }
-    .btn-warn {
-      background: var(--warn-bg); color: #92400e; border: 1px solid #fcd34d;
-    }
+    .btn-warn { background: var(--warn-bg); color: #92400e; border: 1px solid #fcd34d; }
     .btn-warn:hover:not(:disabled) { background: #fde68a; }
-    .btn-outline {
-      background: white; border: 1.5px solid var(--border-mid); color: var(--text-mid);
-    }
+    .btn-outline { background: white; border: 1.5px solid var(--border-mid); color: var(--text-mid); }
     .btn-outline:hover:not(:disabled) { border-color: var(--electric); color: var(--electric); }
     .btn-ghost { background: transparent; color: var(--slate); padding: 0 8px; }
     .btn-ghost:hover:not(:disabled) { color: var(--danger); background: var(--danger-bg); }
@@ -191,13 +150,9 @@
     .btn-xl { height: 54px; padding: 0 30px; font-size: 15px; border-radius: 13px; font-weight: 700; }
     .btn-icon { width: 32px; height: 32px; padding: 0; border-radius: 7px; font-size: 14px; }
 
-    /* ── STEPPER ── */
     .stepper-wrap { background: white; border-bottom: 1px solid var(--border); padding: 14px 20px 0; }
     .stepper { display: flex; max-width: 640px; margin: 0 auto; }
-    .step-item {
-      flex: 1; display: flex; flex-direction: column; align-items: center;
-      position: relative; padding-bottom: 12px;
-    }
+    .step-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 12px; }
     .step-item::before {
       content: ''; position: absolute; top: 13px;
       left: calc(50% + 15px); right: calc(-50% + 15px);
@@ -212,27 +167,21 @@
       font-size: 10px; font-weight: 700; color: var(--slate);
       transition: all .3s; position: relative; z-index: 1;
     }
-    .step-item.active .step-circle {
-      border-color: var(--electric); background: var(--electric); color: white;
-      box-shadow: 0 0 0 4px rgba(37,99,235,.15);
-    }
+    .step-item.active .step-circle { border-color: var(--electric); background: var(--electric); color: white; box-shadow: 0 0 0 4px rgba(37,99,235,.15); }
     .step-item.done .step-circle { border-color: var(--electric); background: var(--electric); color: white; }
     .step-label { font-size: 10px; color: var(--slate); margin-top: 5px; font-weight: 600; text-align: center; }
     .step-item.active .step-label { color: var(--electric); }
     .step-item.done .step-label { color: var(--electric); }
 
-    /* ── TABS dentro de card ── */
     .tabs { display: flex; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 3px; gap: 3px; }
     .tab { flex: 1; height: 32px; border-radius: 7px; border: none; background: transparent; font-size: 12px; font-weight: 600; color: var(--slate); cursor: pointer; transition: all .2s; }
     .tab.active { background: white; color: var(--electric); box-shadow: 0 1px 4px rgba(0,0,0,.1); }
 
-    /* ── QTY STEPPER ── */
     .qty-stepper { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; height: 40px; width: 130px; }
     .qty-btn { width: 38px; height: 100%; background: var(--bg); border: none; font-size: 18px; font-weight: 700; color: var(--navy); cursor: pointer; transition: background .15s; }
     .qty-btn:hover { background: var(--cyan-soft); }
     .qty-val { flex: 1; text-align: center; font-size: 15px; font-weight: 800; color: var(--navy); border: none; outline: none; background: white; }
 
-    /* ── PRAZO CHIPS ── */
     .prazo-chip {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; border: 2px solid var(--border); border-radius: 20px;
@@ -242,21 +191,18 @@
     .prazo-chip:hover { border-color: var(--electric); color: var(--navy); }
     .prazo-chip.sel { border-color: var(--electric); background: rgba(37,99,235,.07); color: var(--electric); }
 
-    /* ── BADGES ── */
     .badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; }
     .badge-ok  { background: var(--success-bg); color: var(--success); }
     .badge-err { background: var(--danger-bg); color: var(--danger); }
     .badge-warn { background: var(--warn-bg); color: var(--warn); }
     .badge-blue { background: rgba(37,99,235,.1); color: var(--electric); }
 
-    /* ── INFO BOX ── */
     .ibox { padding: 10px 12px; border-radius: var(--radius); font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
     .ibox.blue { background: rgba(37,99,235,.07); border: 1px solid rgba(37,99,235,.15); color: var(--navy-mid); }
     .ibox.green { background: var(--success-bg); border: 1px solid #6ee7b7; color: #065f46; }
     .ibox.warn { background: var(--warn-bg); border: 1px solid #fcd34d; color: #92400e; }
     .ibox.red { background: var(--danger-bg); border: 1px solid #fca5a5; color: #7f1d1d; }
 
-    /* ── PRODUTO ROW ── */
     .produto-row {
       background: var(--bg); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 11px 13px;
@@ -271,7 +217,6 @@
     .produto-valor .val { font-size: 13px; font-weight: 800; color: var(--navy); }
     .produto-valor .sub { font-size: 10px; color: var(--slate); }
 
-    /* ── ESTOQUE CARD ── */
     .estoque-grid { display: grid; gap: 10px; }
     .estoque-item {
       background: white; border: 1px solid var(--border); border-radius: var(--radius);
@@ -279,6 +224,8 @@
       transition: box-shadow .2s;
     }
     .estoque-item:hover { box-shadow: var(--shadow-md); }
+    .estoque-item.sem-estoque { border-color: #fca5a5; background: #fff8f8; }
+    .estoque-item.estoque-baixo { border-color: #fcd34d; background: #fffdf0; }
     .estoque-item .ei-info { flex: 1; min-width: 0; }
     .estoque-item .ei-nome { font-size: 13px; font-weight: 700; color: var(--navy); }
     .estoque-item .ei-spec { font-size: 11px; color: var(--slate); margin-top: 2px; }
@@ -287,16 +234,33 @@
     .estoque-meta-box .mval { font-size: 14px; font-weight: 800; color: var(--navy); }
     .estoque-meta-box .mlabel { font-size: 9px; color: var(--slate); text-transform: uppercase; }
     .estoque-item .ei-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .qtd-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .qtd-badge.ok   { background: var(--success-bg); color: var(--success); }
+    .qtd-badge.low  { background: var(--warn-bg); color: var(--warn); }
+    .qtd-badge.zero { background: var(--danger-bg); color: var(--danger); }
 
-    /* ── ESTOQUE QTDE BADGE ── */
-    .qtd-badge {
-      padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    /* ── CONTRATOS ── */
+    .contract-row {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 14px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color .2s;
     }
-    .qtd-badge.ok  { background: var(--success-bg); color: var(--success); }
-    .qtd-badge.low { background: var(--warn-bg); color: var(--warn); }
-    .qtd-badge.zero{ background: var(--danger-bg); color: var(--danger); }
+    .contract-row:hover { border-color: var(--border-mid); }
+    .contract-row.vencendo { border-color: #fcd34d; background: #fffdf0; }
+    .contract-row.vencido  { border-color: #fca5a5; background: #fff8f8; }
+    .contract-info { flex: 1; min-width: 0; }
+    .contract-nome { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .contract-sub  { font-size: 11px; color: var(--slate); margin-top: 2px; }
+    .contract-meta { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; align-items: center; }
+    .dias-badge {
+      padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+    .dias-badge.ok      { background: var(--success-bg); color: var(--success); }
+    .dias-badge.warn    { background: var(--warn-bg); color: var(--warn); }
+    .dias-badge.perigo  { background: var(--danger-bg); color: var(--danger); }
+    .dias-badge.vencido { background: #1f2937; color: white; }
 
-    /* ── RESUMO TABLE ── */
     .resumo-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .resumo-table th { background: var(--navy); color: white; padding: 9px 10px; text-align: center; font-size: 11px; font-weight: 700; }
     .resumo-table th:first-child { text-align: left; border-radius: 7px 0 0 0; }
@@ -308,20 +272,17 @@
     .resumo-table tfoot tr:last-child td { background: var(--navy); color: white; font-size: 13px; }
     .no-col { color: var(--slate-light); font-size: 10px; font-style: italic; }
 
-    /* ── METRICS ── */
     .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; margin-bottom: 14px; }
     .metric-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
     .metric-box .mv { font-size: 15px; font-weight: 800; color: var(--navy); margin-top: 3px; }
     .metric-box .ml { font-size: 9px; color: var(--slate); text-transform: uppercase; }
 
-    /* ── MODAL ── */
     .overlay { position: fixed; inset: 0; background: rgba(15,39,68,.55); backdrop-filter: blur(4px); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; }
     .modal { background: white; border-radius: var(--radius-lg); padding: 24px; max-width: 520px; width: 100%; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
     .modal-title { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
     .modal-sub { font-size: 12px; color: var(--slate); margin-bottom: 18px; }
     .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
 
-    /* ── TOAST ── */
     .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
     .toast { padding: 11px 16px; border-radius: var(--radius); font-size: 12px; font-weight: 600; color: white; box-shadow: var(--shadow-md); animation: slideIn .3s ease; pointer-events: auto; max-width: 300px; display: flex; align-items: center; gap: 7px; }
     .toast.success { background: var(--success); }
@@ -331,34 +292,26 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; }
 
-    /* ── DIVIDER ── */
     .divider { height: 1px; background: var(--border); margin: 14px 0; }
-
-    /* ── EMPTY ── */
     .empty { text-align: center; padding: 28px 16px; color: var(--slate); }
     .empty .eicon { font-size: 34px; margin-bottom: 8px; }
     .empty p { font-size: 12px; }
-
-    /* ── PDF SUCCESS ── */
     .pdf-success { text-align: center; padding: 28px 16px; }
     .pdf-success .big { font-size: 52px; display: block; margin-bottom: 10px; }
     .pdf-success h3 { font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
     .pdf-success p { font-size: 12px; color: var(--slate); margin-bottom: 18px; }
     .pdf-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-
-    /* ── NAV BTNS ── */
     .nav-btns { display: flex; gap: 10px; justify-content: space-between; margin-top: 18px; }
 
-    /* ── INLINE EDIT ── */
-    .ie-input { height: 34px; border: 1.5px solid var(--electric); border-radius: 7px; padding: 0 8px; font-size: 13px; font-weight: 700; color: var(--navy); width: 100%; outline: none; text-align: center; }
+    /* ── SETTINGS ── */
+    .settings-section { margin-bottom: 20px; }
+    .settings-section-title { font-size: 11px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
 
-    /* ── RESPONSIVE ── */
     @media (max-width: 560px) {
       .form-row.c2 { grid-template-columns: 1fr; }
       .form-row.c3 { grid-template-columns: 1fr 1fr; }
       .form-row.c4 { grid-template-columns: 1fr 1fr; }
       .topbar-btn span { display: none; }
-      .screen-tab { padding: 12px 12px; font-size: 12px; }
     }
   </style>
 </head>
@@ -368,30 +321,34 @@
 const { useState, useEffect, useCallback, useRef } = React;
 
 /* ══════════════════════════════════════════
-   CONFIGURAÇÃO DO SUPABASE
+   DADOS PADRÃO
 ══════════════════════════════════════════ */
-const SUPABASE_URL = "SUA_SUPABASE_URL_AQUI";
-const SUPABASE_ANON_KEY = "SUA_SUPABASE_ANON_KEY_AQUI";
-const supabase = (SUPABASE_URL && !SUPABASE_URL.includes('SUA_SUPABASE_URL_AQUI') && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes('SUA_SUPABASE_ANON_KEY_AQUI'))
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+const CONFIG_INICIAL = {
+  nomeEmpresa: 'Urban Store',
+  cnpjEmpresa: '',
+  enderecoEmpresa: '',
+  responsavelNome: '',
+  responsavelCelular: '',
+  responsavelEmail: '',
+  textoIntro: 'Gostaríamos de apresentar nossa proposta de locação de computadores para atender às necessidades de sua empresa. Nossa empresa é especializada em fornecer soluções de tecnologia para empresas, e temos uma ampla variedade de opções de computadores disponíveis para locação, desde desktops a laptops, monitores etc.',
+  textoConclusao: 'Acreditamos que nossa proposta de locação de computadores é a escolha ideal para sua empresa, proporcionando acesso a equipamentos modernos e atualizados, suporte técnico confiável e flexibilidade financeira. Estamos comprometidos em fornecer soluções de tecnologia de alta qualidade para ajudar sua empresa a alcançar seus objetivos de negócios.\n\nSem mais, estamos à disposição.',
+  alertaDiasContrato: 30,
+  alertaEstoqueMinimoQtd: 3,
+};
 
-/* ══════════════════════════════════════════
-   CATÁLOGO PADRÃO (editável em runtime)
-══════════════════════════════════════════ */
 const CATALOGO_INICIAL = [
-  { id:'NB-001', nome:'Dell Latitude 5440', spec:'i5-1335U / 16GB / 256GB SSD', qtdEstoque:8,
-    precos:{ 1:395, 5:365, 10:325 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-002', nome:'Lenovo ThinkPad E14', spec:'i7-1355U / 16GB / 512GB SSD', qtdEstoque:5,
-    precos:{ 1:480, 5:445, 10:395 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-003', nome:'HP ProBook 445 G10', spec:'Ryzen 5 7530U / 8GB / 256GB SSD', qtdEstoque:12,
-    precos:{ 1:340, 5:310, 10:278 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-004', nome:'MacBook Air M2', spec:'Apple M2 / 8GB / 256GB SSD', qtdEstoque:3,
-    precos:{ 1:890, 5:820, 10:750 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-005', nome:'Dell Inspiron 15', spec:'i3-1215U / 8GB / 256GB SSD', qtdEstoque:15,
-    precos:{ 1:280, 5:250, 10:220 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-006', nome:'Lenovo IdeaPad 3', spec:'Ryzen 3 7320U / 8GB / 512GB SSD', qtdEstoque:0,
-    precos:{ 1:260, 5:235, 10:205 }, prazosPadrao:[12,24,36], modalidade:'Venda' },
+  { id:'NB-001', nome:'Dell Latitude 5440', spec:'i5-1335U / 16GB / 256GB SSD', qtdEstoque:8, precos:{ 1:395, 5:365, 10:325 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-002', nome:'Lenovo ThinkPad E14', spec:'i7-1355U / 16GB / 512GB SSD', qtdEstoque:5, precos:{ 1:480, 5:445, 10:395 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-003', nome:'HP ProBook 445 G10', spec:'Ryzen 5 7530U / 8GB / 256GB SSD', qtdEstoque:12, precos:{ 1:340, 5:310, 10:278 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-004', nome:'MacBook Air M2', spec:'Apple M2 / 8GB / 256GB SSD', qtdEstoque:3, precos:{ 1:890, 5:820, 10:750 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-005', nome:'Dell Inspiron 15', spec:'i3-1215U / 8GB / 256GB SSD', qtdEstoque:15, precos:{ 1:280, 5:250, 10:220 }, prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-006', nome:'Lenovo IdeaPad 3', spec:'Ryzen 3 7320U / 8GB / 512GB SSD', qtdEstoque:0, precos:{ 1:260, 5:235, 10:205 }, prazosPadrao:[12,24,36], modalidade:'Venda' },
+];
+
+const CONTRATOS_INICIAIS = [
+  { id:'CTR-001', cliente:'Passos Digital', produto:'Notebook Dell 5420', qtd:2, inicio:'2024-03-01', meses:24, mensalidade:279 },
+  { id:'CTR-002', cliente:'Tech Solutions', produto:'Dell Latitude 5440', qtd:5, inicio:'2023-07-15', meses:12, mensalidade:365 },
+  { id:'CTR-003', cliente:'Inova Corp', produto:'HP ProBook 445 G10', qtd:10, inicio:'2025-05-10', meses:36, mensalidade:278 },
 ];
 
 /* ══════════════════════════════════════════
@@ -403,9 +360,7 @@ const orcId = () => `ORC-${uid()}`;
 
 function lookupPreco(produto, qtd) {
   const faixas = Object.keys(produto.precos).map(Number).sort((a,b)=>b-a);
-  for (const f of faixas) {
-    if (qtd >= f) return produto.precos[f];
-  }
+  for (const f of faixas) { if (qtd >= f) return produto.precos[f]; }
   return produto.precos[faixas[faixas.length-1]] || 0;
 }
 
@@ -427,6 +382,13 @@ function formatPhone(v) {
   return d.replace(/^(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
 }
 
+function diasParaVencer(inicio, meses) {
+  const fim = new Date(inicio);
+  fim.setMonth(fim.getMonth() + meses);
+  const hoje = new Date();
+  return Math.ceil((fim - hoje) / 86400000);
+}
+
 function loadLS(key, def) {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; }
 }
@@ -442,32 +404,51 @@ function useToast() {
   const toast = useCallback((msg, type='info') => {
     const id = Date.now();
     setToasts(p => [...p, {id, msg, type}]);
-    setTimeout(() => setToasts(p => p.filter(t=>t.id!==id)), 3000);
+    setTimeout(() => setToasts(p => p.filter(t=>t.id!==id)), 4000);
   },[]);
   return {toasts, toast};
 }
 
 /* ══════════════════════════════════════════
-   PDF GENERATOR
+   PDF GENERATOR (com texto da empresa)
 ══════════════════════════════════════════ */
-function gerarPDF(orcamento, cliente, itens, empresa='Urban Store') {
+function gerarPDF(orcamento, cliente, itens, config) {
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({unit:'mm', format:'a4'});
   const W=210, L=14, R=14;
 
+  const empresa = config.nomeEmpresa || 'Urban Store';
+  const respNome = config.responsavelNome || '';
+  const respFone = config.responsavelCelular || '';
+  const respEmail = config.responsavelEmail || '';
+
   // Header
-  doc.setFillColor(15,39,68); doc.rect(0,0,W,36,'F');
+  doc.setFillColor(15,39,68); doc.rect(0,0,W,40,'F');
   doc.setTextColor(255,255,255); doc.setFontSize(17); doc.setFont('helvetica','bold');
   doc.text(empresa, L, 14);
   doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(160,195,230);
   doc.text('Locação e Venda de Notebooks Corporativos', L, 20);
-  doc.setFontSize(19); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
-  doc.text(orcamento.id, W-R, 14, {align:'right'});
-  doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(160,195,230);
-  doc.text(`Emitido: ${new Date().toLocaleDateString('pt-BR')}`, W-R, 20, {align:'right'});
-  doc.text(`Válido até: ${new Date(Date.now()+30*86400000).toLocaleDateString('pt-BR')}`, W-R, 25, {align:'right'});
+  if (config?.cnpjEmpresa) doc.text(`CNPJ: ${config.cnpjEmpresa}`, L, 25);
+  if (config?.enderecoEmpresa) doc.text(config.enderecoEmpresa, L, 30);
 
-  let y = 44;
+  doc.setFontSize(19); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+  doc.text(orcamento.id, W-R, 12, {align:'right'});
+  doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(160,195,230);
+  doc.text(`Emitido: ${new Date().toLocaleDateString('pt-BR')}`, W-R, 19, {align:'right'});
+  doc.text(`Válido até: ${new Date(Date.now()+30*86400000).toLocaleDateString('pt-BR')}`, W-R, 24, {align:'right'});
+  if (respNome) doc.text(`Resp: ${respNome}`, W-R, 29, {align:'right'});
+  if (respFone) doc.text(respFone, W-R, 34, {align:'right'});
+
+  let y = 48;
+
+  // Texto de apresentação
+  if (config?.textoIntro) {
+    doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(50,65,85);
+    const textoIntro = `Prezado(a) ${cliente.razaoSocial||cliente.nomeFantasia||'cliente'},\n\n${config.textoIntro}`;
+    const linhas = doc.splitTextToSize(textoIntro, W-L-R);
+    doc.text(linhas, L, y);
+    y += linhas.length * 4.5 + 6;
+  }
 
   // Cliente box
   doc.setFillColor(248,250,252); doc.setDrawColor(226,232,240);
@@ -483,16 +464,15 @@ function gerarPDF(orcamento, cliente, itens, empresa='Urban Store') {
   if(l3) doc.text(l3, L+4, y+24);
   y += 35;
 
-  const prazos = [...new Set(itens.map(i=>i.prazo))].sort((a,b)=>a-b);
-  const prods  = [...new Map(itens.map(i=>[i.idProd||i.nome, i])).values()];
-
-  // Título tabela
-  doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(15,39,68);
-  doc.text('TABELA COMPARATIVA DE PRAZOS', L, y); y+=5;
-
+  // Tabela
+  const prazos  = [...new Set(itens.map(i=>i.prazo))].sort((a,b)=>a-b);
+  const prods   = [...new Map(itens.map(i=>[i.idProd||i.nome, i])).values()];
   const colW = Math.min(55, Math.floor((W-L-R-65-12) / prazos.length));
   const colStyles = {0:{cellWidth:65,fontStyle:'bold'}, 1:{cellWidth:12,halign:'center'}};
   prazos.forEach((_,i) => { colStyles[i+2] = {cellWidth:colW, halign:'center'}; });
+
+  doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(15,39,68);
+  doc.text('TABELA COMPARATIVA DE PRAZOS', L, y); y+=5;
 
   doc.autoTable({
     startY: y,
@@ -515,7 +495,6 @@ function gerarPDF(orcamento, cliente, itens, empresa='Urban Store') {
   });
   y = doc.lastAutoTable.finalY + 4;
 
-  // Totais
   const totais = prazos.map(p => {
     const ip = itens.filter(i=>i.prazo===p);
     const m  = ip.reduce((s,i)=>s+i.valorMensal,0);
@@ -541,12 +520,36 @@ function gerarPDF(orcamento, cliente, itens, empresa='Urban Store') {
     },
     margin:{left:L, right:R},
   });
+  y = doc.lastAutoTable.finalY + 8;
+
+  // Texto de conclusão
+  if (config.textoConclusao) {
+    // Se não couber na página, adiciona nova
+    if (y > 230) { doc.addPage(); y = 20; }
+    doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(50,65,85);
+    const linhasConcl = doc.splitTextToSize(config.textoConclusao, W-L-R);
+    doc.text(linhasConcl, L, y);
+    y += linhasConcl.length * 4.5 + 10;
+    // Assinatura
+    if (respNome) {
+      doc.setFont('helvetica','bold'); doc.setTextColor(15,39,68);
+      doc.text(respNome, L, y);
+      y += 5;
+      doc.setFont('helvetica','normal'); doc.setTextColor(100,116,139); doc.setFontSize(8);
+      if (respFone)  { doc.text(respFone,  L, y); y += 4; }
+      if (respEmail) { doc.text(respEmail, L, y); y += 4; }
+    }
+  }
 
   // Rodapé
-  doc.setFillColor(15,39,68); doc.rect(0,279,W,18,'F');
-  doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(160,195,230);
-  doc.text('Preços em BRL. Locação sujeita à aprovação cadastral. Equipamentos sujeitos à disponibilidade de estoque.', W/2, 286, {align:'center'});
-  doc.text(`${empresa}  —  ${orcamento.id}  —  ${new Date().toLocaleDateString('pt-BR')}`, W/2, 291, {align:'center'});
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFillColor(15,39,68); doc.rect(0,279,W,18,'F');
+    doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(160,195,230);
+    doc.text('Preços em BRL. Locação sujeita à aprovação cadastral. Equipamentos sujeitos à disponibilidade de estoque.', W/2, 286, {align:'center'});
+    doc.text(`${empresa}  —  ${orcamento.id}  —  ${new Date().toLocaleDateString('pt-BR')}`, W/2, 291, {align:'center'});
+  }
 
   return doc;
 }
@@ -568,7 +571,7 @@ function FG({label, req, err, hint, children}) {
 function Inp({label, req, err, hint, ...p}) {
   return (
     <FG label={label} req={req} err={err} hint={hint}>
-      <input className={`input${err?' err':''}`} {...p} />
+      <input className={`input${err ? ' err' : ''}`} {...p} />
     </FG>
   );
 }
@@ -583,74 +586,92 @@ function Toast({toasts}) {
 }
 
 /* ══════════════════════════════════════════
-   MODAL EDITAR PRODUTO DO CATÁLOGO
+   BANNER DE ALERTAS GLOBAIS
+══════════════════════════════════════════ */
+function AlertBanner({catalogo, contratos, config}) {
+  const semEstoque = catalogo.filter(p => p.qtdEstoque === 0);
+  const baixoEstoque = catalogo.filter(p => p.qtdEstoque > 0 && p.qtdEstoque <= (config.alertaEstoqueMinimoQtd || 3));
+  const limite = config.alertaDiasContrato || 30;
+  const contratosAlertas = contratos.filter(c => {
+    const d = diasParaVencer(c.inicio, c.meses);
+    return d >= 0 && d <= limite;
+  });
+  const contratosVencidos = contratos.filter(c => diasParaVencer(c.inicio, c.meses) < 0);
+
+  if (semEstoque.length === 0 && baixoEstoque.length === 0 && contratosAlertas.length === 0 && contratosVencidos.length === 0) return null;
+
+  return (
+    <div>
+      {(semEstoque.length > 0 || baixoEstoque.length > 0) && (
+        <div className="alert-banner">
+          <span>⚠️ Alerta de Estoque:</span>
+          {semEstoque.map(p => (
+            <div key={p.id} className="alert-item">🔴 {p.nome} — SEM ESTOQUE</div>
+          ))}
+          {baixoEstoque.map(p => (
+            <div key={p.id} className="alert-item">🟡 {p.nome} — só {p.qtdEstoque} un</div>
+          ))}
+        </div>
+      )}
+      {(contratosAlertas.length > 0 || contratosVencidos.length > 0) && (
+        <div className="alert-banner warn">
+          <span>📋 Alertas de Contrato:</span>
+          {contratosVencidos.map(c => (
+            <div key={c.id} className="alert-item">🔴 {c.cliente} — VENCIDO</div>
+          ))}
+          {contratosAlertas.map(c => {
+            const d = diasParaVencer(c.inicio, c.meses);
+            return <div key={c.id} className="alert-item">🟡 {c.cliente} — vence em {d}d</div>;
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   MODAL EDITAR PRODUTO
 ══════════════════════════════════════════ */
 function ModalEditarProduto({prod, onSave, onClose}) {
   const [form, setForm] = useState({
-    nome: prod?.nome||'',
-    spec: prod?.spec||'',
-    qtdEstoque: prod?.qtdEstoque??0,
-    preco1:  prod?.precos?.[1]||0,
-    preco5:  prod?.precos?.[5]||0,
-    preco10: prod?.precos?.[10]||0,
+    nome: prod?.nome||'', spec: prod?.spec||'', qtdEstoque: prod?.qtdEstoque??0,
+    preco1: prod?.precos?.[1]||0, preco5: prod?.precos?.[5]||0, preco10: prod?.precos?.[10]||0,
     modalidade: prod?.modalidade||'Locação',
   });
-
   const set = (k,v) => setForm(p=>({...p,[k]:v}));
   const isNovo = !prod?.id;
-
   const handleSave = () => {
     if (!form.nome.trim()) return;
-    onSave({
-      id: prod?.id || `NB-${uid()}`,
-      nome: form.nome.trim(),
-      spec: form.spec.trim(),
+    onSave({ id: prod?.id || `NB-${uid()}`, nome: form.nome.trim(), spec: form.spec.trim(),
       qtdEstoque: parseInt(form.qtdEstoque)||0,
       precos: { 1:parseFloat(form.preco1)||0, 5:parseFloat(form.preco5)||0, 10:parseFloat(form.preco10)||0 },
-      prazosPadrao:[12,24,36],
-      modalidade: form.modalidade,
-    });
+      prazosPadrao:[12,24,36], modalidade: form.modalidade });
   };
-
   return (
     <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
         <div className="modal-title">{isNovo?'➕ Novo Produto':'✏️ Editar Produto'}</div>
         <div className="modal-sub">Catálogo de estoque — dados e precificação</div>
-
         <div className="form-row c2" style={{marginBottom:10}}>
-          <Inp label="Nome do Produto" req value={form.nome} onChange={e=>set('nome',e.target.value)} placeholder="Ex: Dell Latitude 5440"/>
-          <FG label="Modalidade">
-            <select className="input" value={form.modalidade} onChange={e=>set('modalidade',e.target.value)}>
-              <option>Locação</option>
-              <option>Venda</option>
-              <option>Locação/Venda</option>
-            </select>
-          </FG>
+          <Inp label="Nome" req value={form.nome} onChange={e=>set('nome',e.target.value)}/>
+          <FG label="Modalidade"><select className="input" value={form.modalidade} onChange={e=>set('modalidade',e.target.value)}><option>Locação</option><option>Venda</option><option>Locação/Venda</option></select></FG>
         </div>
         <div className="form-row" style={{marginBottom:10}}>
-          <Inp label="Especificação / Configuração" value={form.spec} onChange={e=>set('spec',e.target.value)} placeholder="Ex: i5-1335U / 16GB / 256GB SSD"/>
+          <Inp label="Especificação" value={form.spec} onChange={e=>set('spec',e.target.value)} placeholder="Ex: i5-1335U / 16GB / 256GB SSD"/>
         </div>
         <div className="form-row" style={{marginBottom:10}}>
           <Inp label="Qtd em Estoque" type="number" min="0" value={form.qtdEstoque} onChange={e=>set('qtdEstoque',e.target.value)}/>
         </div>
         <div className="divider"/>
-        <div style={{fontSize:12, fontWeight:700, color:'var(--navy)', marginBottom:10}}>
-          💰 Tabela de Preços por Faixa de Quantidade (R$/un/mês)
-        </div>
+        <div style={{fontSize:12, fontWeight:700, color:'var(--navy)', marginBottom:10}}>💰 Preços por Faixa (R$/un/mês)</div>
         <div className="form-row c3" style={{marginBottom:10}}>
-          <Inp label="1–4 unidades" type="number" min="0" step="0.01" value={form.preco1} onChange={e=>set('preco1',e.target.value)}/>
-          <Inp label="5–9 unidades" type="number" min="0" step="0.01" value={form.preco5} onChange={e=>set('preco5',e.target.value)}/>
-          <Inp label="10+ unidades" type="number" min="0" step="0.01" value={form.preco10} onChange={e=>set('preco10',e.target.value)}/>
-        </div>
-        <div className="ibox blue" style={{fontSize:11}}>
-          <span>💡</span> O preço da faixa é aplicado automaticamente conforme a quantidade selecionada no orçamento.
+          <Inp label="1–4 un" type="number" min="0" step="0.01" value={form.preco1} onChange={e=>set('preco1',e.target.value)}/>
+          <Inp label="5–9 un" type="number" min="0" step="0.01" value={form.preco5} onChange={e=>set('preco5',e.target.value)}/>
+          <Inp label="10+ un" type="number" min="0" step="0.01" value={form.preco10} onChange={e=>set('preco10',e.target.value)}/>
         </div>
         <div className="modal-btns">
           <button className="btn btn-outline" style={{flex:1}} onClick={onClose}>Cancelar</button>
-          <button className="btn btn-primary" style={{flex:2}} onClick={handleSave}>
-            {isNovo ? '➕ Adicionar ao Catálogo' : '💾 Salvar Alterações'}
-          </button>
+          <button className="btn btn-primary" style={{flex:2}} onClick={handleSave}>{isNovo?'➕ Adicionar':'💾 Salvar'}</button>
         </div>
       </div>
     </div>
@@ -661,23 +682,19 @@ function ModalEditarProduto({prod, onSave, onClose}) {
    MODAL EDITAR ITEM DO ORÇAMENTO
 ══════════════════════════════════════════ */
 function ModalEditarItem({item, onSave, onClose}) {
-  const [qtd, setQtd]         = useState(item.quantidade);
-  const [prazo, setPrazo]     = useState(item.prazo);
-  const [preco, setPreco]     = useState(item.precoFinal);
-  const [descTipo, setDT]     = useState(item.descTipo||'%');
-  const [descVal, setDV]      = useState(item.descValor||0);
-
-  const precoBase = item.precoBase || item.precoFinal;
+  const [qtd, setQtd]     = useState(item.quantidade);
+  const [prazo, setPrazo] = useState(item.prazo);
+  const [preco, setPreco] = useState(item.precoFinal);
+  const [descTipo, setDT] = useState(item.descTipo||'%');
+  const [descVal, setDV]  = useState(item.descValor||0);
   const precoFinal = aplicaDesc(preco, descTipo, parseFloat(descVal)||0);
   const mensal = precoFinal * qtd;
   const total  = mensal * prazo;
-
   return (
     <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
         <div className="modal-title">✏️ Editar Item</div>
-        <div className="modal-sub">{item.nome} — {item.spec}</div>
-
+        <div className="modal-sub">{item.nome}</div>
         <div className="form-row c2" style={{marginBottom:10}}>
           <div className="form-group">
             <div className="label">Quantidade</div>
@@ -687,35 +704,27 @@ function ModalEditarItem({item, onSave, onClose}) {
               <button className="qty-btn" onClick={()=>setQtd(q=>q+1)}>+</button>
             </div>
           </div>
-          <Inp label="Prazo (meses)" type="number" min="1" value={prazo} onChange={e=>setPrazo(parseInt(e.target.value)||1)} hint="Qualquer valor: 1, 2, 6, 12, 24..."/>
+          <Inp label="Prazo (meses)" type="number" min="1" value={prazo} onChange={e=>setPrazo(parseInt(e.target.value)||1)}/>
         </div>
-
         <div className="form-row c2" style={{marginBottom:10}}>
           <Inp label="Preço Unit./Mês (R$)" type="number" min="0" step="0.01" value={preco} onChange={e=>setPreco(parseFloat(e.target.value)||0)}/>
           <div className="form-group">
             <div className="label">Desconto</div>
             <div style={{display:'flex', gap:6}}>
-              <button className={`btn btn-sm${descTipo==='%'?' btn-primary':' btn-outline'}`} onClick={()=>setDT('%')}>%</button>
-              <button className={`btn btn-sm${descTipo==='$'?' btn-primary':' btn-outline'}`} onClick={()=>setDT('$')}>R$</button>
-              <input className="input" style={{flex:1}} type="number" min="0" step="0.01" value={descVal} onChange={e=>setDV(e.target.value)} placeholder="0"/>
+              <button className={`btn btn-sm${descTipo==='%' ? ' btn-primary' : ' btn-outline'}`} onClick={()=>setDT('%')}>%</button>
+              <button className={`btn btn-sm${descTipo==='$' ? ' btn-primary' : ' btn-outline'}`} onClick={()=>setDT('$')}>R$</button>
+              <input className="input" style={{flex:1}} type="number" min="0" step="0.01" value={descVal} onChange={e=>setDV(e.target.value)}/>
             </div>
           </div>
         </div>
-
         <div className="ibox green">
           <span>📊</span>
-          <div>
-            <strong>Preço final: {R$(precoFinal)}/un</strong>
-            &nbsp;·&nbsp; Mensal: <strong>{R$(mensal)}</strong>
-            &nbsp;·&nbsp; Total contrato: <strong>{R$(total)}</strong>
-          </div>
+          <div>Preço final: <strong>{R$(precoFinal)}/un</strong> · Mensal: <strong>{R$(mensal)}</strong> · Total: <strong>{R$(total)}</strong></div>
         </div>
-
         <div className="modal-btns">
           <button className="btn btn-outline" style={{flex:1}} onClick={onClose}>Cancelar</button>
           <button className="btn btn-primary" style={{flex:2}} onClick={()=>onSave({
-            ...item, quantidade:qtd, prazo, precoFinal,
-            descTipo, descValor:parseFloat(descVal)||0,
+            ...item, quantidade:qtd, prazo, precoFinal, descTipo, descValor:parseFloat(descVal)||0,
             valorMensal:mensal, valorTotal:total,
           })}>💾 Salvar</button>
         </div>
@@ -725,12 +734,124 @@ function ModalEditarItem({item, onSave, onClose}) {
 }
 
 /* ══════════════════════════════════════════
-   TELA: ESTOQUE / CATÁLOGO
+   TELA CONTRATOS (com agente de alertas)
 ══════════════════════════════════════════ */
-function TelaEstoque({catalogo, setCatalogo, toast}) {
+function TelaContratos({contratos, setContratos, config, toast}) {
+  const [modal, setModal] = useState(false);
+  const [form, setForm] = useState({cliente:'',produto:'',qtd:1,inicio:'',meses:24,mensalidade:''});
+  const set = (k,v) => setForm(p=>({...p,[k]:v}));
+  const limite = config.alertaDiasContrato || 30;
+
+  const handleAdd = () => {
+    if (!form.cliente || !form.inicio) { toast('Preencha cliente e data de início.','error'); return; }
+    setContratos(p => [...p, { id:`CTR-${uid()}`, ...form, qtd:parseInt(form.qtd)||1, meses:parseInt(form.meses)||1, mensalidade:parseFloat(form.mensalidade)||0 }]);
+    setModal(false);
+    setForm({cliente:'',produto:'',qtd:1,inicio:'',meses:24,mensalidade:''});
+    toast('Contrato registrado!','success');
+  };
+
+  const handleRemove = (id) => {
+    setContratos(p => p.filter(c=>c.id!==id));
+    toast('Contrato removido.','info');
+  };
+
+  const ordenados = [...contratos].sort((a,b) => diasParaVencer(a.inicio,a.meses) - diasParaVencer(b.inicio,b.meses));
+
+  const diasBadge = (dias) => {
+    if (dias < 0)    return <span className="dias-badge vencido">Vencido há {Math.abs(dias)}d</span>;
+    if (dias <= 7)   return <span className="dias-badge perigo">🔴 {dias}d restantes</span>;
+    if (dias <= limite) return <span className="dias-badge warn">🟡 {dias}d restantes</span>;
+    return <span className="dias-badge ok">✅ {dias}d</span>;
+  };
+
+  return (
+    <div className="main">
+      <div className="card">
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14}}>
+          <div className="card-title" style={{margin:0}}><div className="icon">📋</div>Contratos Ativos</div>
+          <button className="btn btn-success" onClick={()=>setModal(true)}>➕ Novo Contrato</button>
+        </div>
+
+        <div className="ibox blue" style={{marginBottom:12}}>
+          <span>🤖</span>
+          <span>Agente ativo: alertas automáticos para contratos que vencem em até <strong>{limite} dias</strong> e estoque abaixo de <strong>{config.alertaEstoqueMinimoQtd||3} unidades</strong>. Configure em ⚙️ Configurações.</span>
+        </div>
+
+        {ordenados.length === 0 ? (
+          <div className="empty"><div className="eicon">📋</div><p>Nenhum contrato registrado.</p></div>
+        ) : (
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {ordenados.map(c => {
+              const dias = diasParaVencer(c.inicio, c.meses);
+              const cls = dias < 0 ? 'vencido' : dias <= limite ? 'vencendo' : '';
+              const fim = new Date(c.inicio);
+              fim.setMonth(fim.getMonth() + c.meses);
+              return (
+                <div key={c.id} className={`contract-row ${cls}`}>
+                  <div className="contract-info">
+                    <div className="contract-nome">{c.cliente}</div>
+                    <div className="contract-sub">{c.produto} · {c.qtd} un · {c.meses} meses · {R$(c.mensalidade)}/mês</div>
+                    <div className="contract-meta">
+                      {diasBadge(dias)}
+                      <span style={{fontSize:10,color:'var(--slate)'}}>Início: {new Date(c.inicio+'T12:00').toLocaleDateString('pt-BR')}</span>
+                      <span style={{fontSize:10,color:'var(--slate)'}}>Fim: {fim.toLocaleDateString('pt-BR')}</span>
+                      <span className="badge badge-blue">{c.id}</span>
+                    </div>
+                    {dias >= 0 && dias <= limite && (
+                      <div className="ibox warn" style={{marginTop:6,fontSize:11}}>
+                        <span>📣</span>
+                        <span>Contrato próximo do vencimento! Entre em contato com <strong>{c.cliente}</strong> para renovação.</span>
+                      </div>
+                    )}
+                    {dias < 0 && (
+                      <div className="ibox red" style={{marginTop:6,fontSize:11}}>
+                        <span>🚨</span>
+                        <span>Contrato VENCIDO. Regularize urgente com <strong>{c.cliente}</strong>.</span>
+                      </div>
+                    )}
+                  </div>
+                  <button className="btn btn-ghost btn-icon" onClick={()=>handleRemove(c.id)} title="Remover">🗑️</button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {modal && (
+        <div className="overlay" onClick={e=>e.target===e.currentTarget&&setModal(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-title">➕ Novo Contrato</div>
+            <div className="modal-sub">Registre um contrato fechado para monitorar o vencimento</div>
+            <div className="form-row c2" style={{marginBottom:10}}>
+              <Inp label="Cliente" req value={form.cliente} onChange={e=>set('cliente',e.target.value)}/>
+              <Inp label="Produto" value={form.produto} onChange={e=>set('produto',e.target.value)}/>
+            </div>
+            <div className="form-row c3" style={{marginBottom:10}}>
+              <Inp label="Qtd" type="number" min="1" value={form.qtd} onChange={e=>set('qtd',e.target.value)}/>
+              <Inp label="Prazo (meses)" type="number" min="1" value={form.meses} onChange={e=>set('meses',e.target.value)}/>
+              <Inp label="Mensalidade (R$)" type="number" min="0" step="0.01" value={form.mensalidade} onChange={e=>set('mensalidade',e.target.value)}/>
+            </div>
+            <Inp label="Data de Início" req type="date" value={form.inicio} onChange={e=>set('inicio',e.target.value)}/>
+            <div className="modal-btns">
+              <button className="btn btn-outline" style={{flex:1}} onClick={()=>setModal(false)}>Cancelar</button>
+              <button className="btn btn-primary" style={{flex:2}} onClick={handleAdd}>➕ Registrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   TELA ESTOQUE
+══════════════════════════════════════════ */
+function TelaEstoque({catalogo, setCatalogo, config, toast}) {
   const [editando, setEditando] = useState(null);
   const [busca, setBusca] = useState('');
   const [confirmDel, setConfirmDel] = useState(null);
+  const minEstoque = config.alertaEstoqueMinimoQtd || 3;
 
   const filtrados = catalogo.filter(p =>
     p.nome.toLowerCase().includes(busca.toLowerCase()) ||
@@ -738,24 +859,20 @@ function TelaEstoque({catalogo, setCatalogo, toast}) {
   );
 
   const handleSave = (prod) => {
-    setCatalogo(prev =>
-      prev.some(p=>p.id===prod.id)
-        ? prev.map(p=>p.id===prod.id ? prod : p)
-        : [...prev, prod]
-    );
+    setCatalogo(prev => prev.some(p=>p.id===prod.id) ? prev.map(p=>p.id===prod.id?prod:p) : [...prev, prod]);
     setEditando(null);
-    toast('Produto saved!', 'success');
+    toast('Produto salvo!', 'success');
   };
 
   const handleDelete = (id) => {
     setCatalogo(prev => prev.filter(p=>p.id!==id));
     setConfirmDel(null);
-    toast('Produto removido do catálogo.', 'info');
+    toast('Produto removido.', 'info');
   };
 
   const qtdBadge = (qtd) => {
     if (qtd === 0) return <span className="qtd-badge zero">⚠️ Sem estoque</span>;
-    if (qtd <= 3)  return <span className="qtd-badge low">🟡 {qtd} un</span>;
+    if (qtd <= minEstoque) return <span className="qtd-badge low">🟡 {qtd} un — estoque baixo</span>;
     return <span className="qtd-badge ok">✅ {qtd} un</span>;
   };
 
@@ -766,52 +883,51 @@ function TelaEstoque({catalogo, setCatalogo, toast}) {
           <div style={{flex:1, minWidth:200}}>
             <input className="input" placeholder="🔍 Buscar produto..." value={busca} onChange={e=>setBusca(e.target.value)}/>
           </div>
-          <button className="btn btn-success" onClick={()=>setEditando({})}>
-            ➕ Novo Produto
-          </button>
+          <button className="btn btn-success" onClick={()=>setEditando({})}>➕ Novo Produto</button>
         </div>
 
         {filtrados.length === 0 ? (
           <div className="empty"><div className="eicon">📦</div><p>Nenhum produto encontrado.</p></div>
         ) : (
           <div className="estoque-grid">
-            {filtrados.map(prod => (
-              <div key={prod.id} className="estoque-item">
-                <div className="ei-info">
-                  <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
-                    <span className="ei-nome">{prod.nome}</span>
-                    <span className="badge badge-blue">{prod.modalidade}</span>
-                    {qtdBadge(prod.qtdEstoque)}
+            {filtrados.map(prod => {
+              const cls = prod.qtdEstoque === 0 ? 'sem-estoque' : prod.qtdEstoque <= minEstoque ? 'estoque-baixo' : '';
+              return (
+                <div key={prod.id} className={`estoque-item ${cls}`}>
+                  <div className="ei-info">
+                    <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
+                      <span className="ei-nome">{prod.nome}</span>
+                      <span className="badge badge-blue">{prod.modalidade}</span>
+                      {qtdBadge(prod.qtdEstoque)}
+                    </div>
+                    <div className="ei-spec">{prod.spec}</div>
+                    <div className="ei-meta">
+                      {Object.entries(prod.precos).sort(([a],[b])=>Number(a)-Number(b)).map(([faixa, preco]) => (
+                        <div key={faixa} className="estoque-meta-box">
+                          <div className="mval">{R$(preco)}</div>
+                          <div className="mlabel">{faixa === '10' ? '10+' : `${faixa}–${Number(faixa)+3}`} un/mês</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="ei-spec">{prod.spec}</div>
-                  <div className="ei-meta">
-                    {Object.entries(prod.precos).sort(([a],[b])=>Number(a)-Number(b)).map(([faixa, preco]) => (
-                      <div key={faixa} className="estoque-meta-box">
-                        <div className="mval">{R$(preco)}</div>
-                        <div className="mlabel">{faixa}–{faixa==='10' ? '∞' : Number(faixa)+3} un/mês</div>
-                      </div>
-                    ))}
+                  <div className="ei-actions">
+                    <button className="btn btn-warn btn-sm" onClick={()=>setEditando(prod)}>✏️</button>
+                    <button className="btn btn-danger btn-sm" onClick={()=>setConfirmDel(prod)}>🗑️</button>
                   </div>
                 </div>
-                <div className="ei-actions">
-                  <button className="btn btn-warn btn-sm" onClick={()=>setEditando(prod)}>✏️</button>
-                  <button className="btn btn-danger btn-sm" onClick={()=>setConfirmDel(prod)}>🗑️</button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
 
-      {editando !== null && (
-        <ModalEditarProduto prod={editando} onSave={handleSave} onClose={()=>setEditando(null)}/>
-      )}
+      {editando !== null && <ModalEditarProduto prod={editando} onSave={handleSave} onClose={()=>setEditando(null)}/>}
 
       {confirmDel && (
         <div className="overlay" onClick={()=>setConfirmDel(null)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <div className="modal-title">🗑️ Remover Produto</div>
-            <div className="modal-sub">Tem certeza que deseja remover <strong>{confirmDel.nome}</strong> do catálogo?</div>
+            <div className="modal-sub">Remover <strong>{confirmDel.nome}</strong>?</div>
             <div className="modal-btns">
               <button className="btn btn-outline" style={{flex:1}} onClick={()=>setConfirmDel(null)}>Cancelar</button>
               <button className="btn btn-danger" style={{flex:1}} onClick={()=>handleDelete(confirmDel.id)}>Remover</button>
@@ -824,7 +940,94 @@ function TelaEstoque({catalogo, setCatalogo, toast}) {
 }
 
 /* ══════════════════════════════════════════
-   TELA: NOVO ORÇAMENTO — PASSO 1
+   TELA CONFIGURAÇÕES
+══════════════════════════════════════════ */
+function TelaConfiguracoes({config, setConfig, toast}) {
+  const [form, setForm] = useState({...config});
+  const set = (k,v) => setForm(p=>({...p,[k]:v}));
+
+  const handleSave = () => {
+    setConfig(form);
+    saveLS('nb_config', form);
+    toast('Configurações salvas!', 'success');
+  };
+
+  return (
+    <div className="main">
+      <div className="card">
+        <div className="card-title"><div className="icon">🏢</div>Dados da Sua Empresa</div>
+        <div className="ibox blue" style={{marginBottom:14}}>
+          <span>💡</span> Estas informações aparecem no PDF da proposta comercial, no cabeçalho e na assinatura.
+        </div>
+        <div className="settings-section">
+          <div className="settings-section-title">Empresa</div>
+          <div className="form-row c2" style={{marginBottom:10}}>
+            <Inp label="Nome da Empresa" value={form.nomeEmpresa} onChange={e=>set('nomeEmpresa',e.target.value)} placeholder="Ex: Urban Store"/>
+            <Inp label="CNPJ" value={form.cnpjEmpresa} onChange={e=>set('cnpjEmpresa',formatCNPJ(e.target.value))} placeholder="00.000.000/0001-00"/>
+          </div>
+          <div className="form-row" style={{marginBottom:10}}>
+            <Inp label="Endereço Completo" value={form.enderecoEmpresa} onChange={e=>set('enderecoEmpresa',e.target.value)} placeholder="Ex: Av. Francisco Matarazzo, 404 — São Paulo/SP"/>
+          </div>
+        </div>
+
+        <div className="settings-section">
+          <div className="settings-section-title">Responsável / Vendedor</div>
+          <div className="ibox blue" style={{marginBottom:10}}>
+            <span>👤</span> Estes dados identificam <strong>quem está usando o app</strong>. Aparecem no PDF como assinatura da proposta.
+          </div>
+          <div className="form-row c3" style={{marginBottom:10}}>
+            <Inp label="Nome do Responsável" value={form.responsavelNome} onChange={e=>set('responsavelNome',e.target.value)} placeholder="Ex: Guilherme Gomes"/>
+            <Inp label="Celular / WhatsApp" value={form.responsavelCelular} onChange={e=>set('responsavelCelular',formatPhone(e.target.value))} placeholder="(11) 99999-0000"/>
+            <Inp label="E-mail" type="email" value={form.responsavelEmail} onChange={e=>set('responsavelEmail',e.target.value)} placeholder="vendas@empresa.com"/>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title"><div className="icon">📄</div>Texto da Proposta (PDF)</div>
+        <div className="ibox blue" style={{marginBottom:14}}>
+          <span>✍️</span> Personalize o texto de apresentação e conclusão que aparece no PDF da proposta. Use a linguagem da sua empresa.
+        </div>
+        <div className="form-group" style={{marginBottom:12}}>
+          <div className="label">Texto de Apresentação <span style={{color:'var(--slate)',textTransform:'none',fontWeight:400,fontSize:10}}>(aparece no início da proposta)</span></div>
+          <textarea className="input" rows={5} value={form.textoIntro} onChange={e=>set('textoIntro',e.target.value)}/>
+        </div>
+        <div className="form-group">
+          <div className="label">Texto de Conclusão / Encerramento <span style={{color:'var(--slate)',textTransform:'none',fontWeight:400,fontSize:10}}>(aparece após a tabela de preços)</span></div>
+          <textarea className="input" rows={5} value={form.textoConclusao} onChange={e=>set('textoConclusao',e.target.value)}/>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-title"><div className="icon">🤖</div>Agente de Alertas</div>
+        <div className="ibox blue" style={{marginBottom:14}}>
+          <span>🔔</span> Configure quando o agente deve te avisar sobre contratos prestes a vencer e estoque baixo.
+        </div>
+        <div className="form-row c2" style={{marginBottom:10}}>
+          <FG label="Alertar contratos com X dias antes do vencimento" hint="Ex: 30 = avisa 1 mês antes">
+            <input className="input" type="number" min="1" value={form.alertaDiasContrato}
+              onChange={e=>set('alertaDiasContrato',parseInt(e.target.value)||30)}/>
+          </FG>
+          <FG label="Alertar estoque abaixo de X unidades" hint="Ex: 3 = avisa quando restar 3 ou menos">
+            <input className="input" type="number" min="1" value={form.alertaEstoqueMinimoQtd}
+              onChange={e=>set('alertaEstoqueMinimoQtd',parseInt(e.target.value)||3)}/>
+          </FG>
+        </div>
+        <div className="ibox warn">
+          <span>💡</span> Os alertas aparecem como faixa vermelha/amarela no topo do app sempre que há contratos próximos do vencimento ou estoque abaixo do limite configurado.
+        </div>
+      </div>
+
+      <div style={{display:'flex', justifyContent:'flex-end', gap:10}}>
+        <button className="btn btn-outline btn-lg" onClick={()=>setForm({...config})}>Descartar</button>
+        <button className="btn btn-primary btn-lg" onClick={handleSave}>💾 Salvar Configurações</button>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   PASSO 1 — CLIENTE
 ══════════════════════════════════════════ */
 function Passo1({dados, onChange, onNext, toast}) {
   const [loading, setLoading] = useState(false);
@@ -839,21 +1042,11 @@ function Passo1({dados, onChange, onNext, toast}) {
       const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${raw}`);
       if (!res.ok) throw new Error();
       const d = await res.json();
-
-      const telBruto = d.ddd_telefone_1 || '';
-      const telFmt   = telBruto ? formatPhone(telBruto.replace(/\D/g,'')) : '';
-
-      onChange({
-        razaoSocial:   d.razao_social || '',
-        nomeFantasia:  d.nome_fantasia || '',
-        statusReceita: d.descricao_situacao_cadastral || 'ATIVA',
-        email:         dados.email || d.email || '',
-        telefone:      dados.telefone || telFmt,
-        cidade:        d.municipio || '',
-        uf:            d.uf || '',
-      });
+      const telFmt = d.ddd_telefone_1 ? formatPhone(d.ddd_telefone_1.replace(/\D/g,'')) : '';
+      onChange({ razaoSocial:d.razao_social||'', nomeFantasia:d.nome_fantasia||'', statusReceita:d.descricao_situacao_cadastral||'ATIVA',
+        email:dados.email||d.email||'', telefone:dados.telefone||telFmt, cidade:d.municipio||'', uf:d.uf||'' });
       setCnpjStatus('ok');
-      toast('Empresa encontrada na Receita Federal!', 'success');
+      toast('Empresa encontrada!', 'success');
     } catch {
       setCnpjStatus('error');
       toast('CNPJ não encontrado. Preencha manualmente.', 'error');
@@ -872,77 +1065,60 @@ function Passo1({dados, onChange, onNext, toast}) {
   };
 
   const statusMap = {'ATIVA':'badge-ok','BAIXADA':'badge-err','SUSPENSA':'badge-warn','INAPTA':'badge-err'};
-
   return (
     <div>
       <div className="card">
         <div className="card-title"><div className="icon">🏢</div>Dados da Empresa</div>
-
         <div className="form-row" style={{marginBottom:10}}>
           <FG label="CNPJ" req err={errors.cnpj}>
             <div className="input-group">
-              <input className={`input${errors.cnpj?' err':''}`}
-                placeholder="00.000.000/0001-00"
-                value={dados.cnpj}
+              <input className={`input${errors.cnpj ? ' err' : ''}`} placeholder="00.000.000/0001-00" value={dados.cnpj}
                 onChange={e=>onChange({cnpj:formatCNPJ(e.target.value)})}
-                onKeyDown={e=>e.key==='Enter'&&consultarCNPJ()}
-              />
+                onKeyDown={e=>e.key==='Enter'&&consultarCNPJ()}/>
               <button className="btn btn-primary" onClick={consultarCNPJ} disabled={loading} style={{flexShrink:0}}>
                 {loading ? <><div className="spinner"/> Buscando</> : '🔍 Consultar'}
               </button>
             </div>
           </FG>
         </div>
-
         {cnpjStatus==='ok' && dados.razaoSocial && (
           <div className="ibox green" style={{marginBottom:12}}>
             <span>✅</span>
             <div>
-              <strong>{dados.razaoSocial}</strong>
-              {dados.nomeFantasia && <> — {dados.nomeFantasia}</>}
+              <strong>{dados.razaoSocial}</strong>{dados.nomeFantasia && ` — ${dados.nomeFantasia}`}
               {dados.statusReceita && <span className={`badge ${statusMap[dados.statusReceita?.toUpperCase()]||'badge-warn'}`} style={{marginLeft:8}}>{dados.statusReceita}</span>}
               {dados.cidade && <><br/><span style={{fontSize:11,color:'#065f46'}}>📍 {dados.cidade}/{dados.uf}</span></>}
             </div>
           </div>
         )}
-        {cnpjStatus==='error' && (
-          <div className="ibox warn" style={{marginBottom:12}}>
-            <span>⚠️</span> CNPJ não encontrado. Preencha os campos manualmente abaixo.
-          </div>
-        )}
-
+        {cnpjStatus==='error' && <div className="ibox warn" style={{marginBottom:12}}><span>⚠️</span> CNPJ não encontrado. Preencha manualmente.</div>}
         <div className="form-row c2">
-          <Inp label="Razão Social" value={dados.razaoSocial} onChange={e=>onChange({razaoSocial:e.target.value})} placeholder="Empresa XYZ Ltda" readOnly={cnpjStatus==='ok'}/>
-          <Inp label="Nome Fantasia" value={dados.nomeFantasia} onChange={e=>onChange({nomeFantasia:e.target.value})} placeholder="XYZ Tech" readOnly={cnpjStatus==='ok'}/>
+          <Inp label="Razão Social" value={dados.razaoSocial} onChange={e=>onChange({razaoSocial:e.target.value})} readOnly={cnpjStatus==='ok'}/>
+          <Inp label="Nome Fantasia" value={dados.nomeFantasia} onChange={e=>onChange({nomeFantasia:e.target.value})} readOnly={cnpjStatus==='ok'}/>
         </div>
       </div>
-
       <div className="card">
         <div className="card-title"><div className="icon">👤</div>Contato do Responsável</div>
         <div className="form-row">
-          <Inp label="Nome do Responsável" req value={dados.responsavel} onChange={e=>onChange({responsavel:e.target.value})} placeholder="João Silva" err={errors.responsavel}/>
+          <Inp label="Nome do Responsável" req value={dados.responsavel} onChange={e=>onChange({responsavel:e.target.value})} err={errors.responsavel}/>
         </div>
         <div className="form-row c2">
-          <Inp label="E-mail" req type="email" value={dados.email} onChange={e=>onChange({email:e.target.value})} placeholder="joao@empresa.com" err={errors.email}
-            hint={cnpjStatus==='ok' && dados.email ? '✅ Preenchido via Receita Federal' : null}/>
-          <FG label="Telefone / WhatsApp" req err={errors.telefone} hint={cnpjStatus==='ok' && dados.telefone ? '✅ Preenchido via Receita Federal' : null}>
-            <input className={`input${errors.telefone?' err':''}`} value={dados.telefone} onChange={e=>onChange({telefone:formatPhone(e.target.value)})} placeholder="(11) 99999-0000"/>
+          <Inp label="E-mail" req type="email" value={dados.email} onChange={e=>onChange({email:e.target.value})} err={errors.email}/>
+          <FG label="Telefone / WhatsApp" req err={errors.telefone}>
+            <input className={`input${errors.telefone ? ' err' : ''}`} value={dados.telefone} onChange={e=>onChange({telefone:formatPhone(e.target.value)})} placeholder="(11) 99999-0000"/>
           </FG>
         </div>
       </div>
-
       <div className="nav-btns">
         <div/>
-        <button className="btn btn-primary btn-lg" onClick={()=>{if(validate())onNext();}}>
-          Próximo: Produtos →
-        </button>
+        <button className="btn btn-primary btn-lg" onClick={()=>{if(validate())onNext();}}>Próximo: Produtos →</button>
       </div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════
-   TELA: NOVO ORÇAMENTO — PASSO 2
+   PASSO 2 — PRODUTOS
 ══════════════════════════════════════════ */
 function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, onNext, toast}) {
   const [aba, setAba]               = useState('estoque');
@@ -959,21 +1135,16 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
   const [preview, setPreview]       = useState({});
   const [editItem, setEditItem]     = useState(null);
 
-  const disponiveis = catalogo.filter(p=>p.qtdEstoque>0);
+  const disponiveis = catalogo.filter(p => p.qtdEstoque > 0);
+  const semEstoque  = catalogo.filter(p => p.qtdEstoque === 0);
 
   useEffect(() => {
     const dv = parseFloat(descVal.replace(',','.')) || 0;
     const pv = {};
     const prazosCalc = [...new Set([...prazos, ...(prazoCustom?[parseInt(prazoCustom)]:[])])].filter(Boolean);
-
     if (aba==='estoque' && prodSel) {
       const prod = catalogo.find(p=>p.id===prodSel);
-      if (prod) {
-        prazosCalc.forEach(p => {
-          const base = lookupPreco(prod, qtd);
-          pv[p] = aplicaDesc(base, descTipo, dv);
-        });
-      }
+      if (prod) prazosCalc.forEach(p => { pv[p] = aplicaDesc(lookupPreco(prod, qtd), descTipo, dv); });
     } else if (aba==='sob' && precoManual) {
       const base = parseFloat(precoManual.replace(',','.')) || 0;
       prazosCalc.forEach(p => { pv[p] = aplicaDesc(base, descTipo, dv); });
@@ -982,7 +1153,6 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
   }, [aba, prodSel, qtd, prazos, prazoCustom, precoManual, descTipo, descVal, catalogo]);
 
   const togglePrazo = p => setPrazos(prev => prev.includes(p)?prev.filter(x=>x!==p):[...prev,p]);
-
   const prazosFinais = () => {
     const set = new Set([...prazos]);
     if (prazoCustom && parseInt(prazoCustom) > 0) set.add(parseInt(prazoCustom));
@@ -992,17 +1162,13 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
   const handleAdd = () => {
     const pf = prazosFinais();
     if (pf.length === 0) { toast('Selecione ao menos um prazo.','error'); return; }
-
     let idProd=null, nomeProd='', specProd='', fornProd='', precoBase=0;
-
     if (aba==='estoque') {
       if (!prodSel) { toast('Selecione um produto.','error'); return; }
       const prod = catalogo.find(p=>p.id===prodSel);
-      const disponivel = prod.qtdEstoque;
+      if (prod.qtdEstoque === 0) { toast('⛔ Este produto está sem estoque! Selecione outro ou use Sob Demanda.','error'); return; }
       const jaUsado = itens.filter(i=>i.idProd===prodSel && i.prazo===pf[0]).reduce((s,i)=>s+i.quantidade,0);
-      if (qtd > disponivel - jaUsado) {
-        toast(`Estoque insuficiente. Disponível: ${disponivel - jaUsado} un.`, 'error'); return;
-      }
+      if (qtd > prod.qtdEstoque - jaUsado) { toast(`Estoque insuficiente. Disponível: ${prod.qtdEstoque - jaUsado} un.`, 'error'); return; }
       idProd=prod.id; nomeProd=prod.nome; specProd=prod.spec;
       precoBase = lookupPreco(prod, qtd);
     } else {
@@ -1011,24 +1177,14 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
       nomeProd=nome.trim(); specProd=spec.trim(); fornProd=fornecedor.trim();
       precoBase = parseFloat(precoManual.replace(',','.')) || 0;
     }
-
     const dv = parseFloat(descVal.replace(',','.')) || 0;
-
     pf.forEach(prazo => {
       const precoFinal = aplicaDesc(precoBase, descTipo, dv);
-      onAddItem({
-        id: uid(),
-        idProd, nome:nomeProd, spec:specProd, fornecedor:fornProd,
-        origem: aba==='estoque'?'Em Estoque':'Sob Demanda',
-        quantidade:qtd, prazo, precoBase,
-        descTipo, descValor:dv,
-        precoFinal,
-        valorMensal: precoFinal*qtd,
-        valorTotal:  precoFinal*qtd*prazo,
-      });
+      onAddItem({ id: uid(), idProd, nome:nomeProd, spec:specProd, fornecedor:fornProd,
+        origem: aba==='estoque'?'Em Estoque':'Sob Demanda', quantidade:qtd, prazo, precoBase,
+        descTipo, descValor:dv, precoFinal, valorMensal: precoFinal*qtd, valorTotal: precoFinal*qtd*prazo });
     });
-
-    toast(`${nomeProd} adicionado (${pf.length} prazo(s))!`, 'success');
+    toast(`${nomeProd} adicionado!`, 'success');
     setProdSel(''); setNome(''); setSpec(''); setFornecedor('');
     setPrecoManual(''); setQtd(1); setPrazos([]); setPrazoCustom(''); setDescVal('');
   };
@@ -1037,29 +1193,34 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
 
   return (
     <div>
+      {semEstoque.length > 0 && (
+        <div className="ibox red" style={{marginBottom:12}}>
+          <span>⛔</span>
+          <div>
+            <strong>Produtos sem estoque (não disponíveis para locação):</strong>{' '}
+            {semEstoque.map(p=>p.nome).join(', ')}. Use <strong>Sob Demanda</strong> para incluí-los via compra/fornecedor.
+          </div>
+        </div>
+      )}
+
       <div className="card">
         <div className="card-title"><div className="icon">💻</div>Tipo de Atendimento</div>
         <div className="tabs" style={{marginBottom:14}}>
-          <button className={`tab${aba==='estoque'?' active':''}`} onClick={()=>setAba('estoque')}>📦 Em Estoque</button>
-          <button className={`tab${aba==='sob'?' active':''}`} onClick={()=>setAba('sob')}>✏️ Sob Demanda</button>
+          <button className={`tab${aba==='estoque' ? ' active' : ''}`} onClick={()=>setAba('estoque')}>📦 Em Estoque</button>
+          <button className={`tab${aba==='sob' ? ' active' : ''}`} onClick={()=>setAba('sob')}>✏️ Sob Demanda</button>
         </div>
-
         {aba==='estoque' ? (
           <div>
             <FG label="Produto do Catálogo" req>
               <select className="input" value={prodSel} onChange={e=>setProdSel(e.target.value)}>
-                <option value="">— Selecione um produto —</option>
-                {disponiveis.map(p => (
-                  <option key={p.id} value={p.id}>{p.nome} — {p.spec} ({p.qtdEstoque} em estoque)</option>
-                ))}
+                <option value="">— Selecione —</option>
+                {disponiveis.map(p => <option key={p.id} value={p.id}>{p.nome} — {p.spec} ({p.qtdEstoque} un)</option>)}
               </select>
             </FG>
             {prodSel && (
               <div className="ibox blue" style={{marginTop:8, fontSize:11}}>
                 <span>📦</span>
-                <span>Estoque disponível: <strong>{estoqueDoProd} unidades</strong>
-                &nbsp;·&nbsp; Preço para {qtd}un: <strong>{R$(lookupPreco(catalogo.find(p=>p.id===prodSel)||{precos:{}}, qtd))}/mês</strong>
-                </span>
+                <span>Estoque disponível: <strong>{estoqueDoProd} un</strong> · Preço {qtd}un: <strong>{R$(lookupPreco(catalogo.find(p=>p.id===prodSel)||{precos:{}}, qtd))}/mês</strong></span>
               </div>
             )}
           </div>
@@ -1070,13 +1231,14 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
               <Inp label="Especificação" value={spec} onChange={e=>setSpec(e.target.value)} placeholder="Ex: i5 / 8GB / 512GB"/>
             </div>
             <div className="form-row" style={{marginBottom:10}}>
-              <Inp label="Onde será adquirido / Fornecedor" value={fornecedor} onChange={e=>setFornecedor(e.target.value)}
-                placeholder="Ex: Magazine Luiza / Kabum / Distribuidora XYZ"
-                hint="Referência interna para controle de compra ou contratação"/>
+              <Inp label="Fornecedor / Onde será adquirido" value={fornecedor} onChange={e=>setFornecedor(e.target.value)} placeholder="Ex: Magazine Luiza / Kabum / Distribuidora XYZ"/>
             </div>
             <FG label="Preço Base / Unidade / Mês (R$)" req>
               <input className="input" style={{maxWidth:200}} placeholder="0,00" value={precoManual} onChange={e=>setPrecoManual(e.target.value)}/>
             </FG>
+            <div className="ibox blue" style={{marginTop:8, fontSize:11}}>
+              <span>💡</span> Sob Demanda: produto será comprado/adquirido especialmente para o cliente. O fornecedor aparece como referência interna no PDF.
+            </div>
           </div>
         )}
       </div>
@@ -1088,44 +1250,35 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
           <span className="qty-val">{qtd}</span>
           <button className="qty-btn" onClick={()=>setQtd(q=>q+1)}>+</button>
         </div>
-        {aba==='estoque' && prodSel && qtd >= 5 && (
-          <div className="ibox blue" style={{marginTop:8, fontSize:11}}>
-            <span>💡</span> Faixa volumétrica ativa — preço unitário com desconto automático!
-          </div>
-        )}
         {aba==='estoque' && prodSel && qtd > estoqueDoProd && (
           <div className="ibox red" style={{marginTop:8, fontSize:11}}>
-            <span>⚠️</span> Quantidade solicitada ({qtd}) supera o estoque ({estoqueDoProd} un).
+            <span>⚠️</span> Quantidade ({qtd}) supera o estoque disponível ({estoqueDoProd} un).
           </div>
         )}
       </div>
 
       <div className="card">
-        <div className="card-title"><div className="icon">🏷️</div>Desconto <span style={{fontSize:11,fontWeight:400,color:'var(--slate)'}}>(opcional — aplicado no preview abaixo)</span></div>
+        <div className="card-title"><div className="icon">🏷️</div>Desconto <span style={{fontSize:11,fontWeight:400,color:'var(--slate)'}}>(opcional)</span></div>
         <div style={{display:'flex', gap:8, alignItems:'center', flexWrap:'wrap'}}>
-          <button className={`btn btn-sm${descTipo==='%'?' btn-primary':' btn-outline'}`} onClick={()=>setDescTipo('%')}>% Percentual</button>
-          <button className={`btn btn-sm${descTipo==='$'?' btn-primary':' btn-outline'}`} onClick={()=>setDescTipo('$')}>R$ Nominal</button>
-          <input className="input" style={{maxWidth:160}} placeholder={descTipo==='%'?'Ex: 5 (para 5%)':'Ex: 20 (para R$20)'}
-            value={descVal} onChange={e=>setDescVal(e.target.value)}/>
+          <button className={`btn btn-sm${descTipo==='%' ? ' btn-primary' : ' btn-outline'}`} onClick={()=>setDescTipo('%')}>% Percentual</button>
+          <button className={`btn btn-sm${descTipo==='$' ? ' btn-primary' : ' btn-outline'}`} onClick={()=>setDescTipo('$')}>R$ Nominal</button>
+          <input className="input" style={{maxWidth:160}} placeholder={descTipo==='%'?'Ex: 5':'Ex: 20'} value={descVal} onChange={e=>setDescVal(e.target.value)}/>
         </div>
       </div>
 
       <div className="card">
         <div className="card-title"><div className="icon">📅</div>Prazo(s) do Contrato</div>
-        <p style={{fontSize:11, color:'var(--slate)', marginBottom:10}}>
-          Selecione prazos pré-definidos e/ou digite um prazo personalizado. Múltiplos geram tabela comparativa no PDF.
-        </p>
+        <p style={{fontSize:11, color:'var(--slate)', marginBottom:10}}>Múltiplos prazos geram tabela comparativa no PDF.</p>
         <div style={{display:'flex', gap:8, flexWrap:'wrap', marginBottom:12}}>
           {[1,3,6,12,24,36,48].map(p => (
-            <div key={p} className={`prazo-chip${prazos.includes(p)?' sel':''}`} onClick={()=>togglePrazo(p)}>
+            <div key={p} className={`prazo-chip${prazos.includes(p) ? ' sel' : ''}`} onClick={()=>togglePrazo(p)}>
               {prazos.includes(p)?'✓':''} {p}m
               {preview[p]!=null && <span style={{fontSize:10,color:'var(--success)',fontWeight:700}}>{R$(preview[p])}/un</span>}
             </div>
           ))}
         </div>
-        <FG label="Prazo personalizado (meses)" hint="Ex: 2, 8, 18 — qualquer valor">
-          <input className="input" style={{maxWidth:200}} type="number" min="1" placeholder="Ex: 18"
-            value={prazoCustom} onChange={e=>setPrazoCustom(e.target.value)}/>
+        <FG label="Prazo personalizado (meses)" hint="Ex: 2, 8, 18">
+          <input className="input" style={{maxWidth:200}} type="number" min="1" placeholder="Ex: 18" value={prazoCustom} onChange={e=>setPrazoCustom(e.target.value)}/>
         </FG>
       </div>
 
@@ -1144,20 +1297,19 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
                 <div className="produto-info">
                   <div className="produto-nome">{item.nome}</div>
                   <div className="produto-sub">
-                    {item.spec&&<>{item.spec} · </>}
-                    Qtd: {item.quantidade} ·
+                    {item.spec&&<>{item.spec} · </>}Qtd: {item.quantidade} ·
                     <span className="badge badge-blue" style={{margin:'0 4px'}}>{item.prazo}m</span>
                     {item.origem==='Sob Demanda' && <span className="badge badge-ok" style={{marginRight:4}}>Sob Demanda</span>}
                     {item.fornecedor && <span style={{fontSize:10,color:'var(--slate)'}}>📍{item.fornecedor}</span>}
-                    {item.descValor>0 && <span style={{fontSize:10,color:'var(--warn)'}}> desc.{item.descTipo==='%'?`${item.descValor}%`:`R$${item.descValor}`}</span>}
+                    {item.descValor>0 && <span style={{fontSize:10,color:'var(--warn)'}}> desc.{item.descTipo==='%' ? `${item.descValor}%` : `R$${item.descValor}`}</span>}
                   </div>
                 </div>
                 <div className="produto-valor">
                   <div className="val">{R$(item.valorMensal)}</div>
                   <div className="sub">/mês</div>
                 </div>
-                <button className="btn btn-warn btn-icon" onClick={()=>setEditItem(item)} title="Editar">✏️</button>
-                <button className="btn btn-ghost btn-icon" onClick={()=>onRemoveItem(item.id)} title="Remover">🗑️</button>
+                <button className="btn btn-warn btn-icon" onClick={()=>setEditItem(item)}>✏️</button>
+                <button className="btn btn-ghost btn-icon" onClick={()=>onRemoveItem(item.id)}>🗑️</button>
               </div>
             ))}
           </div>
@@ -1166,27 +1318,22 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
 
       <div className="nav-btns">
         <button className="btn btn-outline btn-lg" onClick={onBack}>← Voltar</button>
-        <button className="btn btn-primary btn-lg" onClick={()=>{
-          if(itens.length===0){toast('Adicione ao menos um produto.','error');return;}
-          onNext();
-        }}>Ver Resumo →</button>
+        <button className="btn btn-primary btn-lg" onClick={()=>{if(itens.length===0){toast('Adicione ao menos um produto.','error');return;}onNext();}}>Ver Resumo →</button>
       </div>
 
       {editItem && (
-        <ModalEditarItem
-          item={editItem}
+        <ModalEditarItem item={editItem}
           onSave={updated=>{ onEditItem(updated); setEditItem(null); toast('Item atualizado!','success'); }}
-          onClose={()=>setEditItem(null)}
-        />
+          onClose={()=>setEditItem(null)}/>
       )}
     </div>
   );
 }
 
 /* ══════════════════════════════════════════
-   TELA: NOVO ORÇAMENTO — PASSO 3
+   PASSO 3 — RESUMO + PDF
 ══════════════════════════════════════════ */
-function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
+function Passo3({cliente, itens, catalogo, setCatalogo, config, onBack, toast}) {
   const [pdfGerado, setPdfGerado] = useState(false);
   const [pdfUrl,    setPdfUrl]    = useState(null);
   const [loading,   setLoading]   = useState(false);
@@ -1194,8 +1341,7 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
 
   const prazos   = [...new Set(itens.map(i=>i.prazo))].sort((a,b)=>a-b);
   const produtos = [...new Map(itens.map(i=>[i.idProd||i.nome, i])).values()];
-
-  const totais = prazos.map(p => {
+  const totais   = prazos.map(p => {
     const ip = itens.filter(i=>i.prazo===p);
     const m  = ip.reduce((s,i)=>s+i.valorMensal,0);
     return {prazo:p, mensal:m, total:m*p};
@@ -1205,7 +1351,7 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
     setLoading(true);
     setTimeout(()=>{
       try {
-        const doc = gerarPDF({id}, cliente, itens);
+        const doc = gerarPDF({id}, cliente, itens, config);
         const url = URL.createObjectURL(doc.output('blob'));
         setPdfUrl(url); setPdfGerado(true);
         toast('PDF gerado com sucesso!', 'success');
@@ -1216,30 +1362,21 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
   };
 
   const handleFecharOrc = () => {
-    const agrupadosPorProd = {};
-    itens.filter(i=>i.idProd).forEach(i=>{
-      if(!agrupadosPorProd[i.idProd]) agrupadosPorProd[i.idProd] = 0;
-      agrupadosPorProd[i.idProd] = Math.max(agrupadosPorProd[i.idProd], i.quantidade);
-    });
-    setCatalogo(prev => prev.map(p => {
-      if (agrupadosPorProd[p.id]) {
-        return {...p, qtdEstoque: Math.max(0, p.qtdEstoque - agrupadosPorProd[p.id])};
-      }
-      return p;
-    }));
+    const agrupados = {};
+    itens.filter(i=>i.idProd).forEach(i=>{ agrupados[i.idProd] = Math.max(agrupados[i.idProd]||0, i.quantidade); });
+    setCatalogo(prev => prev.map(p => agrupados[p.id] ? {...p, qtdEstoque: Math.max(0, p.qtdEstoque - agrupados[p.id])} : p));
     toast('✅ Orçamento fechado! Estoque atualizado.','success');
   };
 
   const handleDownload = () => {
     if(!pdfUrl) return;
-    const a=document.createElement('a');
-    a.href=pdfUrl;
+    const a=document.createElement('a'); a.href=pdfUrl;
     a.download = `${id}_${(cliente.nomeFantasia||cliente.razaoSocial||'cliente').replace(/\s+/g,'-')}.pdf`;
     a.click();
   };
 
   const handleWhatsApp = () => {
-    const msg = encodeURIComponent(`Olá, ${cliente.responsavel}! 😊\n\nSegue o orçamento *${id}* referente à locação de notebooks.\n\n📊 Temos ${prazos.length} opção(ões) de prazo para você comparar!\n\nProposta gerada em ${new Date().toLocaleDateString('pt-BR')}. Qualquer dúvida estou à disposição!`);
+    const msg = encodeURIComponent(`Olá, ${cliente.responsavel}! 😊\n\nSegue o orçamento *${id}* referente à locação de notebooks.\n\n📊 Temos ${prazos.length} opção(ões) de prazo para você comparar!\n\nProposta gerada em ${new Date().toLocaleDateString('pt-BR')}. Qualquer dúvida estou à disposição!\n\n${config.responsavelNome||''}${config.responsavelCelular ? '\n'+config.responsavelCelular : ''}`);
     const fone = cliente.telefone.replace(/\D/g,'');
     window.open(`https://wa.me/55${fone}?text=${msg}`, '_blank');
   };
@@ -1254,22 +1391,23 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
             <div style={{color:'rgba(255,255,255,.5)',fontSize:11,marginTop:3}}>
               Válido até {new Date(Date.now()+30*86400000).toLocaleDateString('pt-BR')}
             </div>
+            {config.responsavelNome && (
+              <div style={{color:'rgba(255,255,255,.7)',fontSize:12,marginTop:6,fontWeight:600}}>
+                👤 {config.responsavelNome} {config.responsavelCelular && ` · ${config.responsavelCelular}`}
+              </div>
+            )}
           </div>
           <div style={{textAlign:'right'}}>
             <div style={{color:'rgba(255,255,255,.5)',fontSize:10}}>Emitido em</div>
             <div style={{color:'white',fontWeight:700,fontSize:13}}>{new Date().toLocaleDateString('pt-BR')}</div>
+            <div style={{color:'rgba(255,255,255,.6)',fontSize:11,marginTop:4}}>{config.nomeEmpresa||'Urban Store'}</div>
           </div>
         </div>
       </div>
 
       <div className="card">
         <div className="card-title"><div className="icon">🏢</div>Cliente</div>
-        <div style={{fontWeight:700,fontSize:14,color:'var(--navy)',marginBottom:4}}>
-          {cliente.razaoSocial||cliente.nomeFantasia||'—'}
-        </div>
-        {cliente.nomeFantasia&&cliente.razaoSocial!==cliente.nomeFantasia&&(
-          <div style={{color:'var(--slate)',fontSize:12,marginBottom:4}}>{cliente.nomeFantasia}</div>
-        )}
+        <div style={{fontWeight:700,fontSize:14,color:'var(--navy)',marginBottom:4}}>{cliente.razaoSocial||cliente.nomeFantasia||'—'}</div>
         {cliente.cnpj&&<div style={{fontSize:11,color:'var(--slate)',marginBottom:6}}>CNPJ: {cliente.cnpj}</div>}
         <div className="divider" style={{margin:'8px 0'}}/>
         <div style={{fontSize:12,display:'flex',gap:14,flexWrap:'wrap'}}>
@@ -1280,76 +1418,47 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
       </div>
 
       <div className="card">
-        <div className="card-title"><div className="icon">📊</div>Tabela Comparativa de Prazos</div>
+        <div className="card-title"><div className="icon">📊</div>Tabela Comparativa</div>
         <div style={{overflowX:'auto'}}>
           <table className="resumo-table">
-            <thead>
-              <tr>
-                <th>Produto / Spec</th>
-                <th>Qtd</th>
-                {prazos.map(p=><th key={p}>{p} {p===1?'mês':'meses'}</th>)}
-              </tr>
-            </thead>
+            <thead><tr><th>Produto</th><th>Qtd</th>{prazos.map(p=><th key={p}>{p}m</th>)}</tr></thead>
             <tbody>
               {produtos.map(prod=>(
                 <tr key={prod.idProd||prod.nome}>
                   <td>
                     <div style={{fontWeight:700,fontSize:11}}>{prod.nome}</div>
                     {prod.spec&&<div style={{fontSize:10,color:'var(--slate)'}}>{prod.spec}</div>}
-                    {prod.fornecedor&&<div style={{fontSize:10,color:'var(--cyan)'}}>📍{prod.fornecedor}</div>}
+                    {prod.origem==='Sob Demanda'&&<div style={{fontSize:10,color:'var(--success)'}}>Sob Demanda</div>}
                   </td>
                   <td style={{fontWeight:700}}>{prod.quantidade}</td>
                   {prazos.map(p=>{
                     const item=itens.find(i=>(i.idProd||i.nome)===(prod.idProd||prod.nome)&&i.prazo===p);
-                    return (
-                      <td key={p}>
-                        {item?(
-                          <>
-                            <div style={{fontWeight:700,color:'var(--navy)',fontSize:11}}>{R$(item.valorMensal)}<span style={{fontSize:9,fontWeight:400,color:'var(--slate)'}}>/mês</span></div>
-                            <div style={{fontSize:9,color:'var(--slate)'}}>{R$(item.valorTotal)} total</div>
-                          </>
-                        ):<span className="no-col">—</span>}
-                      </td>
-                    );
+                    return <td key={p}>{item?(<><div style={{fontWeight:700,color:'var(--navy)',fontSize:11}}>{R$(item.valorMensal)}<span style={{fontSize:9,fontWeight:400,color:'var(--slate)'}}>/mês</span></div><div style={{fontSize:9,color:'var(--slate)'}}>{R$(item.valorTotal)} total</div></>):<span className="no-col">—</span>}</td>;
                   })}
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              <tr>
-                <td colSpan={2} style={{fontWeight:700}}>Mensalidade Total</td>
-                {totais.map(t=><td key={t.prazo} style={{fontWeight:700,color:'var(--electric)'}}>{R$(t.mensal)}</td>)}
-              </tr>
-              <tr>
-                <td colSpan={2}>Valor Total do Contrato</td>
-                {totais.map(t=><td key={t.prazo}>{R$(t.total)}</td>)}
-              </tr>
+              <tr><td colSpan={2}>Mensalidade Total</td>{totais.map(t=><td key={t.prazo} style={{fontWeight:700,color:'var(--electric)'}}>{R$(t.mensal)}</td>)}</tr>
+              <tr><td colSpan={2}>Total do Contrato</td>{totais.map(t=><td key={t.prazo}>{R$(t.total)}</td>)}</tr>
             </tfoot>
           </table>
         </div>
       </div>
 
-      <div className="metrics-grid">
-        {totais.map(t=>(
-          <div key={t.prazo} className="metric-box">
-            <div className="ml">{t.prazo} {t.prazo===1?'mês':'meses'}</div>
-            <div className="mv">{R$(t.mensal)}<span style={{fontSize:9,fontWeight:400,color:'var(--slate)'}}>/mês</span></div>
-            <div style={{fontSize:10,color:'var(--slate)',marginTop:2}}>{R$(t.total)} total</div>
-          </div>
-        ))}
-      </div>
-
       {!pdfGerado ? (
         <div className="card" style={{textAlign:'center'}}>
           <div style={{fontSize:12,color:'var(--slate)',marginBottom:18}}>
-            Revise os dados e gere o PDF. Ao fechar o orçamento, o estoque será atualizado automaticamente.
+            Revise os dados. O PDF usará os textos e dados do responsável configurados em ⚙️ Configurações.
           </div>
+          {!config.responsavelNome && (
+            <div className="ibox warn" style={{marginBottom:14, textAlign:'left'}}>
+              <span>⚠️</span> Você não configurou os dados do responsável. O PDF sairá sem assinatura. Vá em <strong>⚙️ Configurações</strong> para adicionar.
+            </div>
+          )}
           <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
             <button className="btn btn-primary btn-xl" onClick={handlePDF} disabled={loading}>
               {loading?<><div className="spinner"/> Gerando...</>:'📄 Gerar PDF'}
-            </button>
-            <button className="btn btn-outline btn-xl" onClick={()=>toast('Rascunho salvo localmente!','info')}>
-              💾 Salvar Rascunho
             </button>
           </div>
         </div>
@@ -1357,14 +1466,12 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
         <div className="card">
           <div className="pdf-success">
             <span className="big">📄</span>
-            <h3>PDF Gerado com Sucesso!</h3>
-            <p>Orçamento <strong>{id}</strong> pronto para envio.</p>
+            <h3>PDF Gerado!</h3>
+            <p>Proposta <strong>{id}</strong> com texto e dados de <strong>{config.responsavelNome||'responsável'}</strong> — pronta para envio.</p>
             <div className="pdf-btns">
               <button className="btn btn-primary btn-lg" onClick={handleDownload}>⬇️ Baixar PDF</button>
               <button className="btn btn-success btn-lg" onClick={handleWhatsApp}>💬 WhatsApp</button>
-              <a href={pdfUrl} target="_blank" rel="noreferrer">
-                <button className="btn btn-outline btn-lg">🔍 Visualizar</button>
-              </a>
+              <a href={pdfUrl} target="_blank" rel="noreferrer"><button className="btn btn-outline btn-lg">🔍 Visualizar</button></a>
               <button className="btn btn-warn btn-lg" onClick={handleFecharOrc}>✅ Fechar Orçamento</button>
             </div>
           </div>
@@ -1379,21 +1486,16 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
 }
 
 /* ══════════════════════════════════════════
-   WIZARD WRAPPER (Novo Orçamento)
+   WIZARD ORÇAMENTO
 ══════════════════════════════════════════ */
-function TelaOrcamento({catalogo, setCatalogo, toast}) {
+function TelaOrcamento({catalogo, setCatalogo, config, toast}) {
   const [step, setStep] = useState(1);
-
   const [cliente, setCliente] = useState(() => loadLS('nb_cliente', {
-    cnpj:'', razaoSocial:'', nomeFantasia:'', statusReceita:'',
-    responsavel:'', email:'', telefone:'', cidade:'', uf:'',
+    cnpj:'', razaoSocial:'', nomeFantasia:'', statusReceita:'', responsavel:'', email:'', telefone:'', cidade:'', uf:'',
   }));
   const [itens, setItens] = useState([]);
-
   useEffect(()=>{ saveLS('nb_cliente', cliente); }, [cliente]);
-
   const steps = [{n:1,label:'Cliente'},{n:2,label:'Produtos'},{n:3,label:'Resumo'}];
-
   return (
     <div>
       <div className="stepper-wrap">
@@ -1409,50 +1511,44 @@ function TelaOrcamento({catalogo, setCatalogo, toast}) {
           })}
         </div>
       </div>
-
       <div className="main">
         {step===1 && <Passo1 dados={cliente} onChange={p=>setCliente(v=>({...v,...p}))} onNext={()=>setStep(2)} toast={toast}/>}
-        {step===2 && (
-          <Passo2
-            catalogo={catalogo}
-            itens={itens}
-            onAddItem={item=>setItens(p=>[...p,item])}
-            onRemoveItem={id=>setItens(p=>p.filter(i=>i.id!==id))}
-            onEditItem={updated=>setItens(p=>p.map(i=>i.id===updated.id?updated:i))}
-            onBack={()=>setStep(1)} onNext={()=>setStep(3)} toast={toast}
-          />
-        )}
-        {step===3 && (
-          <Passo3
-            cliente={cliente} itens={itens}
-            catalogo={catalogo} setCatalogo={setCatalogo}
-            onBack={()=>setStep(2)} toast={toast}
-          />
-        )}
+        {step===2 && <Passo2 catalogo={catalogo} itens={itens}
+          onAddItem={item=>setItens(p=>[...p,item])}
+          onRemoveItem={id=>setItens(p=>p.filter(i=>i.id!==id))}
+          onEditItem={updated=>setItens(p=>p.map(i=>i.id===updated.id?updated:i))}
+          onBack={()=>setStep(1)} onNext={()=>setStep(3)} toast={toast}/>}
+        {step===3 && <Passo3 cliente={cliente} itens={itens} catalogo={catalogo} setCatalogo={setCatalogo} config={config} onBack={()=>setStep(2)} toast={toast}/>}
       </div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════
-   DASHBOARD E FLUXOS INTERNOS (BLOQUEADOS)
+   APP PRINCIPAL
 ══════════════════════════════════════════ */
-function AppInterno({ session, onSignOut, toasts, toast, offlineMode }) {
+function App() {
   const [tela, setTela] = useState('orcamento');
   const [catalogo, setCatalogoBruto] = useState(() => loadLS('nb_catalogo', CATALOGO_INICIAL));
+  const [contratos, setContratosBrutos] = useState(() => loadLS('nb_contratos', CONTRATOS_INICIAIS));
+  const [config, setConfigBruto] = useState(() => loadLS('nb_config', CONFIG_INICIAL));
+  const { toasts, toast } = useToast();
 
   const setCatalogo = (fn) => {
-    setCatalogoBruto(prev => {
-      const next = typeof fn === 'function' ? fn(prev) : fn;
-      saveLS('nb_catalogo', next);
-      return next;
-    });
+    setCatalogoBruto(prev => { const next = typeof fn === 'function' ? fn(prev) : fn; saveLS('nb_catalogo', next); return next; });
+  };
+  const setContratos = (fn) => {
+    setContratosBrutos(prev => { const next = typeof fn === 'function' ? fn(prev) : fn; saveLS('nb_contratos', next); return next; });
+  };
+  const setConfig = (val) => {
+    setConfigBruto(val); saveLS('nb_config', val);
   };
 
-  const resetCatalogo = () => {
-    setCatalogo(CATALOGO_INICIAL);
-    toast('Catálogo restaurado para o padrão.', 'info');
-  };
+  // Contagem de alertas para badge
+  const limite = config.alertaDiasContrato || 30;
+  const numAlertas =
+    catalogo.filter(p => p.qtdEstoque === 0 || p.qtdEstoque <= (config.alertaEstoqueMinimoQtd||3)).length +
+    contratos.filter(c => diasParaVencer(c.inicio, c.meses) <= limite).length;
 
   return (
     <div>
@@ -1462,158 +1558,32 @@ function AppInterno({ session, onSignOut, toasts, toast, offlineMode }) {
           NB Diogo
         </div>
         <div className="topbar-nav">
-          <button className={`topbar-btn${tela==='orcamento'?' active':''}`} onClick={()=>setTela('orcamento')}>
+          <button className={`topbar-btn${tela==='orcamento' ? ' active' : ''}`} onClick={()=>setTela('orcamento')}>
             📄 <span>Orçamento</span>
           </button>
-          <button className={`topbar-btn${tela==='estoque'?' active':''}`} onClick={()=>setTela('estoque')}>
+          <button className={`topbar-btn${tela==='contratos' ? ' active' : ''}`} onClick={()=>setTela('contratos')}>
+            📋 <span>Contratos</span>
+            {contratos.filter(c=>diasParaVencer(c.inicio,c.meses)<=limite).length > 0 && <div className="notif-dot"/>}
+          </button>
+          <button className={`topbar-btn${tela==='estoque' ? ' active' : ''}`} onClick={()=>setTela('estoque')}>
             📦 <span>Estoque</span>
+            {catalogo.filter(p=>p.qtdEstoque===0||p.qtdEstoque<=(config.alertaEstoqueMinimoQtd||3)).length > 0 && <div className="notif-dot"/>}
           </button>
-          <button className="topbar-btn" onClick={resetCatalogo} title="Restaurar catálogo padrão">
-            🔄
+          <button className={`topbar-btn${tela==='config' ? ' active' : ''}`} onClick={()=>setTela('config')}>
+            ⚙️ <span>Config</span>
           </button>
-          {!offlineMode && (
-            <button className="topbar-btn" style={{background:'rgba(239,68,68,0.2)', color:'#fca5a5'}} onClick={onSignOut}>
-              🚪 Sair
-            </button>
-          )}
         </div>
-        {offlineMode && (
-          <div style={{marginLeft:'16px', fontSize:12, color:'#fde68a', fontWeight:700}}>
-            Modo offline ativado
-          </div>
-        )}
       </div>
 
-      {tela==='orcamento' && <TelaOrcamento catalogo={catalogo} setCatalogo={setCatalogo} toast={toast}/>}
-      {tela==='estoque'   && <TelaEstoque   catalogo={catalogo} setCatalogo={setCatalogo} toast={toast}/>}
+      <AlertBanner catalogo={catalogo} contratos={contratos} config={config}/>
+
+      {tela==='orcamento'  && <TelaOrcamento catalogo={catalogo} setCatalogo={setCatalogo} config={config} toast={toast}/>}
+      {tela==='contratos'  && <TelaContratos contratos={contratos} setContratos={setContratos} config={config} toast={toast}/>}
+      {tela==='estoque'    && <TelaEstoque catalogo={catalogo} setCatalogo={setCatalogo} config={config} toast={toast}/>}
+      {tela==='config'     && <TelaConfiguracoes config={config} setConfig={setConfig} toast={toast}/>}
 
       <Toast toasts={toasts}/>
     </div>
-  );
-}
-
-/* ══════════════════════════════════════════
-   APP ROOT (Garante a Trava de Segurança)
-══════════════════════════════════════════ */
-function App() {
-  const offlineMode = !supabase;
-  const [session, setSession] = useState(offlineMode ? {} : null);
-  const [loading, setLoading] = useState(offlineMode ? false : true);
-  const [isSignUp, setIsSignUp] = useState(false);
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { toasts, toast } = useToast();
-
-  useEffect(() => {
-    if (offlineMode) return;
-
-    // Busca sessão ativa ao carregar
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    }).catch(() => {
-      setLoading(false);
-    });
-
-    // Escuta mudanças de estado da autenticação
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [offlineMode]);
-
-  const handleAuth = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      toast('Preencha todos os campos.', 'error');
-      return;
-    }
-    if (offlineMode) {
-      toast('Supabase não configurado. O modo offline está ativo.', 'info');
-      return;
-    }
-    
-    setLoading(true);
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) toast(error.message, 'error');
-      else toast('Cadastro realizado! Verifique seu e-mail caso necessário.', 'success');
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) toast(error.message, 'error');
-      else toast('Login realizado com sucesso!', 'success');
-    }
-    setLoading(false);
-  };
-
-  const handleSignOut = async () => {
-    if (supabase) await supabase.auth.signOut();
-    toast('Você saiu do sistema.', 'info');
-    if (!offlineMode) setSession(null);
-  };
-
-  if (loading && !session) {
-    return (
-      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'var(--bg)' }}>
-        <div className="spinner" style={{ width: 40, height: 40, borderColor: 'rgba(37,99,235,0.2)', borderTopColor: 'var(--electric)' }} />
-      </div>
-    );
-  }
-
-  // Se o usuário não estiver autenticado e Supabase estiver configurado, exibe a tela de Login/Cadastro
-  if (!session && !offlineMode) {
-    return (
-      <div>
-        <div className="topbar">
-          <div className="topbar-brand">
-            <div className="dot">💻</div>
-            NB Diogo
-          </div>
-        </div>
-        <div className="auth-container">
-          <div className="auth-card">
-            <div className="auth-header">
-              <div className="auth-logo">🔑</div>
-              <h2 className="auth-title">{isSignUp ? 'Criar Conta' : 'Acesso Restrito'}</h2>
-              <p className="auth-subtitle">Faça login para acessar o gerador de orçamentos</p>
-            </div>
-            
-            <form onSubmit={handleAuth}>
-              <div style={{ marginBottom: 14 }}>
-                <Inp label="E-mail" type="email" placeholder="seu@email.com" value={email} onChange={e=>setEmail(e.target.value)} />
-              </div>
-              <div style={{ marginBottom: 20 }}>
-                <Inp label="Senha" type="password" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} />
-              </div>
-              
-              <button type="submit" className="btn btn-primary btn-lg" style={{ width:'100%' }} disabled={loading}>
-                {loading ? <div className="spinner" /> : (isSignUp ? 'Cadastrar' : 'Entrar no Sistema')}
-              </button>
-            </form>
-            
-            <div className="auth-footer-link">
-              {isSignUp ? 'Já tem uma conta?' : 'Não possui acesso?'} 
-              <button className="auth-link" style={{ marginLeft: 5 }} onClick={() => setIsSignUp(!isSignUp)}>
-                {isSignUp ? 'Faça Login' : 'Cadastre-se'}
-              </button>
-            </div>
-          </div>
-        </div>
-        <Toast toasts={toasts}/>
-      </div>
-    );
-  }
-
-  // Se estiver autenticado, libera o AppInterno com todas as funções do seu projeto
-  return (
-    <AppInterno 
-      session={session} 
-      onSignOut={handleSignOut} 
-      toasts={toasts} 
-      toast={toast} 
-    />
   );
 }
 
