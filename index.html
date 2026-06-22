@@ -9,6 +9,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.js"></script>
   <style>
     :root {
       --navy:       #0f2744;
@@ -57,7 +58,7 @@
       width: 30px; height: 30px; background: var(--cyan); border-radius: 8px;
       display: flex; align-items: center; justify-content: center; font-size: 16px;
     }
-    .topbar-nav { display: flex; gap: 4px; }
+    .topbar-nav { display: flex; gap: 4px; align-items: center; }
     .topbar-btn {
       height: 34px; padding: 0 14px; border-radius: 8px; border: none;
       font-size: 12px; font-weight: 600; cursor: pointer;
@@ -68,6 +69,30 @@
       background: rgba(255,255,255,.2); color: white;
     }
     .topbar-btn.active { background: rgba(255,255,255,.25); color: white; }
+
+    /* ── TELA DE LOGIN / DE BLOQUEIO ── */
+    .auth-container {
+      display: flex; align-items: center; justify-content: center;
+      min-height: calc(100vh - 56px); padding: 20px;
+    }
+    .auth-card {
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 32px;
+      box-shadow: var(--shadow-md); max-width: 400px; width: 100%;
+    }
+    .auth-header { text-align: center; margin-bottom: 24px; }
+    .auth-logo {
+      width: 50px; height: 50px; background: linear-gradient(135deg, var(--navy), var(--electric));
+      border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 24px; color: white; margin-bottom: 12px;
+    }
+    .auth-title { font-size: 20px; font-weight: 800; color: var(--navy); }
+    .auth-subtitle { font-size: 12px; color: var(--slate); margin-top: 4px; }
+    .auth-footer-link {
+      text-align: center; margin-top: 16px; font-size: 12px; color: var(--slate);
+    }
+    .auth-link { color: var(--electric); font-weight: 600; cursor: pointer; background: none; border: none; font-size: 12px; }
+    .auth-link:hover { text-decoration: underline; }
 
     /* ── NAV TABS (tela) ── */
     .screen-tabs {
@@ -343,6 +368,13 @@
 const { useState, useEffect, useCallback, useRef } = React;
 
 /* ══════════════════════════════════════════
+   CONFIGURAÇÃO DO SUPABASE
+══════════════════════════════════════════ */
+const SUPABASE_URL = "SUA_SUPABASE_URL_AQUI";
+const SUPABASE_ANON_KEY = "SUA_SUPABASE_ANON_KEY_AQUI";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ══════════════════════════════════════════
    CATÁLOGO PADRÃO (editável em runtime)
 ══════════════════════════════════════════ */
 const CATALOGO_INICIAL = [
@@ -580,7 +612,7 @@ function ModalEditarProduto({prod, onSave, onClose}) {
 
   return (
     <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal">
+      <div className="modal" onClick={e=>e.stopPropagation()}>
         <div className="modal-title">{isNovo?'➕ Novo Produto':'✏️ Editar Produto'}</div>
         <div className="modal-sub">Catálogo de estoque — dados e precificação</div>
 
@@ -640,7 +672,7 @@ function ModalEditarItem({item, onSave, onClose}) {
 
   return (
     <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal">
+      <div className="modal" onClick={e=>e.stopPropagation()}>
         <div className="modal-title">✏️ Editar Item</div>
         <div className="modal-sub">{item.nome} — {item.spec}</div>
 
@@ -710,7 +742,7 @@ function TelaEstoque({catalogo, setCatalogo, toast}) {
         : [...prev, prod]
     );
     setEditando(null);
-    toast('Produto salvo!', 'success');
+    toast('Produto saved!', 'success');
   };
 
   const handleDelete = (id) => {
@@ -806,7 +838,6 @@ function Passo1({dados, onChange, onNext, toast}) {
       if (!res.ok) throw new Error();
       const d = await res.json();
 
-      // Extrai telefone e e-mail da BrasilAPI se disponíveis
       const telBruto = d.ddd_telefone_1 || '';
       const telFmt   = telBruto ? formatPhone(telBruto.replace(/\D/g,'')) : '';
 
@@ -928,7 +959,6 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
 
   const disponiveis = catalogo.filter(p=>p.qtdEstoque>0);
 
-  // Preview dinâmico
   useEffect(() => {
     const dv = parseFloat(descVal.replace(',','.')) || 0;
     const pv = {};
@@ -1005,7 +1035,6 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
 
   return (
     <div>
-      {/* Tipo de Atendimento */}
       <div className="card">
         <div className="card-title"><div className="icon">💻</div>Tipo de Atendimento</div>
         <div className="tabs" style={{marginBottom:14}}>
@@ -1050,7 +1079,6 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
         )}
       </div>
 
-      {/* Quantidade */}
       <div className="card">
         <div className="card-title"><div className="icon">🔢</div>Quantidade</div>
         <div className="qty-stepper">
@@ -1070,7 +1098,6 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
         )}
       </div>
 
-      {/* Desconto */}
       <div className="card">
         <div className="card-title"><div className="icon">🏷️</div>Desconto <span style={{fontSize:11,fontWeight:400,color:'var(--slate)'}}>(opcional — aplicado no preview abaixo)</span></div>
         <div style={{display:'flex', gap:8, alignItems:'center', flexWrap:'wrap'}}>
@@ -1081,7 +1108,6 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
         </div>
       </div>
 
-      {/* Prazos */}
       <div className="card">
         <div className="card-title"><div className="icon">📅</div>Prazo(s) do Contrato</div>
         <p style={{fontSize:11, color:'var(--slate)', marginBottom:10}}>
@@ -1101,12 +1127,10 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
         </FG>
       </div>
 
-      {/* Botão Adicionar */}
       <button className="btn btn-success btn-lg" style={{width:'100%', marginBottom:14}} onClick={handleAdd}>
         ＋ Adicionar à Lista
       </button>
 
-      {/* Lista de itens */}
       <div className="card">
         <div className="card-title"><div className="icon">📋</div>Itens do Orçamento ({itens.length})</div>
         {itens.length===0 ? (
@@ -1190,11 +1214,9 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
   };
 
   const handleFecharOrc = () => {
-    // Decrementa estoque dos itens "Em Estoque"
     const agrupadosPorProd = {};
     itens.filter(i=>i.idProd).forEach(i=>{
       if(!agrupadosPorProd[i.idProd]) agrupadosPorProd[i.idProd] = 0;
-      // Só decrementa uma vez por produto (considera o maior prazo como referência)
       agrupadosPorProd[i.idProd] = Math.max(agrupadosPorProd[i.idProd], i.quantidade);
     });
     setCatalogo(prev => prev.map(p => {
@@ -1222,7 +1244,6 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
 
   return (
     <div>
-      {/* Header orçamento */}
       <div className="card" style={{background:'linear-gradient(135deg,var(--navy),var(--navy-light))',border:'none'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
           <div>
@@ -1239,7 +1260,6 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
         </div>
       </div>
 
-      {/* Cliente */}
       <div className="card">
         <div className="card-title"><div className="icon">🏢</div>Cliente</div>
         <div style={{fontWeight:700,fontSize:14,color:'var(--navy)',marginBottom:4}}>
@@ -1257,7 +1277,6 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
         </div>
       </div>
 
-      {/* Tabela comparativa */}
       <div className="card">
         <div className="card-title"><div className="icon">📊</div>Tabela Comparativa de Prazos</div>
         <div style={{overflowX:'auto'}}>
@@ -1308,7 +1327,6 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
         </div>
       </div>
 
-      {/* Métricas */}
       <div className="metrics-grid">
         {totais.map(t=>(
           <div key={t.prazo} className="metric-box">
@@ -1319,7 +1337,6 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
         ))}
       </div>
 
-      {/* Ações */}
       {!pdfGerado ? (
         <div className="card" style={{textAlign:'center'}}>
           <div style={{fontSize:12,color:'var(--slate)',marginBottom:18}}>
@@ -1360,7 +1377,7 @@ function Passo3({cliente, itens, catalogo, setCatalogo, onBack, toast}) {
 }
 
 /* ══════════════════════════════════════════
-   TELA: NOVO ORÇAMENTO (WIZARD WRAPPER)
+   WIZARD WRAPPER (Novo Orçamento)
 ══════════════════════════════════════════ */
 function TelaOrcamento({catalogo, setCatalogo, toast}) {
   const [step, setStep] = useState(1);
@@ -1416,12 +1433,10 @@ function TelaOrcamento({catalogo, setCatalogo, toast}) {
 }
 
 /* ══════════════════════════════════════════
-   APP ROOT
+   DASHBOARD E FLUXOS INTERNOS (BLOQUEADOS)
 ══════════════════════════════════════════ */
-function App() {
+function AppInterno({ session, onSignOut, toasts, toast }) {
   const [tela, setTela] = useState('orcamento');
-  const {toasts, toast} = useToast();
-
   const [catalogo, setCatalogoBruto] = useState(() => loadLS('nb_catalogo', CATALOGO_INICIAL));
 
   const setCatalogo = (fn) => {
@@ -1454,6 +1469,9 @@ function App() {
           <button className="topbar-btn" onClick={resetCatalogo} title="Restaurar catálogo padrão">
             🔄
           </button>
+          <button className="topbar-btn" style={{background:'rgba(239,68,68,0.2)', color:'#fca5a5'}} onClick={onSignOut}>
+            🚪 Sair
+          </button>
         </div>
       </div>
 
@@ -1462,6 +1480,121 @@ function App() {
 
       <Toast toasts={toasts}/>
     </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   APP ROOT (Garante a Trava de Segurança)
+══════════════════════════════════════════ */
+function App() {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(false);
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { toasts, toast } = useToast();
+
+  useEffect(() => {
+    // Busca sessão ativa ao carregar
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    // Escuta mudanças de estado da autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+    if (!email || !password) {
+      toast('Preencha todos os campos.', 'error');
+      return;
+    }
+    
+    setLoading(true);
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) toast(error.message, 'error');
+      else toast('Cadastro realizado! Verifique seu e-mail caso necessário.', 'success');
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) toast(error.message, 'error');
+      else toast('Login realizado com sucesso!', 'success');
+    }
+    setLoading(false);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast('Você saiu do sistema.', 'info');
+  };
+
+  if (loading && !session) {
+    return (
+      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center', background:'var(--bg)' }}>
+        <div className="spinner" style={{ width: 40, height: 40, borderColor: 'rgba(37,99,235,0.2)', borderTopColor: 'var(--electric)' }} />
+      </div>
+    );
+  }
+
+  // Se o usuário não estiver autenticado, exibe a tela de Login/Cadastro
+  if (!session) {
+    return (
+      <div>
+        <div className="topbar">
+          <div className="topbar-brand">
+            <div className="dot">💻</div>
+            NB Diogo
+          </div>
+        </div>
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <div className="auth-logo">🔑</div>
+              <h2 className="auth-title">{isSignUp ? 'Criar Conta' : 'Acesso Restrito'}</h2>
+              <p className="auth-subtitle">Faça login para acessar o gerador de orçamentos</p>
+            </div>
+            
+            <form onSubmit={handleAuth}>
+              <div style={{ marginBottom: 14 }}>
+                <Inp label="E-mail" type="email" placeholder="seu@email.com" value={email} onChange={e=>setEmail(e.target.value)} />
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <Inp label="Senha" type="password" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} />
+              </div>
+              
+              <button type="submit" className="btn btn-primary btn-lg" style={{ width:'100%' }} disabled={loading}>
+                {loading ? <div className="spinner" /> : (isSignUp ? 'Cadastrar' : 'Entrar no Sistema')}
+              </button>
+            </form>
+            
+            <div className="auth-footer-link">
+              {isSignUp ? 'Já tem uma conta?' : 'Não possui acesso?'} 
+              <button className="auth-link" style={{ marginLeft: 5 }} onClick={() => setIsSignUp(!isSignUp)}>
+                {isSignUp ? 'Faça Login' : 'Cadastre-se'}
+              </button>
+            </div>
+          </div>
+        </div>
+        <Toast toasts={toasts}/>
+      </div>
+    );
+  }
+
+  // Se estiver autenticado, libera o AppInterno com todas as funções do seu projeto
+  return (
+    <AppInterno 
+      session={session} 
+      onSignOut={handleSignOut} 
+      toasts={toasts} 
+      toast={toast} 
+    />
   );
 }
 
