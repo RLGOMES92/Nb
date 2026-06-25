@@ -814,62 +814,83 @@ function ModalEditarProduto({prod, onSave, onClose}) {
           <span>Defina quantas faixas quiser com os limites que preferir. Ex: 1–3 un, 4–10 un, 11+ un. O app aplica o preço automaticamente conforme a quantidade selecionada.</span>
         </div>
 
-        {/* Cabeçalho */}
-        <div style={{display:'grid', gridTemplateColumns:'80px 80px 1fr 80px 32px', gap:6, marginBottom:6, padding:'0 2px'}}>
+        {/* Cabeçalho — oculto no mobile, visível no desktop */}
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1.6fr auto 32px', gap:8, marginBottom:6, padding:'0 2px'}}>
           <div className="label">De (un)</div>
           <div className="label">Até (un)</div>
           <div className="label">Preço R$/un/mês</div>
-          <div className="label">Desc. s/ 1ª</div>
+          <div className="label" style={{minWidth:54}}>Desc.</div>
           <div/>
         </div>
 
         {faixas.map((f, i) => {
           const isUltima = i === faixas.length - 1;
-          const descPerc = precoBase > 0 && i > 0 && f.preco > 0
-            ? Math.round((1 - f.preco / precoBase) * 100 * 10) / 10 : 0;
+          const precoNum = parseFloat(f.preco) || 0;
+          const descPerc = precoBase > 0 && i > 0 && precoNum > 0
+            ? Math.round((1 - precoNum / precoBase) * 100 * 10) / 10 : 0;
           return (
-            <div key={i} style={{display:'grid', gridTemplateColumns:'80px 80px 1fr 80px 32px', gap:6, marginBottom:6, alignItems:'center'}}>
-              {/* De */}
+            <div key={i} style={{display:'grid', gridTemplateColumns:'1fr 1fr 1.6fr auto 32px', gap:8, marginBottom:8, alignItems:'center'}}>
+              {/* De — só leitura na 1ª faixa */}
               <input className="input" type="number" min="1"
                 value={f.qtdMin}
-                onChange={e=>setFaixa(i,'qtdMin',parseInt(e.target.value)||1)}
-                style={{textAlign:'center', fontWeight:700}}
+                onChange={e => setFaixa(i, 'qtdMin', e.target.value === '' ? '' : parseInt(e.target.value)||1)}
+                style={{textAlign:'center', fontWeight:700, background: i===0 ? 'var(--bg)' : 'white'}}
                 readOnly={i===0}
               />
-              {/* Até */}
+              {/* Até — campo livre, permite apagar para redigitar */}
               {isUltima ? (
-                <div className="input" style={{display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)',color:'var(--slate)',fontSize:15,fontWeight:700}}>∞</div>
+                <div className="input" style={{display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)',color:'var(--slate)',fontSize:18,fontWeight:700}}>∞</div>
               ) : (
-                <input className="input" type="number" min={f.qtdMin}
-                  value={f.qtdMax}
+                <input className="input" type="number" min="1"
+                  value={f.qtdMax === 9999 ? '' : f.qtdMax}
+                  placeholder="ex: 9"
                   onChange={e => {
-                    const v = parseInt(e.target.value)||f.qtdMin;
+                    const raw = e.target.value;
+                    // Permite campo vazio durante digitação sem forçar valor
+                    if (raw === '' || raw === '0') {
+                      setFaixas(prev => prev.map((fx,idx) => idx === i ? {...fx, qtdMax: ''} : fx));
+                      return;
+                    }
+                    const v = parseInt(raw);
+                    if (isNaN(v)) return;
                     setFaixas(prev => prev.map((fx,idx) => {
                       if (idx === i)   return {...fx, qtdMax: v};
                       if (idx === i+1) return {...fx, qtdMin: v+1};
                       return fx;
                     }));
                   }}
+                  onBlur={e => {
+                    // Ao sair do campo vazio, restaura valor mínimo válido
+                    if (e.target.value === '' || parseInt(e.target.value) < 1) {
+                      const minValido = (f.qtdMin || 1) + 1;
+                      setFaixas(prev => prev.map((fx,idx) => {
+                        if (idx === i)   return {...fx, qtdMax: minValido};
+                        if (idx === i+1) return {...fx, qtdMin: minValido+1};
+                        return fx;
+                      }));
+                    }
+                  }}
                   style={{textAlign:'center', fontWeight:700}}
                 />
               )}
-              {/* Preço */}
+              {/* Preço — campo largo com R$ embutido */}
               <div style={{position:'relative'}}>
                 <input className="input" type="number" min="0" step="0.01"
-                  value={f.preco}
-                  onChange={e=>setFaixa(i,'preco',e.target.value)}
+                  value={f.preco === 0 ? '' : f.preco}
+                  onChange={e => setFaixa(i, 'preco', e.target.value)}
                   placeholder="0,00"
-                  style={{paddingLeft:28}}
+                  style={{paddingLeft:30, fontWeight:700, fontSize:14}}
                 />
-                <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',fontSize:12,color:'var(--slate)',pointerEvents:'none',fontWeight:600}}>R$</span>
+                <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',fontSize:11,color:'var(--slate)',pointerEvents:'none',fontWeight:600}}>R$</span>
               </div>
-              {/* Desconto automático em relação à 1ª faixa */}
+              {/* Badge de desconto */}
               <div style={{
-                height:40, display:'flex', alignItems:'center', justifyContent:'center',
-                borderRadius:'var(--radius)', fontSize:12, fontWeight:800,
+                minWidth:54, height:40, display:'flex', alignItems:'center', justifyContent:'center',
+                borderRadius:'var(--radius)', fontSize:11, fontWeight:800,
                 background: descPerc > 0 ? 'var(--success-bg)' : i===0 ? 'rgba(37,99,235,.07)' : 'var(--bg)',
                 color: descPerc > 0 ? 'var(--success)' : i===0 ? 'var(--electric)' : 'var(--slate)',
                 border: `1px solid ${descPerc>0?'#6ee7b7':i===0?'rgba(37,99,235,.2)':'var(--border)'}`,
+                whiteSpace:'nowrap',
               }}>
                 {i === 0 ? 'Base' : descPerc > 0 ? `-${descPerc}%` : '—'}
               </div>
