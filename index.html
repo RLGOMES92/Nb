@@ -11,7 +11,20 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    :root{--navy:#0f2744;--navy-mid:#1a3a5c;--navy-light:#234f7a;--electric:#2563eb;--cyan:#06b6d4;--cyan-soft:#e0f7fa;--slate:#64748b;--slate-light:#94a3b8;--bg:#f8fafc;--border:#e2e8f0;--border-mid:#cbd5e1;--success:#10b981;--success-bg:#d1fae5;--danger:#ef4444;--danger-bg:#fee2e2;--warn:#f59e0b;--warn-bg:#fef3c7;--text:#0f172a;--text-mid:#334155;--radius:10px;--radius-lg:16px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.05);--shadow-md:0 4px 20px rgba(15,39,68,.12);--shadow-lg:0 8px 40px rgba(15,39,68,.18)}
+    :root {
+      --navy:#0f2744;--navy-mid:#1a3a5c;--navy-light:#234f7a;
+      --electric:#2563eb;--cyan:#06b6d4;--cyan-soft:#e0f7fa;
+      --slate:#64748b;--slate-light:#94a3b8;--bg:#f8fafc;
+      --border:#e2e8f0;--border-mid:#cbd5e1;
+      --success:#10b981;--success-bg:#d1fae5;
+      --danger:#ef4444;--danger-bg:#fee2e2;
+      --warn:#f59e0b;--warn-bg:#fef3c7;
+      --text:#0f172a;--text-mid:#334155;
+      --radius:10px;--radius-lg:16px;
+      --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.05);
+      --shadow-md:0 4px 20px rgba(15,39,68,.12);
+      --shadow-lg:0 8px 40px rgba(15,39,68,.18);
+    }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
     .topbar{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,var(--navy-light) 100%);padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.25)}
@@ -20,7 +33,7 @@
     .topbar-nav{display:flex;gap:4px;align-items:center}
     .topbar-btn{height:34px;padding:0 14px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);transition:all .2s;position:relative;white-space:nowrap}
     .topbar-btn:hover,.topbar-btn.active{background:rgba(255,255,255,.2);color:white}
-    .topbar-btn.active{background:rgba(255,255,255,.25)}
+    .topbar-btn.active{background:rgba(255,255,255,.25);color:white}
     .notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--danger);border-radius:50%;border:1.5px solid var(--navy)}
     .alert-banner{background:linear-gradient(135deg,#7c2d12,#dc2626);color:white;padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:600}
     .alert-banner.warn{background:linear-gradient(135deg,#92400e,#d97706)}
@@ -47,7 +60,7 @@
     .btn:disabled{opacity:.45;cursor:not-allowed}
     .btn-primary{background:linear-gradient(135deg,var(--electric),#1e40af);color:white;box-shadow:0 2px 8px rgba(37,99,235,.3)}
     .btn-primary:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
-    .btn-success{background:linear-gradient(135deg,var(--success),#059669);color:white}
+    .btn-success{background:linear-gradient(135deg,var(--success),#059669);color:white;box-shadow:0 2px 8px rgba(16,185,129,.25)}
     .btn-success:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
     .btn-warn{background:var(--warn-bg);color:#92400e;border:1px solid #fcd34d}
     .btn-warn:hover:not(:disabled){background:#fde68a}
@@ -71,7 +84,7 @@
     .step-item.active .step-circle{border-color:var(--electric);background:var(--electric);color:white;box-shadow:0 0 0 4px rgba(37,99,235,.15)}
     .step-item.done .step-circle{border-color:var(--electric);background:var(--electric);color:white}
     .step-label{font-size:10px;color:var(--slate);margin-top:5px;font-weight:600;text-align:center}
-    .step-item.active .step-label,.step-item.done .step-label{color:var(--electric)}
+    .step-item.active .step-label{color:var(--electric)}.step-item.done .step-label{color:var(--electric)}
     .tabs{display:flex;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);padding:3px;gap:3px}
     .tab{flex:1;height:32px;border-radius:7px;border:none;background:transparent;font-size:12px;font-weight:600;color:var(--slate);cursor:pointer;transition:all .2s}
     .tab.active{background:white;color:var(--electric);box-shadow:0 1px 4px rgba(0,0,0,.1)}
@@ -120,7 +133,10 @@
     .contract-sub{font-size:11px;color:var(--slate);margin-top:2px}
     .contract-meta{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;align-items:center}
     .dias-badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
-    .dias-badge.ok{background:var(--success-bg);color:var(--success)}.dias-badge.warn{background:var(--warn-bg);color:var(--warn)}.dias-badge.perigo{background:var(--danger-bg);color:var(--danger)}.dias-badge.vencido{background:#1f2937;color:white}
+    .dias-badge.ok{background:var(--success-bg);color:var(--success)}
+    .dias-badge.warn{background:var(--warn-bg);color:var(--warn)}
+    .dias-badge.perigo{background:var(--danger-bg);color:var(--danger)}
+    .dias-badge.vencido{background:#1f2937;color:white}
     .resumo-table{width:100%;border-collapse:collapse;font-size:12px}
     .resumo-table th{background:var(--navy);color:white;padding:9px 10px;text-align:center;font-size:11px;font-weight:700}
     .resumo-table th:first-child{text-align:left;border-radius:7px 0 0 0}.resumo-table th:last-child{border-radius:0 7px 0 0}
@@ -156,11 +172,24 @@
     .nav-btns{display:flex;gap:10px;justify-content:space-between;margin-top:18px}
     .settings-section{margin-bottom:20px}
     .settings-section-title{font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    /* Logo upload */
     .logo-upload-area{border:2px dashed var(--border-mid);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg)}
     .logo-upload-area:hover{border-color:var(--electric);background:rgba(37,99,235,.03)}
     .logo-preview{max-height:60px;max-width:200px;object-fit:contain;display:block;margin:0 auto}
-    .import-drop-zone{border:2.5px dashed var(--border-mid);border-radius:var(--radius-lg);padding:32px 20px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg);position:relative}
-    .import-drop-zone:hover,.import-drop-zone.drag-over{border-color:var(--electric);background:rgba(37,99,235,.04)}
+    @media(max-width:560px){
+      .form-row.c2{grid-template-columns:1fr}
+      .form-row.c3{grid-template-columns:1fr 1fr}
+      .topbar-btn span{display:none}
+    }
+    /* ── IMPORTAR PLANILHA ── */
+    .import-drop-zone{
+      border:2.5px dashed var(--border-mid);border-radius:var(--radius-lg);
+      padding:32px 20px;text-align:center;cursor:pointer;transition:all .25s;
+      background:var(--bg);position:relative;
+    }
+    .import-drop-zone:hover,.import-drop-zone.drag-over{
+      border-color:var(--electric);background:rgba(37,99,235,.04);
+    }
     .import-drop-zone .dz-icon{font-size:40px;margin-bottom:10px;display:block}
     .import-drop-zone h3{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:4px}
     .import-drop-zone p{font-size:12px;color:var(--slate);margin-bottom:12px}
@@ -170,8 +199,10 @@
     .import-preview-table tbody tr:hover{background:rgba(37,99,235,.03)}
     .import-preview-table .row-ok td{background:rgba(16,185,129,.04)}
     .import-preview-table .row-warn td{background:rgba(245,158,11,.06)}
+    .import-preview-table .row-err td{background:rgba(239,68,68,.05)}
     .col-map-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;align-items:center}
     .col-map-label{font-size:12px;font-weight:700;color:var(--text-mid)}
+    .col-map-arrow{color:var(--electric);font-size:16px;text-align:center}
     .step-indicator{display:flex;gap:0;margin-bottom:20px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
     .step-ind-item{flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:700;color:var(--slate);background:var(--bg);border-right:1px solid var(--border);transition:all .2s}
     .step-ind-item:last-child{border-right:none}
@@ -181,16 +212,6 @@
     .import-stat-box{flex:1;min-width:90px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center}
     .import-stat-box .isv{font-size:20px;font-weight:800;color:var(--navy)}
     .import-stat-box .isl{font-size:10px;color:var(--slate);text-transform:uppercase}
-    /* desconto volume preview */
-    .vol-preview-box{background:white;border:1.5px solid var(--border);border-radius:8px;padding:8px;text-align:center}
-    .vol-preview-box.tier1{border-color:var(--border)}
-    .vol-preview-box.tier2{border-color:#fcd34d}
-    .vol-preview-box.tier3{border-color:#6ee7b7}
-    @media(max-width:560px){
-      .form-row.c2{grid-template-columns:1fr}
-      .form-row.c3{grid-template-columns:1fr 1fr}
-      .topbar-btn span{display:none}
-    }
   </style>
 </head>
 <body>
@@ -202,21 +223,38 @@ const { useState, useEffect, useCallback, useRef } = React;
    CONFIG PADRÃO
 ══════════════════════════════════════════ */
 const CONFIG_INICIAL = {
-  nomeEmpresa: 'Urban Store', cnpjEmpresa: '', enderecoEmpresa: '',
-  responsavelNome: '', responsavelCelular: '', responsavelEmail: '',
+  nomeEmpresa: 'Urban Store',
+  cnpjEmpresa: '',
+  enderecoEmpresa: '',
+  responsavelNome: '',
+  responsavelCelular: '',
+  responsavelEmail: '',
   logoBase64: '',
   textoIntro: 'Gostaríamos de apresentar nossa proposta de locação de computadores para atender às necessidades de sua empresa. Nossa empresa é especializada em fornecer soluções de tecnologia para empresas, e disponibilizamos uma ampla variedade de equipamentos para locação, incluindo desktops, notebooks, monitores e demais periféricos.\n\nNossa proposta oferece uma solução completa, contemplando os seguintes detalhes:',
   textoConclusao: 'Acreditamos que nossa proposta é a escolha ideal para sua empresa, proporcionando acesso a equipamentos modernos e atualizados, suporte técnico confiável e flexibilidade financeira. Estamos comprometidos em fornecer soluções de tecnologia de alta qualidade para ajudar sua empresa a alcançar seus objetivos de negócios.\n\nSem mais, estamos à disposição.',
-  alertaDiasContrato: 30, alertaEstoqueMinimoQtd: 3,
+  alertaDiasContrato: 30,
+  alertaEstoqueMinimoQtd: 3,
 };
 
 const CATALOGO_INICIAL = [
-  { id:'NB-001', nome:'Dell Latitude 5440', spec:'i5-1335U / 16GB / 256GB SSD', qtdEstoque:8, precos:{1:395,5:365,10:325}, descontos:{desc5:7.6,desc10:17.7}, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-002', nome:'Lenovo ThinkPad E14', spec:'i7-1355U / 16GB / 512GB SSD', qtdEstoque:5, precos:{1:480,5:445,10:395}, descontos:{desc5:7.3,desc10:17.7}, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-003', nome:'HP ProBook 445 G10', spec:'Ryzen 5 7530U / 8GB / 256GB SSD', qtdEstoque:12, precos:{1:340,5:310,10:278}, descontos:{desc5:8.8,desc10:18.2}, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-004', nome:'MacBook Air M2', spec:'Apple M2 / 8GB / 256GB SSD', qtdEstoque:3, precos:{1:890,5:820,10:750}, descontos:{desc5:7.9,desc10:15.7}, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-005', nome:'Dell Inspiron 15', spec:'i3-1215U / 8GB / 256GB SSD', qtdEstoque:15, precos:{1:280,5:250,10:220}, descontos:{desc5:10.7,desc10:21.4}, prazosPadrao:[12,24,36], modalidade:'Locação' },
-  { id:'NB-006', nome:'Lenovo IdeaPad 3', spec:'Ryzen 3 7320U / 8GB / 512GB SSD', qtdEstoque:0, precos:{1:260,5:235,10:205}, descontos:{desc5:9.6,desc10:21.2}, prazosPadrao:[12,24,36], modalidade:'Venda' },
+  { id:'NB-001', nome:'Dell Latitude 5440', spec:'i5-1335U / 16GB / 256GB SSD', qtdEstoque:8,
+    faixas:[{qtdMin:1,qtdMax:4,preco:395},{qtdMin:5,qtdMax:9,preco:365},{qtdMin:10,qtdMax:9999,preco:325}],
+    prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-002', nome:'Lenovo ThinkPad E14', spec:'i7-1355U / 16GB / 512GB SSD', qtdEstoque:5,
+    faixas:[{qtdMin:1,qtdMax:4,preco:480},{qtdMin:5,qtdMax:9,preco:445},{qtdMin:10,qtdMax:9999,preco:395}],
+    prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-003', nome:'HP ProBook 445 G10', spec:'Ryzen 5 7530U / 8GB / 256GB SSD', qtdEstoque:12,
+    faixas:[{qtdMin:1,qtdMax:4,preco:340},{qtdMin:5,qtdMax:9,preco:310},{qtdMin:10,qtdMax:9999,preco:278}],
+    prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-004', nome:'MacBook Air M2', spec:'Apple M2 / 8GB / 256GB SSD', qtdEstoque:3,
+    faixas:[{qtdMin:1,qtdMax:4,preco:890},{qtdMin:5,qtdMax:9,preco:820},{qtdMin:10,qtdMax:9999,preco:750}],
+    prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-005', nome:'Dell Inspiron 15', spec:'i3-1215U / 8GB / 256GB SSD', qtdEstoque:15,
+    faixas:[{qtdMin:1,qtdMax:4,preco:280},{qtdMin:5,qtdMax:9,preco:250},{qtdMin:10,qtdMax:9999,preco:220}],
+    prazosPadrao:[12,24,36], modalidade:'Locação' },
+  { id:'NB-006', nome:'Lenovo IdeaPad 3', spec:'Ryzen 3 7320U / 8GB / 512GB SSD', qtdEstoque:0,
+    faixas:[{qtdMin:1,qtdMax:4,preco:260},{qtdMin:5,qtdMax:9,preco:235},{qtdMin:10,qtdMax:9999,preco:205}],
+    prazosPadrao:[12,24,36], modalidade:'Venda' },
 ];
 
 const CONTRATOS_INICIAIS = [
@@ -228,18 +266,47 @@ const CONTRATOS_INICIAIS = [
 /* ══════════════════════════════════════════
    HELPERS
 ══════════════════════════════════════════ */
-const R$ = v => v==null?'—':v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const uid = () => Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();
+const R$ = v => v == null ? '—' : v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const uid = () => Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,5).toUpperCase();
 const orcId = () => `ORC-${uid()}`;
 
 function lookupPreco(produto, qtd) {
-  const faixas = Object.keys(produto.precos).map(Number).sort((a,b)=>b-a);
-  for (const f of faixas) { if (qtd >= f) return produto.precos[f]; }
-  return produto.precos[faixas[faixas.length-1]] || 0;
+  // Sistema novo: array de faixas [{qtdMin, qtdMax, preco}]
+  if (produto.faixas && produto.faixas.length > 0) {
+    const fs = [...produto.faixas].sort((a,b) => a.qtdMin - b.qtdMin);
+    let melhor = fs[0];
+    for (const f of fs) { if (qtd >= f.qtdMin) melhor = f; }
+    return melhor.preco || 0;
+  }
+  // Fallback legado: precos:{1:x, 5:y, 10:z}
+  if (produto.precos) {
+    const chaves = Object.keys(produto.precos).map(Number).sort((a,b)=>b-a);
+    for (const f of chaves) { if (qtd >= f) return produto.precos[f]; }
+    return produto.precos[chaves[chaves.length-1]] || 0;
+  }
+  return 0;
+}
+// Retorna a faixa ativa para uma quantidade (para mostrar desconto)
+function getFaixaAtiva(produto, qtd) {
+  if (produto.faixas && produto.faixas.length > 0) {
+    const fs = [...produto.faixas].sort((a,b) => a.qtdMin - b.qtdMin);
+    let melhor = fs[0];
+    for (const f of fs) { if (qtd >= f.qtdMin) melhor = f; }
+    return melhor;
+  }
+  return null;
+}
+// Calcula % de desconto de uma faixa em relação ao preço da 1ª faixa
+function calcDescPerc(produto, faixa) {
+  if (!produto.faixas || produto.faixas.length < 2) return 0;
+  const fs = [...produto.faixas].sort((a,b) => a.qtdMin - b.qtdMin);
+  const base = fs[0].preco;
+  if (!base || faixa.preco >= base) return 0;
+  return Math.round((1 - faixa.preco / base) * 100 * 10) / 10;
 }
 function aplicaDesc(base, tipo, val) {
   if (!val || val <= 0) return base;
-  return Math.max(0, tipo==='%' ? base*(1-val/100) : base-val);
+  return Math.max(0, tipo === '%' ? base*(1-val/100) : base - val);
 }
 function formatCNPJ(v) {
   const d = v.replace(/\D/g,'').slice(0,14);
@@ -247,376 +314,604 @@ function formatCNPJ(v) {
 }
 function formatPhone(v) {
   const d = v.replace(/\D/g,'').slice(0,11);
-  if (d.length<=10) return d.replace(/^(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  if (d.length <= 10) return d.replace(/^(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
   return d.replace(/^(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
 }
 function diasParaVencer(inicio, meses) {
-  const fim = new Date(inicio); fim.setMonth(fim.getMonth()+meses);
-  return Math.ceil((fim-new Date())/86400000);
+  const fim = new Date(inicio);
+  fim.setMonth(fim.getMonth() + meses);
+  return Math.ceil((fim - new Date()) / 86400000);
 }
-function loadLS(key,def){try{const v=localStorage.getItem(key);return v?JSON.parse(v):def;}catch{return def;}}
-function saveLS(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch{}}
+function loadLS(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } }
+function saveLS(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
 
 function useToast() {
-  const [toasts,setToasts]=useState([]);
-  const toast=useCallback((msg,type='info')=>{
-    const id=Date.now(); setToasts(p=>[...p,{id,msg,type}]);
-    setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),4000);
+  const [toasts, setToasts] = useState([]);
+  const toast = useCallback((msg, type='info') => {
+    const id = Date.now();
+    setToasts(p => [...p, {id, msg, type}]);
+    setTimeout(() => setToasts(p => p.filter(t=>t.id!==id)), 4000);
   },[]);
-  return {toasts,toast};
+  return {toasts, toast};
 }
 
 /* ══════════════════════════════════════════
-   PDF GENERATOR — LAYOUT VERMELHO
-   CORREÇÃO: mostra preço UNITÁRIO na tabela
-   (sem duplicar o valor total)
+   PDF GENERATOR — LAYOUT VERMELHO MODERNO
+   com suporte a logo, 2 páginas, subtítulos bold
 ══════════════════════════════════════════ */
 function gerarPDF(orcamento, cliente, itens, config) {
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({unit:'mm',format:'a4'});
-  const W=210,L=14,R=14,TW=W-L-R;
-  const VERMELHO=[180,20,20], VERMELHO2=[220,38,38];
-  const CINZA_ESC=[30,30,30], CINZA_MD=[80,80,80], CINZA_LT=[140,140,140];
-  const BRANCO=[255,255,255], FUNDO_LT=[252,248,248];
-  const empresa=config.nomeEmpresa||'Urban Store';
-  const vendedor=config.responsavelNome||'';
-  const telefone=config.responsavelCelular||'';
-  const email_v=config.responsavelEmail||'';
-  const cnpjEmp=config.cnpjEmpresa||'';
-  const enderecoE=config.enderecoEmpresa||'';
-  const logoB64=config.logoBase64||'';
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const W=210, L=14, R=14, TW=W-L-R;
 
-  function drawHeader() {
-    doc.setFillColor(...BRANCO); doc.rect(0,0,W,30,'F');
-    doc.setFillColor(...VERMELHO); doc.rect(0,30,W,3,'F');
+  // Cores da identidade visual
+  const VERMELHO  = [180, 20, 20];
+  const VERMELHO2 = [220, 38, 38];
+  const CINZA_ESC = [30, 30, 30];
+  const CINZA_MD  = [80, 80, 80];
+  const CINZA_LT  = [140, 140, 140];
+  const BRANCO    = [255, 255, 255];
+  const FUNDO_LT  = [252, 248, 248];
+
+  const empresa   = config.nomeEmpresa   || 'Urban Store';
+  const vendedor  = config.responsavelNome   || '';
+  const telefone  = config.responsavelCelular || '';
+  const email_v   = config.responsavelEmail  || '';
+  const cnpjEmp   = config.cnpjEmpresa   || '';
+  const enderecoE = config.enderecoEmpresa || '';
+  const logoB64   = config.logoBase64    || '';
+
+  // ── FUNÇÃO: desenha cabeçalho em qualquer página ──────────────────
+  function drawHeader(paginaNum) {
+    // Faixa de topo branca + linha vermelha grossa embaixo
+    doc.setFillColor(...BRANCO);
+    doc.rect(0, 0, W, 30, 'F');
+    doc.setFillColor(...VERMELHO);
+    doc.rect(0, 30, W, 3, 'F');
+
+    // Logo ou nome
     if (logoB64) {
-      try { doc.addImage(logoB64,'PNG',L,5,55,20,'','FAST'); }
-      catch(e) {
-        doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(...VERMELHO);
-        doc.text(empresa,L,20);
+      try {
+        doc.addImage(logoB64, 'PNG', L, 5, 55, 20, '', 'FAST');
+      } catch(e) {
+        // fallback: nome texto
+        doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.setTextColor(...VERMELHO);
+        doc.text(empresa, L, 20);
       }
     } else {
-      doc.setFontSize(18);doc.setFont('helvetica','bold');doc.setTextColor(...VERMELHO);
-      doc.text(empresa,L,20);
+      doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.setTextColor(...VERMELHO);
+      doc.text(empresa, L, 20);
     }
-    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(...CINZA_ESC);
-    doc.text('Proposta Comercial',W-R,10,{align:'right'});
-    doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_LT);
-    doc.text(`Nº ${orcamento.id}`,W-R,15,{align:'right'});
-    [vendedor,telefone,email_v].filter(Boolean).forEach((l,i)=>{
-      doc.setFontSize(7.5);doc.text(l,W-R,20+(i*4),{align:'right'});
+
+    // Bloco "Proposta Comercial" — direita
+    doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.setTextColor(...CINZA_ESC);
+    doc.text('Proposta Comercial', W-R, 10, {align:'right'});
+    doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_LT);
+    doc.text(`Nº ${orcamento.id}`, W-R, 15, {align:'right'});
+
+    // Dados do vendedor - canto direito
+    const linhasVend = [vendedor, telefone, email_v].filter(Boolean);
+    linhasVend.forEach((l,i) => {
+      doc.setFontSize(7.5); doc.setTextColor(...CINZA_LT);
+      doc.text(l, W-R, 20+(i*4), {align:'right'});
     });
   }
 
+  // ── FUNÇÃO: rodapé ────────────────────────────────────────────────
   function drawFooter() {
-    doc.setDrawColor(...VERMELHO);doc.setLineWidth(0.5);doc.line(L,275,W-R,275);
-    doc.setFontSize(7);doc.setFont('helvetica','bold');doc.setTextColor(...CINZA_ESC);
-    const r1=[empresa,cnpjEmp].filter(Boolean).join('  ·  ');
-    if(r1) doc.text(r1,L,280);
-    doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_LT);
-    if(enderecoE) doc.text(enderecoE,L,284);
-    doc.text('Preços em BRL. Locação sujeita à aprovação cadastral. Equipamentos sujeitos à disponibilidade de estoque.',L,288);
-    doc.text(`${empresa}  —  ${orcamento.id}  —  ${new Date().toLocaleDateString('pt-BR')}`,W-R,288,{align:'right'});
+    // Linha separadora
+    doc.setDrawColor(...VERMELHO);
+    doc.setLineWidth(0.5);
+    doc.line(L, 275, W-R, 275);
+
+    doc.setFontSize(7); doc.setFont('helvetica','bold'); doc.setTextColor(...CINZA_ESC);
+    const rodape1 = [empresa, cnpjEmp].filter(Boolean).join('  ·  ');
+    if (rodape1) doc.text(rodape1, L, 280);
+
+    doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_LT);
+    if (enderecoE) doc.text(enderecoE, L, 284);
+    doc.text(
+      `Preços em BRL. Locação sujeita à aprovação cadastral. Equipamentos sujeitos à disponibilidade de estoque.`,
+      L, 288
+    );
+    doc.text(`${empresa}  —  ${orcamento.id}  —  ${new Date().toLocaleDateString('pt-BR')}`, W-R, 288, {align:'right'});
   }
 
-  let y=0;
-  function checkBreak(h) {
-    if (y+h>268) {
+  // ── FUNÇÃO: verifica quebra de página ─────────────────────────────
+  let paginaAtual = 1;
+  function checkBreak(altura) {
+    if (y + altura > 268) {
       drawFooter();
       doc.addPage();
-      drawHeader();
-      y=40;
+      paginaAtual++;
+      drawHeader(paginaAtual);
+      y = 40;
     }
   }
 
-  drawHeader(); y=40;
+  // ── PÁGINA 1 ──────────────────────────────────────────────────────
+  drawHeader(1);
+  let y = 40;
 
-  // Faixa vermelha cliente
-  doc.setFillColor(...VERMELHO); doc.rect(0,y,W,12,'F');
-  doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(...BRANCO);
-  const nomeCliente=cliente.razaoSocial||cliente.nomeFantasia||'Cliente';
-  const infoCliente=cliente.cnpj?`${cliente.cnpj} — ${nomeCliente}`:nomeCliente;
-  doc.text(`Prezado(a) ${infoCliente}`,L,y+8);
-  y+=17;
+  // ── FAIXA VERMELHA com dados do cliente ───────────────────────────
+  doc.setFillColor(...VERMELHO);
+  doc.rect(0, y, W, 12, 'F');
+  doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...BRANCO);
+  const nomeCliente = cliente.razaoSocial || cliente.nomeFantasia || 'Cliente';
+  const infoCliente = cliente.cnpj ? `${cliente.cnpj} — ${nomeCliente}` : nomeCliente;
+  doc.text(`Prezado(a) ${infoCliente}`, L, y+8);
+  y += 17;
 
-  // Card dados cliente
-  doc.setFillColor(...FUNDO_LT);doc.setDrawColor(...VERMELHO2);doc.setLineWidth(0.3);
-  doc.roundedRect(L,y,TW,22,2,2,'FD');
-  doc.setFontSize(6.5);doc.setFont('helvetica','bold');doc.setTextColor(...VERMELHO);
-  doc.text('DADOS DO CLIENTE',L+4,y+5);
-  doc.setFontSize(9.5);doc.setFont('helvetica','bold');doc.setTextColor(...CINZA_ESC);
-  doc.text(nomeCliente,L+4,y+11);
-  doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_LT);
-  const l2=[cliente.cnpj&&`CNPJ: ${cliente.cnpj}`,cliente.nomeFantasia&&cliente.razaoSocial!==cliente.nomeFantasia&&`(${cliente.nomeFantasia})`].filter(Boolean).join('  ·  ');
-  const l3=[cliente.responsavel&&`Resp: ${cliente.responsavel}`,cliente.email,cliente.telefone].filter(Boolean).join('  ·  ');
-  if(l2) doc.text(l2,L+4,y+16);
-  if(l3) doc.text(l3,L+4,y+20);
-  y+=28;
+  // ── CAIXA DE DADOS DO CLIENTE (estilo card) ───────────────────────
+  doc.setFillColor(...FUNDO_LT);
+  doc.setDrawColor(...VERMELHO2);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(L, y, TW, 22, 2, 2, 'FD');
+  doc.setFontSize(6.5); doc.setFont('helvetica','bold'); doc.setTextColor(...VERMELHO);
+  doc.text('DADOS DO CLIENTE', L+4, y+5);
+  doc.setFontSize(9.5); doc.setFont('helvetica','bold'); doc.setTextColor(...CINZA_ESC);
+  doc.text(nomeCliente, L+4, y+11);
+  doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_LT);
+  const l2 = [cliente.cnpj && `CNPJ: ${cliente.cnpj}`, cliente.nomeFantasia && cliente.razaoSocial !== cliente.nomeFantasia && `(${cliente.nomeFantasia})`].filter(Boolean).join('  ·  ');
+  const l3 = [cliente.responsavel && `Resp: ${cliente.responsavel}`, cliente.email, cliente.telefone].filter(Boolean).join('  ·  ');
+  if (l2) doc.text(l2, L+4, y+16);
+  if (l3) doc.text(l3, L+4, y+20);
+  y += 28;
 
-  // Texto de abertura
-  if(config.textoIntro){
-    const linhas=doc.splitTextToSize(config.textoIntro,TW);
-    checkBreak(linhas.length*4.5+6);
-    doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_MD);
-    doc.text(linhas,L,y);
-    y+=linhas.length*4.5+8;
+  // ── TEXTO DE ABERTURA ─────────────────────────────────────────────
+  const textoAb = config.textoIntro || '';
+  if (textoAb) {
+    const linhasAb = doc.splitTextToSize(textoAb, TW);
+    checkBreak(linhasAb.length * 4.5 + 6);
+    doc.setFontSize(8.5); doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_MD);
+    doc.text(linhasAb, L, y);
+    y += linhasAb.length * 4.5 + 8;
   }
 
-  // Título tabela
+  // ── TÍTULO SEÇÃO TABELA ───────────────────────────────────────────
   checkBreak(20);
-  doc.setFillColor(...VERMELHO);doc.rect(L,y,3,6,'F');
-  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...VERMELHO);
-  doc.text('TABELA COMPARATIVA DE PRAZOS',L+6,y+5);
-  y+=10;
+  // Linha vermelha lateral + título
+  doc.setFillColor(...VERMELHO);
+  doc.rect(L, y, 3, 6, 'F');
+  doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(...VERMELHO);
+  doc.text('TABELA COMPARATIVA DE PRAZOS', L+6, y+5);
+  y += 10;
 
-  // ── TABELA DE PRODUTOS ──
-  // CORREÇÃO: mostra Preço/un (sem valor total duplicado)
-  const prazos=[...new Set(itens.map(i=>i.prazo))].sort((a,b)=>a-b);
-  const prods=[...new Map(itens.map(i=>[i.idProd||i.nome,i])).values()];
-  const colW=Math.min(52,Math.floor((TW-65-10)/prazos.length));
-  const colStyles={0:{cellWidth:65,fontStyle:'bold'},1:{cellWidth:10,halign:'center'}};
-  prazos.forEach((_,i)=>{ colStyles[i+2]={cellWidth:colW,halign:'center'}; });
+  // ── TABELA DE PRODUTOS ────────────────────────────────────────────
+  const prazos = [...new Set(itens.map(i=>i.prazo))].sort((a,b)=>a-b);
+  const prods  = [...new Map(itens.map(i=>[i.idProd||i.nome, i])).values()];
+  const colW   = Math.min(52, Math.floor((TW-65-10) / prazos.length));
+  const colStyles = {0:{cellWidth:65,fontStyle:'bold'}, 1:{cellWidth:10,halign:'center'}};
+  prazos.forEach((_,i) => { colStyles[i+2] = {cellWidth:colW, halign:'center'}; });
 
   doc.autoTable({
-    startY:y,
-    head:[['Produto / Especificação','Qtd',...prazos.map(p=>`${p} ${p===1?'Mês':'Meses'}`)]],
-    body:prods.map(prod=>{
-      const row=[`${prod.nome}\n${prod.spec||''}`,String(prod.quantidade)];
-      prazos.forEach(p=>{
-        const item=itens.find(i=>(i.idProd||i.nome)===(prod.idProd||prod.nome)&&i.prazo===p);
-        // CORREÇÃO: só preço unitário, sem duplicar valor total
-        row.push(item?`${R$(item.precoFinal)}/un`:'—');
+    startY: y,
+    head: [['Produto / Especificação', 'Qtd', ...prazos.map(p=>`${p} ${p===1?'Mês':'Meses'}`)]],
+    body: prods.map(prod => {
+      const row = [`${prod.nome}\n${prod.spec||''}`, String(prod.quantidade)];
+      prazos.forEach(p => {
+        const item = itens.find(i=>(i.idProd||i.nome)===(prod.idProd||prod.nome)&&i.prazo===p);
+        if (!item) { row.push('—'); return; }
+        // Mostra: preço/un em destaque + desconto se tiver + mensal total embaixo
+        const descPerc = item.precoBase > 0 && item.precoFinal < item.precoBase
+          ? Math.round((1 - item.precoFinal/item.precoBase)*100*10)/10 : 0;
+        let celula = `${R$(item.precoFinal)}/un`;
+        if (descPerc > 0) celula += `\n-${descPerc}% volume`;
+        celula += `\n${R$(item.valorMensal)}/mês`;
+        row.push(celula);
       });
       return row;
     }),
-    theme:'grid',
-    styles:{fontSize:7.5,cellPadding:3,lineColor:[220,220,220],lineWidth:0.25},
-    headStyles:{fillColor:VERMELHO,textColor:BRANCO,fontStyle:'bold',halign:'center',fontSize:7.5},
-    columnStyles:colStyles,
-    bodyStyles:{valign:'middle',textColor:CINZA_ESC},
-    alternateRowStyles:{fillColor:FUNDO_LT},
-    margin:{left:L,right:R},
-  });
-  y=doc.lastAutoTable.finalY+3;
-
-  // Tabela totais (mensalidade + valor total do contrato — só aqui aparece!)
-  const totais=prazos.map(p=>{
-    const ip=itens.filter(i=>i.prazo===p);
-    const m=ip.reduce((s,i)=>s+i.valorMensal,0);
-    return {prazo:p,mensal:m,total:m*p};
-  });
-  doc.autoTable({
-    startY:y,
-    head:[['', ...prazos.map(p=>`${p} ${p===1?'Mês':'Meses'}`)]],
-    body:[
-      ['Mensalidade Total',...totais.map(t=>R$(t.mensal))],
-      ['VALOR TOTAL DO CONTRATO',...totais.map(t=>R$(t.total))],
-    ],
-    theme:'grid',
-    styles:{fontSize:8.5,cellPadding:3.5,fontStyle:'bold',lineColor:[220,220,220],lineWidth:0.25},
-    headStyles:{fillColor:[100,10,10],textColor:BRANCO,halign:'center',fontSize:7.5},
-    bodyStyles:{halign:'center',textColor:CINZA_ESC},
-    columnStyles:{0:{halign:'left',cellWidth:75,fillColor:FUNDO_LT}},
-    didParseCell(d){
-      if(d.section==='body'&&d.row.index===1){
-        d.cell.styles.fillColor=VERMELHO;d.cell.styles.textColor=BRANCO;d.cell.styles.fontSize=9;
+    theme: 'grid',
+    styles: { fontSize:7.5, cellPadding:3, lineColor:[220,220,220], lineWidth:0.25 },
+    headStyles: { fillColor:VERMELHO, textColor:BRANCO, fontStyle:'bold', halign:'center', fontSize:7.5 },
+    columnStyles: colStyles,
+    bodyStyles: { valign:'middle', textColor:CINZA_ESC },
+    alternateRowStyles: { fillColor:FUNDO_LT },
+    margin: { left:L, right:R },
+    // Colore a linha de desconto em verde
+    didParseCell(d) {
+      if (d.section === 'body' && d.column.index >= 2) {
+        const txt = d.cell.raw || '';
+        if (typeof txt === 'string' && txt.includes('% volume')) {
+          d.cell.styles.textColor = [16, 120, 60];
+        }
       }
     },
-    margin:{left:L,right:R},
   });
-  y=doc.lastAutoTable.finalY+10;
+  y = doc.lastAutoTable.finalY + 3;
 
-  // Informações Importantes
+  // ── TABELA TOTAIS ─────────────────────────────────────────────────
+  const totais = prazos.map(p => {
+    const ip = itens.filter(i=>i.prazo===p);
+    const m  = ip.reduce((s,i)=>s+i.valorMensal, 0);
+    return {prazo:p, mensal:m, total:m*p};
+  });
+
+  doc.autoTable({
+    startY: y,
+    head: [['', ...prazos.map(p=>`${p} ${p===1?'Mês':'Meses'}`) ]],
+    body: [
+      ['Mensalidade Total', ...totais.map(t=>R$(t.mensal))],
+      ['VALOR TOTAL DO CONTRATO', ...totais.map(t=>R$(t.total))],
+    ],
+    theme: 'grid',
+    styles: { fontSize:8.5, cellPadding:3.5, fontStyle:'bold', lineColor:[220,220,220], lineWidth:0.25 },
+    headStyles: { fillColor:[100,10,10], textColor:BRANCO, halign:'center', fontSize:7.5 },
+    bodyStyles: { halign:'center', textColor:CINZA_ESC },
+    columnStyles: { 0: { halign:'left', cellWidth:75, fillColor:FUNDO_LT } },
+    didParseCell(d) {
+      if (d.section==='body' && d.row.index===1) {
+        d.cell.styles.fillColor = VERMELHO;
+        d.cell.styles.textColor = BRANCO;
+        d.cell.styles.fontSize  = 9;
+      }
+    },
+    margin: { left:L, right:R },
+  });
+  y = doc.lastAutoTable.finalY + 10;
+
+  // ── SEÇÃO: INFORMAÇÕES IMPORTANTES ───────────────────────────────
   checkBreak(14);
-  doc.setFillColor(...VERMELHO);doc.rect(L,y,3,6,'F');
-  doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...VERMELHO);
-  doc.text('Informações Importantes',L+6,y+5);
-  y+=12;
+  doc.setFillColor(...VERMELHO);
+  doc.rect(L, y, 3, 6, 'F');
+  doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(...VERMELHO);
+  doc.text('Informações Importantes', L+6, y+5);
+  y += 12;
 
-  const clausulas=[
-    {t:'Seleção de Equipamentos',c:'Trabalhamos com as principais marcas do mercado, como Dell, Lenovo, HP, iSync e outras fabricantes reconhecidas. Disponibilizamos uma ampla gama de modelos para atender às necessidades específicas de cada empresa. Nossos equipamentos são constantemente atualizados e configurados de acordo com as especificações técnicas exigidas.'},
-    {t:'Personalização',c:'Entendemos que cada empresa possui demandas únicas. Por isso, oferecemos opções de personalização para adequar os equipamentos às necessidades do seu ambiente de trabalho, incluindo capacidade de processamento, memória, armazenamento e recursos de segurança.'},
-    {t:'Suporte Técnico Especializado',c:'Nossa equipe de suporte técnico altamente qualificada está disponível para prestar assistência sempre que necessário. O atendimento pode ser realizado remotamente, por telefone ou presencialmente, conforme a necessidade da operação.'},
-    {t:'Manutenção e Atualizações',c:'Todos os equipamentos passam por manutenção preventiva e corretiva periódica para garantir seu pleno funcionamento. Também realizamos atualizações de software e segurança para manter os dispositivos protegidos e atualizados.'},
-    {t:'Opções Flexíveis de Locação',c:'Oferecemos contratos de curto, médio e longo prazo, permitindo adequação às necessidades financeiras e operacionais da sua empresa. Também disponibilizamos opções de renovação contratual e aquisição dos equipamentos ao término da locação.'},
-    {t:'Entrega e Instalação',c:'Realizamos a entrega e instalação dos equipamentos nas dependências da sua empresa, garantindo que todos os dispositivos sejam configurados corretamente e estejam prontos para uso imediato.'},
+  // Cláusulas — subtítulos em negrito vermelho + texto normal
+  const clausulas = [
+    {
+      t: 'Seleção de Equipamentos',
+      c: 'Trabalhamos com as principais marcas do mercado, como Dell, Lenovo, HP, iSync e outras fabricantes reconhecidas. Disponibilizamos uma ampla gama de modelos para atender às necessidades específicas de cada empresa. Nossos equipamentos são constantemente atualizados e configurados de acordo com as especificações técnicas exigidas.'
+    },
+    {
+      t: 'Personalização',
+      c: 'Entendemos que cada empresa possui demandas únicas. Por isso, oferecemos opções de personalização para adequar os equipamentos às necessidades do seu ambiente de trabalho, incluindo capacidade de processamento, memória, armazenamento e recursos de segurança.'
+    },
+    {
+      t: 'Suporte Técnico Especializado',
+      c: 'Nossa equipe de suporte técnico altamente qualificada está disponível para prestar assistência sempre que necessário. O atendimento pode ser realizado remotamente, por telefone ou presencialmente, conforme a necessidade da operação.'
+    },
+    {
+      t: 'Manutenção e Atualizações',
+      c: 'Todos os equipamentos passam por manutenção preventiva e corretiva periódica para garantir seu pleno funcionamento. Também realizamos atualizações de software e segurança para manter os dispositivos protegidos e atualizados.'
+    },
+    {
+      t: 'Opções Flexíveis de Locação',
+      c: 'Oferecemos contratos de curto, médio e longo prazo, permitindo adequação às necessidades financeiras e operacionais da sua empresa. Também disponibilizamos opções de renovação contratual e aquisição dos equipamentos ao término da locação.'
+    },
+    {
+      t: 'Entrega e Instalação',
+      c: 'Realizamos a entrega e instalação dos equipamentos nas dependências da sua empresa, garantindo que todos os dispositivos sejam configurados corretamente e estejam prontos para uso imediato.'
+    },
   ];
 
-  clausulas.forEach(item=>{
-    const textBody=doc.splitTextToSize(item.c,TW-4);
-    checkBreak(5+(textBody.length*4.2)+5);
-    doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(...VERMELHO);
-    doc.text(item.t,L,y); y+=5;
-    doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_MD);
-    doc.text(textBody,L+4,y);
-    y+=textBody.length*4.2+4;
+  clausulas.forEach(item => {
+    // Estima altura: título (4mm) + texto
+    const textBody = doc.splitTextToSize(item.c, TW - 4);
+    const alturaTotal = 5 + (textBody.length * 4.2) + 5;
+    checkBreak(alturaTotal);
+
+    // Subtítulo vermelho negrito
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...VERMELHO);
+    doc.text(item.t, L, y);
+    y += 5;
+
+    // Corpo do texto
+    doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_MD); doc.setFontSize(8.5);
+    doc.text(textBody, L+4, y);
+    y += textBody.length * 4.2 + 4;
   });
 
-  // Conclusão
-  if(config.textoConclusao){
-    const lc=doc.splitTextToSize(config.textoConclusao,TW);
-    checkBreak(lc.length*4.5+20);
-    y+=4;
-    doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_MD);
-    doc.text(lc,L,y);
-    y+=lc.length*4.5+10;
-    if(vendedor){
+  // ── TEXTO DE CONCLUSÃO ────────────────────────────────────────────
+  const textoConcl = config.textoConclusao || '';
+  if (textoConcl) {
+    const linhasConcl = doc.splitTextToSize(textoConcl, TW);
+    checkBreak(linhasConcl.length * 4.5 + 20);
+    y += 4;
+    doc.setFontSize(8.5); doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_MD);
+    doc.text(linhasConcl, L, y);
+    y += linhasConcl.length * 4.5 + 10;
+
+    // ── ASSINATURA ────────────────────────────────────────────────
+    if (vendedor) {
       checkBreak(18);
-      doc.setDrawColor(...CINZA_LT);doc.setLineWidth(0.3);doc.line(L,y,L+55,y); y+=5;
-      doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(...CINZA_ESC);
-      doc.text(vendedor,L,y); y+=4.5;
-      doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_LT);doc.setFontSize(8);
-      if(telefone){doc.text(telefone,L,y);y+=4;}
-      if(email_v){doc.text(email_v,L,y);y+=4;}
+      // Linha de assinatura
+      doc.setDrawColor(...CINZA_LT); doc.setLineWidth(0.3);
+      doc.line(L, y, L+55, y);
+      y += 5;
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(...CINZA_ESC);
+      doc.text(vendedor, L, y); y += 4.5;
+      doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_LT); doc.setFontSize(8);
+      if (telefone)  { doc.text(telefone,  L, y); y += 4; }
+      if (email_v)   { doc.text(email_v,   L, y); y += 4; }
     }
   }
 
-  const total_pages=doc.internal.getNumberOfPages();
-  for(let i=1;i<=total_pages;i++){
-    doc.setPage(i);drawFooter();
-    doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(...CINZA_LT);
-    doc.text(`Página ${i} de ${total_pages}`,W-R,292,{align:'right'});
+  // ── RODAPÉ EM TODAS AS PÁGINAS ─────────────────────────────────
+  const total_pages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= total_pages; i++) {
+    doc.setPage(i);
+    drawFooter();
+    // Número da página
+    doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(...CINZA_LT);
+    doc.text(`Página ${i} de ${total_pages}`, W-R, 292, {align:'right'});
   }
+
   return doc;
 }
 
 /* ══════════════════════════════════════════
    COMPONENTES BASE
 ══════════════════════════════════════════ */
-function FG({label,req,err,hint,children}){
-  return(<div className="form-group">
-    {label&&<div className="label">{label}{req&&<span className="req"> *</span>}</div>}
-    {children}
-    {hint&&<span className="fhint">{hint}</span>}
-    {err&&<span className="ferr">{err}</span>}
-  </div>);
+function FG({label, req, err, hint, children}) {
+  return (
+    <div className="form-group">
+      {label && <div className="label">{label}{req&&<span className="req"> *</span>}</div>}
+      {children}
+      {hint && <span className="fhint">{hint}</span>}
+      {err  && <span className="ferr">{err}</span>}
+    </div>
+  );
 }
-function Inp({label,req,err,hint,...p}){
-  return(<FG label={label} req={req} err={err} hint={hint}><input className={`input${err?' err':''}`} {...p}/></FG>);
+function Inp({label, req, err, hint, ...p}) {
+  return (
+    <FG label={label} req={req} err={err} hint={hint}>
+      <input className={`input${err?' err':''}`} {...p}/>
+    </FG>
+  );
 }
-function Toast({toasts}){
-  const ic={success:'✅',error:'❌',info:'ℹ️'};
-  return(<div className="toast-container">{toasts.map(t=><div key={t.id} className={`toast ${t.type}`}><span>{ic[t.type]}</span>{t.msg}</div>)}</div>);
+function Toast({toasts}) {
+  const ic = {success:'✅', error:'❌', info:'ℹ️'};
+  return (
+    <div className="toast-container">
+      {toasts.map(t => <div key={t.id} className={`toast ${t.type}`}><span>{ic[t.type]}</span>{t.msg}</div>)}
+    </div>
+  );
 }
 
 /* ══════════════════════════════════════════
    BANNER ALERTAS
 ══════════════════════════════════════════ */
-function AlertBanner({catalogo,contratos,config}){
-  const semEstoque=catalogo.filter(p=>p.qtdEstoque===0);
-  const baixoEstoque=catalogo.filter(p=>p.qtdEstoque>0&&p.qtdEstoque<=(config.alertaEstoqueMinimoQtd||3));
-  const limite=config.alertaDiasContrato||30;
-  const contratosAlertas=contratos.filter(c=>{const d=diasParaVencer(c.inicio,c.meses);return d>=0&&d<=limite;});
-  const contratosVencidos=contratos.filter(c=>diasParaVencer(c.inicio,c.meses)<0);
-  if(!semEstoque.length&&!baixoEstoque.length&&!contratosAlertas.length&&!contratosVencidos.length) return null;
-  return(<div>
-    {(semEstoque.length>0||baixoEstoque.length>0)&&(
-      <div className="alert-banner">
-        <span>⚠️ Estoque:</span>
-        {semEstoque.map(p=><div key={p.id} className="alert-item">🔴 {p.nome} — SEM ESTOQUE</div>)}
-        {baixoEstoque.map(p=><div key={p.id} className="alert-item">🟡 {p.nome} — só {p.qtdEstoque} un</div>)}
-      </div>
-    )}
-    {(contratosAlertas.length>0||contratosVencidos.length>0)&&(
-      <div className="alert-banner warn">
-        <span>📋 Contratos:</span>
-        {contratosVencidos.map(c=><div key={c.id} className="alert-item">🔴 {c.cliente} — VENCIDO</div>)}
-        {contratosAlertas.map(c=>{const d=diasParaVencer(c.inicio,c.meses);return<div key={c.id} className="alert-item">🟡 {c.cliente} — vence em {d}d</div>;})}
-      </div>
-    )}
-  </div>);
+function AlertBanner({catalogo, contratos, config}) {
+  const semEstoque = catalogo.filter(p => p.qtdEstoque === 0);
+  const baixoEstoque = catalogo.filter(p => p.qtdEstoque > 0 && p.qtdEstoque <= (config.alertaEstoqueMinimoQtd || 3));
+  const limite = config.alertaDiasContrato || 30;
+  const contratosAlertas = contratos.filter(c => { const d = diasParaVencer(c.inicio, c.meses); return d >= 0 && d <= limite; });
+  const contratosVencidos = contratos.filter(c => diasParaVencer(c.inicio, c.meses) < 0);
+  if (!semEstoque.length && !baixoEstoque.length && !contratosAlertas.length && !contratosVencidos.length) return null;
+  return (
+    <div>
+      {(semEstoque.length > 0 || baixoEstoque.length > 0) && (
+        <div className="alert-banner">
+          <span>⚠️ Estoque:</span>
+          {semEstoque.map(p => <div key={p.id} className="alert-item">🔴 {p.nome} — SEM ESTOQUE</div>)}
+          {baixoEstoque.map(p => <div key={p.id} className="alert-item">🟡 {p.nome} — só {p.qtdEstoque} un</div>)}
+        </div>
+      )}
+      {(contratosAlertas.length > 0 || contratosVencidos.length > 0) && (
+        <div className="alert-banner warn">
+          <span>📋 Contratos:</span>
+          {contratosVencidos.map(c => <div key={c.id} className="alert-item">🔴 {c.cliente} — VENCIDO</div>)}
+          {contratosAlertas.map(c => { const d = diasParaVencer(c.inicio, c.meses); return <div key={c.id} className="alert-item">🟡 {c.cliente} — vence em {d}d</div>; })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /* ══════════════════════════════════════════
    MODAL EDITAR PRODUTO
-   NOVO: preço base + % desconto por volume
+   Faixas de volume totalmente editáveis:
+   qtdMin, qtdMax e preço direto por faixa
 ══════════════════════════════════════════ */
-function ModalEditarProduto({prod,onSave,onClose}){
-  const p1orig=prod?.precos?.[1]||0;
-  const p5orig=prod?.precos?.[5]||0;
-  const p10orig=prod?.precos?.[10]||0;
-  const desc5calc  = p1orig&&p5orig  ? Math.round((1-p5orig/p1orig)*100*10)/10  : (prod?.descontos?.desc5||0);
-  const desc10calc = p1orig&&p10orig ? Math.round((1-p10orig/p1orig)*100*10)/10 : (prod?.descontos?.desc10||0);
+function ModalEditarProduto({prod, onSave, onClose}) {
+  const isNovo = !prod?.id;
 
-  const [form,setForm]=useState({
-    nome:prod?.nome||'', spec:prod?.spec||'', qtdEstoque:prod?.qtdEstoque??0,
-    preco1:p1orig||0, desc5:desc5calc||0, desc10:desc10calc||0,
-    modalidade:prod?.modalidade||'Locação',
-  });
-  const set=(k,v)=>setForm(p=>({...p,[k]:v}));
-  const isNovo=!prod?.id;
-
-  const base=parseFloat(form.preco1)||0;
-  const d5=parseFloat(form.desc5)||0;
-  const d10=parseFloat(form.desc10)||0;
-  const preco5=base>0?Math.round(base*(1-d5/100)*100)/100:0;
-  const preco10=base>0?Math.round(base*(1-d10/100)*100)/100:0;
-
-  const handleSave=()=>{
-    if(!form.nome.trim()) return;
-    onSave({id:prod?.id||`NB-${uid()}`,nome:form.nome.trim(),spec:form.spec.trim(),
-      qtdEstoque:parseInt(form.qtdEstoque)||0,
-      precos:{1:base,5:preco5||base,10:preco10||base},
-      descontos:{desc5:d5,desc10:d10},
-      prazosPadrao:[12,24,36],modalidade:form.modalidade});
+  // Converte precos legado {1:x,5:y,10:z} → faixas se necessário
+  const faixasIniciais = () => {
+    if (prod?.faixas && prod.faixas.length > 0) return prod.faixas;
+    if (prod?.precos) {
+      const chaves = Object.keys(prod.precos).map(Number).sort((a,b)=>a-b);
+      return chaves.map((k, i) => ({
+        qtdMin: k,
+        qtdMax: chaves[i+1] ? chaves[i+1]-1 : 9999,
+        preco: prod.precos[k] || 0,
+      }));
+    }
+    // Padrão novo produto: 3 faixas
+    return [
+      { qtdMin:1,  qtdMax:4,    preco:0 },
+      { qtdMin:5,  qtdMax:9,    preco:0 },
+      { qtdMin:10, qtdMax:9999, preco:0 },
+    ];
   };
 
-  return(
+  const [form, setForm] = useState({
+    nome:       prod?.nome       || '',
+    spec:       prod?.spec       || '',
+    qtdEstoque: prod?.qtdEstoque ?? 0,
+    modalidade: prod?.modalidade || 'Locação',
+  });
+  const [faixas, setFaixas] = useState(faixasIniciais);
+  const setF = (k,v) => setForm(p=>({...p,[k]:v}));
+
+  const precoBase = faixas[0]?.preco || 0;
+
+  const setFaixa = (i, campo, valor) => {
+    setFaixas(prev => prev.map((f, idx) => idx === i ? {...f, [campo]: valor} : f));
+  };
+
+  const adicionarFaixa = () => {
+    const ultima = faixas[faixas.length-1];
+    const novoMin = ultima ? (ultima.qtdMax >= 9999 ? ultima.qtdMin + 10 : ultima.qtdMax + 1) : 1;
+    setFaixas(prev => [
+      ...prev.map((f,i) => i === prev.length-1 ? {...f, qtdMax: novoMin-1} : f),
+      { qtdMin: novoMin, qtdMax: 9999, preco: Math.round((ultima?.preco || 0) * 0.9) },
+    ]);
+  };
+
+  const removerFaixa = (i) => {
+    if (faixas.length <= 1) return;
+    setFaixas(prev => {
+      const nova = prev.filter((_,idx) => idx !== i);
+      // Última faixa sempre vai até infinito
+      nova[nova.length-1] = {...nova[nova.length-1], qtdMax: 9999};
+      return nova;
+    });
+  };
+
+  const handleSave = () => {
+    if (!form.nome.trim() || !faixas[0]?.preco) return;
+    // Monta precos legado para compatibilidade com importação antiga
+    const precos = {};
+    faixas.forEach(f => { precos[f.qtdMin] = f.preco; });
+    onSave({
+      id:         prod?.id || `NB-${uid()}`,
+      nome:       form.nome.trim(),
+      spec:       form.spec.trim(),
+      qtdEstoque: parseInt(form.qtdEstoque) || 0,
+      faixas:     faixas.map(f => ({...f, preco: parseFloat(f.preco)||0})),
+      precos,
+      prazosPadrao: [12,24,36],
+      modalidade: form.modalidade,
+    });
+  };
+
+  return (
     <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="modal" onClick={e=>e.stopPropagation()}>
+      <div className="modal" style={{maxWidth:560}} onClick={e=>e.stopPropagation()}>
         <div className="modal-title">{isNovo?'➕ Novo Produto':'✏️ Editar Produto'}</div>
-        <div className="modal-sub">Catálogo de estoque — dados e precificação</div>
+        <div className="modal-sub">Catálogo · defina faixas de volume com preços personalizados</div>
+
+        {/* Dados básicos */}
         <div className="form-row c2" style={{marginBottom:10}}>
-          <Inp label="Nome" req value={form.nome} onChange={e=>set('nome',e.target.value)}/>
-          <FG label="Modalidade"><select className="input" value={form.modalidade} onChange={e=>set('modalidade',e.target.value)}><option>Locação</option><option>Venda</option><option>Locação/Venda</option></select></FG>
+          <Inp label="Nome do Produto" req value={form.nome} onChange={e=>setF('nome',e.target.value)} placeholder="Dell Latitude 5440"/>
+          <FG label="Modalidade">
+            <select className="input" value={form.modalidade} onChange={e=>setF('modalidade',e.target.value)}>
+              <option>Locação</option><option>Venda</option><option>Locação/Venda</option>
+            </select>
+          </FG>
         </div>
-        <div className="form-row" style={{marginBottom:10}}>
-          <Inp label="Especificação" value={form.spec} onChange={e=>set('spec',e.target.value)} placeholder="Ex: i5-1335U / 16GB / 256GB SSD"/>
+        <div className="form-row c2" style={{marginBottom:10}}>
+          <Inp label="Especificação" value={form.spec} onChange={e=>setF('spec',e.target.value)} placeholder="i5-1335U / 16GB / 256GB SSD"/>
+          <Inp label="Qtd em Estoque" type="number" min="0" value={form.qtdEstoque} onChange={e=>setF('qtdEstoque',e.target.value)}/>
         </div>
-        <div className="form-row" style={{marginBottom:10}}>
-          <Inp label="Qtd em Estoque" type="number" min="0" value={form.qtdEstoque} onChange={e=>set('qtdEstoque',e.target.value)}/>
-        </div>
+
         <div className="divider"/>
-        <div style={{fontSize:12,fontWeight:700,color:'var(--navy)',marginBottom:6}}>💰 Precificação por Volume</div>
-        <div className="ibox blue" style={{marginBottom:10,fontSize:11}}>
-          <span>💡</span> Defina o preço base (1–4 un) e o % de desconto automático para volumes maiores. Quanto mais pega, mais desconto!
-        </div>
-        <div className="form-row" style={{marginBottom:12}}>
-          <Inp label="Preço Base — 1 a 4 unidades (R$/un/mês)" req type="number" min="0" step="0.01" value={form.preco1} onChange={e=>set('preco1',e.target.value)} placeholder="Ex: 395"/>
-        </div>
-        <div style={{background:'var(--bg)',border:'1.5px solid var(--border)',borderRadius:'var(--radius)',padding:'14px',marginBottom:12}}>
-          <div style={{fontSize:11,fontWeight:700,color:'var(--text-mid)',marginBottom:10,textTransform:'uppercase',letterSpacing:'.4px'}}>🏷️ Descontos por Volume (%)</div>
-          <div className="form-row c2" style={{marginBottom:12}}>
-            <div className="form-group">
-              <div className="label">5–9 unidades — % de desconto</div>
-              <input className="input" type="number" min="0" max="99" step="0.1" value={form.desc5}
-                onChange={e=>set('desc5',e.target.value)} placeholder="Ex: 8"/>
-            </div>
-            <div className="form-group">
-              <div className="label">10+ unidades — % de desconto</div>
-              <input className="input" type="number" min="0" max="99" step="0.1" value={form.desc10}
-                onChange={e=>set('desc10',e.target.value)} placeholder="Ex: 18"/>
-            </div>
+
+        {/* Faixas de volume */}
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
+          <div style={{fontSize:12, fontWeight:800, color:'var(--navy)'}}>
+            📊 Faixas de Volume — Preço por Unidade/Mês
           </div>
-          {/* Simulação visual das 3 faixas */}
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
-            {[
-              {label:'1–4 un',preco:base,desc:0,cls:'tier1'},
-              {label:'5–9 un',preco:preco5,desc:d5,cls:'tier2'},
-              {label:'10+ un',preco:preco10,desc:d10,cls:'tier3'},
-            ].map((f,i)=>(
-              <div key={i} className={`vol-preview-box ${f.cls}`}>
-                <div style={{fontSize:9,color:'var(--slate)',textTransform:'uppercase',fontWeight:700,marginBottom:3}}>{f.label}</div>
-                <div style={{fontSize:15,fontWeight:800,color:'var(--navy)'}}>{base>0?R$(Math.round(f.preco*100)/100):'—'}</div>
-                {f.desc>0&&<div style={{fontSize:10,color:'var(--success)',fontWeight:700}}>-{f.desc}%</div>}
-                <div style={{fontSize:9,color:'var(--slate)'}}>por un/mês</div>
+          <button className="btn btn-outline btn-sm" onClick={adicionarFaixa}>＋ Faixa</button>
+        </div>
+
+        <div className="ibox blue" style={{marginBottom:12, fontSize:11}}>
+          <span>💡</span>
+          <span>Defina quantas faixas quiser com os limites que preferir. Ex: 1–3 un, 4–10 un, 11+ un. O app aplica o preço automaticamente conforme a quantidade selecionada.</span>
+        </div>
+
+        {/* Cabeçalho */}
+        <div style={{display:'grid', gridTemplateColumns:'80px 80px 1fr 80px 32px', gap:6, marginBottom:6, padding:'0 2px'}}>
+          <div className="label">De (un)</div>
+          <div className="label">Até (un)</div>
+          <div className="label">Preço R$/un/mês</div>
+          <div className="label">Desc. s/ 1ª</div>
+          <div/>
+        </div>
+
+        {faixas.map((f, i) => {
+          const isUltima = i === faixas.length - 1;
+          const descPerc = precoBase > 0 && i > 0 && f.preco > 0
+            ? Math.round((1 - f.preco / precoBase) * 100 * 10) / 10 : 0;
+          return (
+            <div key={i} style={{display:'grid', gridTemplateColumns:'80px 80px 1fr 80px 32px', gap:6, marginBottom:6, alignItems:'center'}}>
+              {/* De */}
+              <input className="input" type="number" min="1"
+                value={f.qtdMin}
+                onChange={e=>setFaixa(i,'qtdMin',parseInt(e.target.value)||1)}
+                style={{textAlign:'center', fontWeight:700}}
+                readOnly={i===0}
+              />
+              {/* Até */}
+              {isUltima ? (
+                <div className="input" style={{display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)',color:'var(--slate)',fontSize:15,fontWeight:700}}>∞</div>
+              ) : (
+                <input className="input" type="number" min={f.qtdMin}
+                  value={f.qtdMax}
+                  onChange={e => {
+                    const v = parseInt(e.target.value)||f.qtdMin;
+                    setFaixas(prev => prev.map((fx,idx) => {
+                      if (idx === i)   return {...fx, qtdMax: v};
+                      if (idx === i+1) return {...fx, qtdMin: v+1};
+                      return fx;
+                    }));
+                  }}
+                  style={{textAlign:'center', fontWeight:700}}
+                />
+              )}
+              {/* Preço */}
+              <div style={{position:'relative'}}>
+                <input className="input" type="number" min="0" step="0.01"
+                  value={f.preco}
+                  onChange={e=>setFaixa(i,'preco',e.target.value)}
+                  placeholder="0,00"
+                  style={{paddingLeft:28}}
+                />
+                <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',fontSize:12,color:'var(--slate)',pointerEvents:'none',fontWeight:600}}>R$</span>
               </div>
-            ))}
+              {/* Desconto automático em relação à 1ª faixa */}
+              <div style={{
+                height:40, display:'flex', alignItems:'center', justifyContent:'center',
+                borderRadius:'var(--radius)', fontSize:12, fontWeight:800,
+                background: descPerc > 0 ? 'var(--success-bg)' : i===0 ? 'rgba(37,99,235,.07)' : 'var(--bg)',
+                color: descPerc > 0 ? 'var(--success)' : i===0 ? 'var(--electric)' : 'var(--slate)',
+                border: `1px solid ${descPerc>0?'#6ee7b7':i===0?'rgba(37,99,235,.2)':'var(--border)'}`,
+              }}>
+                {i === 0 ? 'Base' : descPerc > 0 ? `-${descPerc}%` : '—'}
+              </div>
+              {/* Remover */}
+              {faixas.length > 1 ? (
+                <button className="btn btn-ghost btn-icon" style={{fontSize:13}} onClick={()=>removerFaixa(i)}>🗑️</button>
+              ) : <div/>}
+            </div>
+          );
+        })}
+
+        {/* Preview visual */}
+        {faixas.some(f=>f.preco>0) && (
+          <div style={{marginTop:12, background:'var(--bg)', borderRadius:'var(--radius)', padding:'10px 12px'}}>
+            <div style={{fontSize:11,fontWeight:700,color:'var(--navy)',marginBottom:8}}>👀 Prévia — Como aparece no orçamento</div>
+            <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
+              {faixas.map((f,i) => {
+                const p = parseFloat(f.preco)||0;
+                const desc = precoBase>0&&i>0&&p>0 ? Math.round((1-p/precoBase)*100*10)/10 : 0;
+                return (
+                  <div key={i} style={{flex:1, minWidth:70, textAlign:'center', background:'white', border:'1px solid var(--border)', borderRadius:'var(--radius)', padding:'8px 4px'}}>
+                    <div style={{fontSize:10,color:'var(--slate)',marginBottom:3}}>
+                      {i===faixas.length-1?`${f.qtdMin}+ un`:`${f.qtdMin}–${f.qtdMax} un`}
+                    </div>
+                    <div style={{fontSize:15, fontWeight:800, color:'var(--navy)'}}>{p>0?R$(p):'—'}</div>
+                    {desc>0&&(
+                      <div style={{fontSize:10,background:'var(--success-bg)',color:'var(--success)',borderRadius:20,padding:'1px 7px',fontWeight:700,marginTop:3}}>-{desc}%</div>
+                    )}
+                    <div style={{fontSize:9,color:'var(--slate)',marginTop:2}}>/un/mês</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
+
         <div className="modal-btns">
           <button className="btn btn-outline" style={{flex:1}} onClick={onClose}>Cancelar</button>
-          <button className="btn btn-primary" style={{flex:2}} onClick={handleSave}>{isNovo?'➕ Adicionar':'💾 Salvar'}</button>
+          <button className="btn btn-primary" style={{flex:2}} onClick={handleSave}
+            disabled={!form.nome.trim() || !faixas[0]?.preco}>
+            {isNovo?'➕ Adicionar ao Catálogo':'💾 Salvar Alterações'}
+          </button>
         </div>
       </div>
     </div>
@@ -626,15 +921,15 @@ function ModalEditarProduto({prod,onSave,onClose}){
 /* ══════════════════════════════════════════
    MODAL EDITAR ITEM
 ══════════════════════════════════════════ */
-function ModalEditarItem({item,onSave,onClose}){
-  const [qtd,setQtd]=useState(item.quantidade);
-  const [prazo,setPrazo]=useState(item.prazo);
-  const [preco,setPreco]=useState(item.precoFinal);
-  const [dT,setDT]=useState(item.descTipo||'%');
-  const [dV,setDV]=useState(item.descValor||0);
-  const pFin=aplicaDesc(preco,dT,parseFloat(dV)||0);
-  const mensal=pFin*qtd; const total=mensal*prazo;
-  return(
+function ModalEditarItem({item, onSave, onClose}) {
+  const [qtd, setQtd]     = useState(item.quantidade);
+  const [prazo, setPrazo] = useState(item.prazo);
+  const [preco, setPreco] = useState(item.precoFinal);
+  const [dT, setDT]       = useState(item.descTipo||'%');
+  const [dV, setDV]       = useState(item.descValor||0);
+  const pFin = aplicaDesc(preco, dT, parseFloat(dV)||0);
+  const mensal = pFin * qtd; const total = mensal * prazo;
+  return (
     <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="modal" onClick={e=>e.stopPropagation()}>
         <div className="modal-title">✏️ Editar Item</div>
@@ -674,25 +969,29 @@ function ModalEditarItem({item,onSave,onClose}){
 /* ══════════════════════════════════════════
    TELA CONTRATOS
 ══════════════════════════════════════════ */
-function TelaContratos({contratos,setContratos,config,toast}){
-  const [modal,setModal]=useState(false);
-  const [form,setForm]=useState({cliente:'',produto:'',qtd:1,inicio:'',meses:24,mensalidade:''});
-  const set=(k,v)=>setForm(p=>({...p,[k]:v}));
-  const limite=config.alertaDiasContrato||30;
-  const handleAdd=()=>{
-    if(!form.cliente||!form.inicio){toast('Preencha cliente e data de início.','error');return;}
-    setContratos(p=>[...p,{id:`CTR-${uid()}`,...form,qtd:parseInt(form.qtd)||1,meses:parseInt(form.meses)||1,mensalidade:parseFloat(form.mensalidade)||0}]);
-    setModal(false);setForm({cliente:'',produto:'',qtd:1,inicio:'',meses:24,mensalidade:''});
+function TelaContratos({contratos, setContratos, config, toast}) {
+  const [modal, setModal] = useState(false);
+  const [form, setForm] = useState({cliente:'',produto:'',qtd:1,inicio:'',meses:24,mensalidade:''});
+  const set = (k,v) => setForm(p=>({...p,[k]:v}));
+  const limite = config.alertaDiasContrato || 30;
+
+  const handleAdd = () => {
+    if (!form.cliente || !form.inicio) { toast('Preencha cliente e data de início.','error'); return; }
+    setContratos(p => [...p, { id:`CTR-${uid()}`, ...form, qtd:parseInt(form.qtd)||1, meses:parseInt(form.meses)||1, mensalidade:parseFloat(form.mensalidade)||0 }]);
+    setModal(false); setForm({cliente:'',produto:'',qtd:1,inicio:'',meses:24,mensalidade:''});
     toast('Contrato registrado!','success');
   };
-  const ordenados=[...contratos].sort((a,b)=>diasParaVencer(a.inicio,a.meses)-diasParaVencer(b.inicio,b.meses));
-  const diasBadge=(dias)=>{
-    if(dias<0) return<span className="dias-badge vencido">Vencido há {Math.abs(dias)}d</span>;
-    if(dias<=7) return<span className="dias-badge perigo">🔴 {dias}d restantes</span>;
-    if(dias<=limite) return<span className="dias-badge warn">🟡 {dias}d restantes</span>;
-    return<span className="dias-badge ok">✅ {dias}d</span>;
+
+  const ordenados = [...contratos].sort((a,b) => diasParaVencer(a.inicio,a.meses) - diasParaVencer(b.inicio,b.meses));
+
+  const diasBadge = (dias) => {
+    if (dias < 0)       return <span className="dias-badge vencido">Vencido há {Math.abs(dias)}d</span>;
+    if (dias <= 7)      return <span className="dias-badge perigo">🔴 {dias}d restantes</span>;
+    if (dias <= limite) return <span className="dias-badge warn">🟡 {dias}d restantes</span>;
+    return <span className="dias-badge ok">✅ {dias}d</span>;
   };
-  return(
+
+  return (
     <div className="main">
       <div className="card">
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
@@ -700,17 +999,18 @@ function TelaContratos({contratos,setContratos,config,toast}){
           <button className="btn btn-success" onClick={()=>setModal(true)}>➕ Novo Contrato</button>
         </div>
         <div className="ibox blue" style={{marginBottom:12}}>
-          <span>🤖</span><span>Agente ativo: alertas para contratos que vencem em até <strong>{limite} dias</strong> e estoque abaixo de <strong>{config.alertaEstoqueMinimoQtd||3} un</strong>.</span>
+          <span>🤖</span>
+          <span>Agente ativo: alertas para contratos que vencem em até <strong>{limite} dias</strong> e estoque abaixo de <strong>{config.alertaEstoqueMinimoQtd||3} unidades</strong>. Configure em ⚙️.</span>
         </div>
-        {ordenados.length===0?(
+        {ordenados.length === 0 ? (
           <div className="empty"><div className="eicon">📋</div><p>Nenhum contrato registrado.</p></div>
-        ):(
+        ) : (
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
-            {ordenados.map(c=>{
-              const dias=diasParaVencer(c.inicio,c.meses);
-              const cls=dias<0?'vencido':dias<=limite?'vencendo':'';
-              const fim=new Date(c.inicio);fim.setMonth(fim.getMonth()+c.meses);
-              return(
+            {ordenados.map(c => {
+              const dias = diasParaVencer(c.inicio, c.meses);
+              const cls  = dias < 0 ? 'vencido' : dias <= limite ? 'vencendo' : '';
+              const fim  = new Date(c.inicio); fim.setMonth(fim.getMonth() + c.meses);
+              return (
                 <div key={c.id} className={`contract-row ${cls}`}>
                   <div className="contract-info">
                     <div className="contract-nome">{c.cliente}</div>
@@ -720,17 +1020,25 @@ function TelaContratos({contratos,setContratos,config,toast}){
                       <span style={{fontSize:10,color:'var(--slate)'}}>Início: {new Date(c.inicio+'T12:00').toLocaleDateString('pt-BR')}</span>
                       <span style={{fontSize:10,color:'var(--slate)'}}>Fim: {fim.toLocaleDateString('pt-BR')}</span>
                     </div>
-                    {dias>=0&&dias<=limite&&<div className="ibox warn" style={{marginTop:6,fontSize:11}}><span>📣</span><span>Contrato próximo do vencimento! Entre em contato com <strong>{c.cliente}</strong>.</span></div>}
-                    {dias<0&&<div className="ibox red" style={{marginTop:6,fontSize:11}}><span>🚨</span><span>Contrato VENCIDO. Regularize com <strong>{c.cliente}</strong>.</span></div>}
+                    {dias >= 0 && dias <= limite && (
+                      <div className="ibox warn" style={{marginTop:6,fontSize:11}}>
+                        <span>📣</span><span>Contrato próximo do vencimento! Entre em contato com <strong>{c.cliente}</strong>.</span>
+                      </div>
+                    )}
+                    {dias < 0 && (
+                      <div className="ibox red" style={{marginTop:6,fontSize:11}}>
+                        <span>🚨</span><span>Contrato VENCIDO. Regularize com <strong>{c.cliente}</strong>.</span>
+                      </div>
+                    )}
                   </div>
-                  <button className="btn btn-ghost btn-icon" onClick={()=>{setContratos(p=>p.filter(x=>x.id!==c.id));toast('Removido.','info')}}>🗑️</button>
+                  <button className="btn btn-ghost btn-icon" onClick={()=>{setContratos(p=>p.filter(x=>x.id!==c.id));toast('Removido.','info')}} title="Remover">🗑️</button>
                 </div>
               );
             })}
           </div>
         )}
       </div>
-      {modal&&(
+      {modal && (
         <div className="overlay" onClick={e=>e.target===e.currentTarget&&setModal(false)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <div className="modal-title">➕ Novo Contrato</div>
@@ -757,238 +1065,513 @@ function TelaContratos({contratos,setContratos,config,toast}){
 }
 
 /* ══════════════════════════════════════════
-   MODAL IMPORTAR PLANILHA
+   TELA ESTOQUE
 ══════════════════════════════════════════ */
-function ModalImportarPlanilha({onImportar,onClose,inline=false}){
-  const [etapa,setEtapa]=useState(1);
-  const [arquivo,setArquivo]=useState(null);
-  const [planilhaLinhas,setPlanilhaLinhas]=useState([]);
-  const [colunas,setColunas]=useState([]);
-  const [mapa,setMapa]=useState({nome:'',spec:'',qtd:'',preco1:'',preco5:'',preco10:'',modalidade:''});
-  const [preview,setPreview]=useState([]);
-  const [dragOver,setDragOver]=useState(false);
-  const [modo,setModo]=useState('substituir');
-  const fileRef=useRef(null);
-  const CAMPOS=[
-    {key:'nome',label:'Nome do Produto',obrigatorio:true,hint:'Ex: Dell Latitude 5440'},
-    {key:'spec',label:'Especificação',obrigatorio:false,hint:'Ex: i5 / 16GB / 256GB'},
-    {key:'qtd',label:'Qtd em Estoque',obrigatorio:false,hint:'Ex: 10'},
-    {key:'preco1',label:'Preço 1–4 un (R$/mês)',obrigatorio:false,hint:'Ex: 395'},
-    {key:'preco5',label:'Preço 5–9 un (R$/mês)',obrigatorio:false,hint:'Ex: 365'},
-    {key:'preco10',label:'Preço 10+ un (R$/mês)',obrigatorio:false,hint:'Ex: 325'},
-    {key:'modalidade',label:'Modalidade',obrigatorio:false,hint:'Locação / Venda'},
+/* ══════════════════════════════════════════
+   MODAL IMPORTAR PLANILHA
+   Fluxo: 1) Upload → 2) Mapear colunas → 3) Preview → 4) Confirmar
+══════════════════════════════════════════ */
+function ModalImportarPlanilha({ onImportar, onClose, inline=false }) {
+  const [etapa, setEtapa] = useState(1); // 1=upload, 2=mapear, 3=preview
+  const [arquivo, setArquivo] = useState(null);
+  const [planilhaLinhas, setPlanilhaLinhas] = useState([]); // rows brutas [{col:val}]
+  const [colunas, setColunas] = useState([]); // nomes das colunas detectadas
+  const [mapa, setMapa] = useState({             // mapeamento campo → coluna da planilha
+    nome: '', spec: '', qtd: '', preco1: '', preco5: '', preco10: '', modalidade: '',
+  });
+  const [preview, setPreview] = useState([]);    // produtos parseados
+  const [dragOver, setDragOver] = useState(false);
+  const [modo, setModo] = useState('substituir'); // 'substituir' | 'mesclar'
+  const fileRef = useRef(null);
+
+  const CAMPOS = [
+    { key:'nome',       label:'Nome do Produto',        obrigatorio:true,  hint:'Ex: Dell Latitude 5440' },
+    { key:'spec',       label:'Especificação / Config', obrigatorio:false, hint:'Ex: i5 / 16GB / 256GB' },
+    { key:'qtd',        label:'Qtd em Estoque',         obrigatorio:false, hint:'Ex: 10' },
+    { key:'preco1',     label:'Preço 1–4 un (R$/mês)',  obrigatorio:false, hint:'Ex: 395' },
+    { key:'preco5',     label:'Preço 5–9 un (R$/mês)',  obrigatorio:false, hint:'Ex: 365' },
+    { key:'preco10',    label:'Preço 10+ un (R$/mês)',  obrigatorio:false, hint:'Ex: 325' },
+    { key:'modalidade', label:'Modalidade',             obrigatorio:false, hint:'Locação / Venda' },
   ];
-  const lerArquivo=(file)=>{
-    if(!file) return;
-    const ext=file.name.split('.').pop().toLowerCase();
-    if(!['xlsx','xls','csv','ods'].includes(ext)){alert('Formato não suportado. Use .xlsx, .xls, .csv ou .ods');return;}
+
+  // Lê o arquivo e extrai linhas
+  const lerArquivo = (file) => {
+    if (!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['xlsx','xls','csv','ods'].includes(ext)) {
+      alert('Formato não suportado. Use .xlsx, .xls, .csv ou .ods');
+      return;
+    }
     setArquivo(file);
-    const reader=new FileReader();
-    reader.onload=(e)=>{
-      try{
-        const wb=XLSX.read(e.target.result,{type:'array'});
-        const ws=wb.Sheets[wb.SheetNames[0]];
-        const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-        if(rows.length===0){alert('Planilha vazia ou sem cabeçalho.');return;}
-        const cols=Object.keys(rows[0]);
-        setColunas(cols);setPlanilhaLinhas(rows);
-        const tentativas={nome:['nome','produto','name','equipamento','descricao','item','modelo'],spec:['spec','especificacao','config','configuracao','detalhe','processador'],qtd:['qtd','quantidade','estoque','qtde','qty','stock','total'],preco1:['preco1','preco_1','preco','preço','valor','price','mensalidade'],preco5:['preco5','preco_5','valor5','price5','5un'],preco10:['preco10','preco_10','valor10','price10','10un'],modalidade:['modalidade','tipo','category','categoria']};
-        const autoMapa={};
-        Object.entries(tentativas).forEach(([campo,keywords])=>{
-          const found=cols.find(c=>keywords.some(k=>c.toLowerCase().replace(/[\s_\-]/g,'').includes(k.replace(/[\s_\-]/g,''))));
-          autoMapa[campo]=found||'';
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const wb = XLSX.read(e.target.result, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        if (rows.length === 0) { alert('A planilha está vazia ou sem cabeçalho.'); return; }
+        const cols = Object.keys(rows[0]);
+        setColunas(cols);
+        setPlanilhaLinhas(rows);
+        // Auto-mapeamento inteligente por nome parecido
+        const autoMapa = {};
+        const tentativas = {
+          nome:       ['nome','produto','name','equipamento','descricao','descrição','item','modelo'],
+          spec:       ['spec','especificacao','especificação','config','configuracao','configuração','detalhe','processador'],
+          qtd:        ['qtd','quantidade','estoque','qtde','qty','stock','total'],
+          preco1:     ['preco1','preco_1','preco','preço','valor','price','mensalidade','mensalidade_1','1un','1-4'],
+          preco5:     ['preco5','preco_5','valor5','price5','5un','5-9'],
+          preco10:    ['preco10','preco_10','valor10','price10','10un','10+'],
+          modalidade: ['modalidade','tipo','category','categoria','mode'],
+        };
+        Object.entries(tentativas).forEach(([campo, keywords]) => {
+          const found = cols.find(c =>
+            keywords.some(k => c.toLowerCase().replace(/[\s_\-]/g,'').includes(k.replace(/[\s_\-]/g,'')))
+          );
+          autoMapa[campo] = found || '';
         });
-        setMapa(autoMapa);setEtapa(2);
-      }catch(err){alert('Erro ao ler o arquivo.\n\n'+err.message);}
+        setMapa(autoMapa);
+        setEtapa(2);
+      } catch(err) {
+        alert('Erro ao ler o arquivo. Verifique se é uma planilha válida.\n\n'+err.message);
+      }
     };
     reader.readAsArrayBuffer(file);
   };
-  const gerarPreview=()=>{
-    if(!mapa.nome){alert('Mapeie ao menos o campo "Nome do Produto".');return;}
-    const produtos=planilhaLinhas.map((row,i)=>{
-      const nome=String(row[mapa.nome]||'').trim();
-      if(!nome) return null;
-      const qtd=parseInt(row[mapa.qtd])||0;
-      const p1=parseFloat(String(row[mapa.preco1]||'0').replace(',','.').replace(/[^0-9.]/g,''))||0;
-      const p5=parseFloat(String(row[mapa.preco5]||'0').replace(',','.').replace(/[^0-9.]/g,''))||(p1?p1*0.93:0);
-      const p10=parseFloat(String(row[mapa.preco10]||'0').replace(',','.').replace(/[^0-9.]/g,''))||(p1?p1*0.85:0);
-      const modalRaw=String(row[mapa.modalidade]||'').trim();
-      const modalidade=modalRaw?(/venda/i.test(modalRaw)?'Venda':/ambos|loc.*vend|vend.*loc/i.test(modalRaw)?'Locação/Venda':'Locação'):'Locação';
-      const d5=p1>0&&p5>0?Math.round((1-p5/p1)*100*10)/10:7;
-      const d10=p1>0&&p10>0?Math.round((1-p10/p1)*100*10)/10:15;
-      return{_linha:i+2,_ok:!!nome,id:`NB-IMP-${Date.now()}-${i}`,nome,spec:mapa.spec?String(row[mapa.spec]||'').trim():'',qtdEstoque:qtd,precos:{1:p1,5:Math.round(p5*100)/100||p1,10:Math.round(p10*100)/100||p5||p1},descontos:{desc5:d5,desc10:d10},prazosPadrao:[12,24,36],modalidade};
-    }).filter(Boolean);
-    setPreview(produtos);setEtapa(3);
+
+  const handleDrop = (e) => {
+    e.preventDefault(); setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    lerArquivo(file);
   };
-  const confirmarImportacao=()=>{const validos=preview.filter(p=>p.nome);onImportar(validos,modo);onClose();};
-  const precoOk=p=>p.precos[1]>0;
-  const rowClass=p=>!p.nome?'row-err':!precoOk(p)?'row-warn':'row-ok';
-  const Wrapper=inline
-    ?({children})=><div className="card" style={{maxWidth:'100%'}}>{children}</div>
-    :({children})=>(<div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}><div className="modal" style={{maxWidth:680}} onClick={e=>e.stopPropagation()}>{children}</div></div>);
-  return(
-    <Wrapper>
-      <div className="step-indicator">
-        {['1. Upload','2. Mapear','3. Confirmar'].map((l,i)=>(
-          <div key={i} className={`step-ind-item${etapa===i+1?' active':etapa>i+1?' done':''}`}>{etapa>i+1?'✓ ':''}{l}</div>
-        ))}
-      </div>
-      {etapa===1&&(
-        <div>
-          <div className="modal-title">📊 Importar Planilha de Estoque</div>
-          <div className="modal-sub">Carregue sua planilha Excel, CSV ou ODS com os produtos.</div>
-          <div className={`import-drop-zone${dragOver?' drag-over':''}`}
-            onDragOver={e=>{e.preventDefault();setDragOver(true)}}
-            onDragLeave={()=>setDragOver(false)}
-            onDrop={e=>{e.preventDefault();setDragOver(false);lerArquivo(e.dataTransfer.files[0])}}
-            onClick={()=>fileRef.current?.click()}>
-            <span className="dz-icon">📂</span>
-            <h3>Arraste a planilha aqui ou clique para selecionar</h3>
-            <p>Formatos: <strong>.xlsx · .xls · .csv · .ods</strong></p>
-            <button className="btn btn-primary" onClick={e=>{e.stopPropagation();fileRef.current?.click()}}>📁 Escolher Arquivo</button>
-            <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv,.ods" style={{display:'none'}} onChange={e=>lerArquivo(e.target.files[0])}/>
-          </div>
-          <div style={{marginTop:12,textAlign:'center'}}>
-            <button className="btn btn-outline btn-sm" onClick={()=>{
-              const ws=XLSX.utils.aoa_to_sheet([['Nome','Especificacao','Qtd_Estoque','Preco_1_4_un','Preco_5_9_un','Preco_10_mais_un','Modalidade'],['Dell Latitude 5440','i5-1335U / 16GB / 256GB SSD',8,395,365,325,'Locação'],['Lenovo ThinkPad E14','i7-1355U / 16GB / 512GB SSD',5,480,445,395,'Locação']]);
-              const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Estoque');XLSX.writeFile(wb,'modelo_estoque_nb.xlsx');
-            }}>⬇️ Baixar Planilha Modelo</button>
-          </div>
-          <div className="modal-btns" style={{marginTop:16}}><button className="btn btn-outline" style={{flex:1}} onClick={onClose}>Cancelar</button></div>
+
+  // Gera preview dos produtos com base no mapeamento
+  const gerarPreview = () => {
+    if (!mapa.nome) { alert('Mapeie ao menos o campo "Nome do Produto".'); return; }
+    const produtos = planilhaLinhas.map((row, i) => {
+      const nome = String(row[mapa.nome] || '').trim();
+      if (!nome) return null;
+      const qtd = parseInt(row[mapa.qtd]) || 0;
+      const p1  = parseFloat(String(row[mapa.preco1] || '0').replace(',','.').replace(/[^0-9.]/g,'')) || 0;
+      const p5  = parseFloat(String(row[mapa.preco5]  || '0').replace(',','.').replace(/[^0-9.]/g,'')) || (p1 ? p1 * 0.93 : 0);
+      const p10 = parseFloat(String(row[mapa.preco10] || '0').replace(',','.').replace(/[^0-9.]/g,'')) || (p1 ? p1 * 0.85 : 0);
+      const modalRaw = String(row[mapa.modalidade] || '').trim();
+      const modalidade = modalRaw
+        ? (/venda/i.test(modalRaw) ? 'Venda' : /ambos|ambas|loc.*vend|vend.*loc/i.test(modalRaw) ? 'Locação/Venda' : 'Locação')
+        : 'Locação';
+      return {
+        _linha: i + 2,
+        _ok: !!nome,
+        id: `NB-IMP-${Date.now()}-${i}`,
+        nome,
+        spec: mapa.spec ? String(row[mapa.spec] || '').trim() : '',
+        qtdEstoque: qtd,
+        precos: { 1: p1, 5: p5 || p1, 10: p10 || p5 || p1 },
+        prazosPadrao: [12, 24, 36],
+        modalidade,
+      };
+    }).filter(Boolean);
+    setPreview(produtos);
+    setEtapa(3);
+  };
+
+  const confirmarImportacao = () => {
+    const validos = preview.filter(p => p.nome);
+    onImportar(validos, modo);
+    onClose();
+  };
+
+  const precoOk  = p => p.precos[1] > 0;
+  const rowClass = p => !p.nome ? 'row-err' : !precoOk(p) ? 'row-warn' : 'row-ok';
+  const comPreco = preview.filter(precoOk).length;
+  const semPreco = preview.filter(p => !precoOk(p)).length;
+
+  const Wrapper = inline
+    ? ({children}) => <div className="card" style={{maxWidth:'100%'}}>{children}</div>
+    : ({children}) => (
+        <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+          <div className="modal" style={{maxWidth:680}} onClick={e=>e.stopPropagation()}>{children}</div>
         </div>
-      )}
-      {etapa===2&&(
-        <div>
-          <div className="modal-title">🗂️ Mapear Colunas</div>
-          <div className="modal-sub">Planilha: <strong>{arquivo?.name}</strong> · {planilhaLinhas.length} linhas</div>
-          <div className="ibox green" style={{marginBottom:14}}><span>✅</span><span>Mapeamento automático aplicado. Revise se necessário.</span></div>
-          {CAMPOS.map(campo=>(
-            <div key={campo.key} className="col-map-row">
-              <div><div className="col-map-label">{campo.label}{campo.obrigatorio&&<span style={{color:'var(--danger)'}}> *</span>}</div><div style={{fontSize:10,color:'var(--slate)'}}>{campo.hint}</div></div>
-              <select className="input" value={mapa[campo.key]} onChange={e=>setMapa(prev=>({...prev,[campo.key]:e.target.value}))}>
-                <option value="">— Não mapear —</option>
-                {colunas.map(c=><option key={c} value={c}>{c}{planilhaLinhas[0]?.[c]!==undefined?` (ex: ${String(planilhaLinhas[0][c]).slice(0,20)})`:''}</option>)}
-              </select>
+      );
+
+  return (
+    <Wrapper>
+        {/* Indicador de etapas */}
+        <div className="step-indicator">
+          {['1. Upload','2. Mapear Colunas','3. Confirmar'].map((l,i)=>(
+            <div key={i} className={`step-ind-item${etapa===i+1?' active':etapa>i+1?' done':''}`}>
+              {etapa>i+1?'✓ ':''}{l}
             </div>
           ))}
-          <div className="divider"/>
-          <div style={{fontSize:12,fontWeight:700,color:'var(--navy)',marginBottom:8}}>⚙️ Modo de Importação</div>
-          <div style={{display:'flex',gap:8,marginBottom:14}}>
-            <button className={`btn${modo==='substituir'?' btn-danger':' btn-outline'}`} onClick={()=>setModo('substituir')} style={{flex:1}}>🔄 Substituir Tudo</button>
-            <button className={`btn${modo==='mesclar'?' btn-primary':' btn-outline'}`} onClick={()=>setModo('mesclar')} style={{flex:1}}>➕ Mesclar</button>
-          </div>
-          <div className="modal-btns">
-            <button className="btn btn-outline" style={{flex:1}} onClick={()=>setEtapa(1)}>← Voltar</button>
-            <button className="btn btn-primary" style={{flex:2}} onClick={gerarPreview} disabled={!mapa.nome}>Ver Preview →</button>
-          </div>
         </div>
-      )}
-      {etapa===3&&(
-        <div>
-          <div className="modal-title">✅ Confirmar Importação</div>
-          <div className="modal-sub">Modo: <strong>{modo==='substituir'?'Substituir tudo':'Mesclar/Adicionar'}</strong></div>
-          <div className="import-stat">
-            <div className="import-stat-box"><div className="isv">{preview.length}</div><div className="isl">Total</div></div>
-            <div className="import-stat-box"><div className="isv" style={{color:'var(--success)'}}>{preview.filter(precoOk).length}</div><div className="isl">Com Preço ✅</div></div>
-            <div className="import-stat-box"><div className="isv" style={{color:'var(--warn)'}}>{preview.filter(p=>!precoOk(p)).length}</div><div className="isl">Sem Preço ⚠️</div></div>
+
+        {/* ── ETAPA 1: UPLOAD ── */}
+        {etapa === 1 && (
+          <div>
+            <div className="modal-title">📊 Importar Planilha de Estoque</div>
+            <div className="modal-sub">Carregue sua planilha do Excel, CSV ou ODS com os produtos da empresa.</div>
+
+            <div
+              className={`import-drop-zone${dragOver?' drag-over':''}`}
+              onDragOver={e=>{e.preventDefault();setDragOver(true)}}
+              onDragLeave={()=>setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={()=>fileRef.current?.click()}
+            >
+              <span className="dz-icon">📂</span>
+              <h3>Arraste a planilha aqui ou clique para selecionar</h3>
+              <p>Formatos aceitos: <strong>.xlsx · .xls · .csv · .ods</strong></p>
+              <button className="btn btn-primary" onClick={e=>{e.stopPropagation();fileRef.current?.click()}}>
+                📁 Escolher Arquivo
+              </button>
+              <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv,.ods" style={{display:'none'}}
+                onChange={e=>lerArquivo(e.target.files[0])}/>
+            </div>
+
+            {/* Guia de formato esperado */}
+            <div style={{marginTop:16}}>
+              <div style={{fontSize:12,fontWeight:700,color:'var(--navy)',marginBottom:8}}>
+                📋 Formato recomendado da planilha:
+              </div>
+              <div style={{overflowX:'auto'}}>
+                <table className="import-preview-table">
+                  <thead>
+                    <tr>
+                      <th>Nome</th><th>Especificação</th><th>Qtd</th>
+                      <th>Preco1</th><th>Preco5</th><th>Preco10</th><th>Modalidade</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="row-ok">
+                      <td>Dell Latitude 5440</td><td>i5 / 16GB / 256GB</td><td>8</td>
+                      <td>395</td><td>365</td><td>325</td><td>Locação</td>
+                    </tr>
+                    <tr className="row-ok">
+                      <td>MacBook Air M2</td><td>M2 / 8GB / 256GB</td><td>3</td>
+                      <td>890</td><td>820</td><td>750</td><td>Locação</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="ibox blue" style={{marginTop:10,fontSize:11}}>
+                <span>💡</span>
+                <div>A planilha <strong>não precisa ter esses nomes de coluna exatos</strong> — na próxima etapa você vai mapear cada campo manualmente. Se tiver só uma coluna de preço, ela será usada para todos os volumes.</div>
+              </div>
+            </div>
+
+            {/* Botão baixar modelo */}
+            <div style={{marginTop:12,textAlign:'center'}}>
+              <button className="btn btn-outline btn-sm" onClick={()=>{
+                const ws = XLSX.utils.aoa_to_sheet([
+                  ['Nome','Especificacao','Qtd_Estoque','Preco_1_4_un','Preco_5_9_un','Preco_10_mais_un','Modalidade'],
+                  ['Dell Latitude 5440','i5-1335U / 16GB / 256GB SSD',8,395,365,325,'Locação'],
+                  ['Lenovo ThinkPad E14','i7-1355U / 16GB / 512GB SSD',5,480,445,395,'Locação'],
+                  ['HP ProBook 445 G10','Ryzen 5 / 8GB / 256GB SSD',12,340,310,278,'Locação'],
+                  ['MacBook Air M2','Apple M2 / 8GB / 256GB SSD',3,890,820,750,'Locação'],
+                ]);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Estoque');
+                XLSX.writeFile(wb, 'modelo_estoque_nb.xlsx');
+              }}>
+                ⬇️ Baixar Planilha Modelo (.xlsx)
+              </button>
+            </div>
+
+            <div className="modal-btns" style={{marginTop:16}}>
+              <button className="btn btn-outline" style={{flex:1}} onClick={onClose}>Cancelar</button>
+            </div>
           </div>
-          {modo==='substituir'&&<div className="ibox red" style={{marginBottom:12}}><span>🔴</span><span>Modo <strong>Substituir</strong>: catálogo atual será <strong>completamente substituído</strong>.</span></div>}
-          <div style={{overflowX:'auto',maxHeight:300,overflowY:'auto'}}>
-            <table className="import-preview-table">
-              <thead><tr><th>#</th><th>Nome</th><th>Spec</th><th>Qtd</th><th>R$/1un</th><th>R$/5un</th><th>R$/10un</th><th>Modal.</th></tr></thead>
-              <tbody>
-                {preview.map((p,i)=>(
-                  <tr key={i} className={rowClass(p)}>
-                    <td style={{fontSize:10,color:'var(--slate)'}}>{p._linha}</td>
-                    <td style={{fontWeight:700,color:'var(--navy)'}}>{p.nome}</td>
-                    <td style={{fontSize:11,color:'var(--slate)'}}>{p.spec||'—'}</td>
-                    <td style={{textAlign:'center'}}><span className={`qtd-badge ${p.qtdEstoque===0?'zero':p.qtdEstoque<=3?'low':'ok'}`}>{p.qtdEstoque}</span></td>
-                    <td style={{textAlign:'center',fontSize:11}}>{p.precos[1]>0?R$(p.precos[1]):<span style={{color:'var(--warn)'}}>—</span>}</td>
-                    <td style={{textAlign:'center',fontSize:11}}>{p.precos[5]>0?R$(p.precos[5]):'—'}</td>
-                    <td style={{textAlign:'center',fontSize:11}}>{p.precos[10]>0?R$(p.precos[10]):'—'}</td>
-                    <td><span className="badge badge-blue">{p.modalidade}</span></td>
+        )}
+
+        {/* ── ETAPA 2: MAPEAR COLUNAS ── */}
+        {etapa === 2 && (
+          <div>
+            <div className="modal-title">🗂️ Mapear Colunas</div>
+            <div className="modal-sub">
+              Planilha: <strong>{arquivo?.name}</strong> · {planilhaLinhas.length} linhas detectadas.
+              Associe cada campo do app com a coluna correspondente na sua planilha.
+            </div>
+
+            <div className="ibox green" style={{marginBottom:14}}>
+              <span>✅</span>
+              <span>Mapeamento automático aplicado. Revise e ajuste se necessário.</span>
+            </div>
+
+            {CAMPOS.map(campo => (
+              <div key={campo.key} className="col-map-row">
+                <div>
+                  <div className="col-map-label">
+                    {campo.label}
+                    {campo.obrigatorio && <span style={{color:'var(--danger)'}}> *</span>}
+                  </div>
+                  <div style={{fontSize:10,color:'var(--slate)'}}>{campo.hint}</div>
+                </div>
+                <select
+                  className="input"
+                  value={mapa[campo.key]}
+                  onChange={e=>setMapa(prev=>({...prev,[campo.key]:e.target.value}))}
+                >
+                  <option value="">— Não mapear —</option>
+                  {colunas.map(c=>(
+                    <option key={c} value={c}>{c}{planilhaLinhas[0]?.[c]!==undefined?` (ex: ${String(planilhaLinhas[0][c]).slice(0,20)})`:''}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+
+            <div className="divider"/>
+            <div style={{fontSize:12,fontWeight:700,color:'var(--navy)',marginBottom:8}}>⚙️ Modo de Importação</div>
+            <div style={{display:'flex',gap:8,marginBottom:14,flexWrap:'wrap'}}>
+              <button
+                className={`btn${modo==='substituir'?' btn-danger':' btn-outline'}`}
+                onClick={()=>setModo('substituir')}
+                style={{flex:1}}
+              >
+                🔄 Substituir Tudo
+                <div style={{fontSize:10,fontWeight:400,display:'block',marginTop:2}}>Apaga catálogo atual e importa tudo da planilha</div>
+              </button>
+              <button
+                className={`btn${modo==='mesclar'?' btn-primary':' btn-outline'}`}
+                onClick={()=>setModo('mesclar')}
+                style={{flex:1}}
+              >
+                ➕ Mesclar / Adicionar
+                <div style={{fontSize:10,fontWeight:400,display:'block',marginTop:2}}>Mantém produtos existentes e adiciona novos</div>
+              </button>
+            </div>
+
+            <div className="modal-btns">
+              <button className="btn btn-outline" style={{flex:1}} onClick={()=>setEtapa(1)}>← Voltar</button>
+              <button className="btn btn-primary" style={{flex:2}} onClick={gerarPreview}
+                disabled={!mapa.nome}>
+                Ver Preview →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── ETAPA 3: PREVIEW + CONFIRMAR ── */}
+        {etapa === 3 && (
+          <div>
+            <div className="modal-title">✅ Confirmar Importação</div>
+            <div className="modal-sub">
+              Revise os dados antes de importar. Modo: <strong>{modo==='substituir'?'Substituir tudo':'Mesclar/Adicionar'}</strong>.
+            </div>
+
+            {/* Estatísticas */}
+            <div className="import-stat">
+              <div className="import-stat-box">
+                <div className="isv" style={{color:'var(--navy)'}}>{preview.length}</div>
+                <div className="isl">Total de Linhas</div>
+              </div>
+              <div className="import-stat-box">
+                <div className="isv" style={{color:'var(--success)'}}>{comPreco}</div>
+                <div className="isl">Com Preço ✅</div>
+              </div>
+              <div className="import-stat-box">
+                <div className="isv" style={{color:'var(--warn)'}}>{semPreco}</div>
+                <div className="isl">Sem Preço ⚠️</div>
+              </div>
+              <div className="import-stat-box">
+                <div className="isv" style={{color:'var(--success)'}}>{preview.filter(p=>p.qtdEstoque>0).length}</div>
+                <div className="isl">Com Estoque</div>
+              </div>
+            </div>
+
+            {semPreco > 0 && (
+              <div className="ibox warn" style={{marginBottom:12}}>
+                <span>⚠️</span>
+                <span>{semPreco} produto(s) serão importados <strong>sem preço configurado</strong>. Você poderá editar depois manualmente.</span>
+              </div>
+            )}
+
+            {modo === 'substituir' && (
+              <div className="ibox red" style={{marginBottom:12}}>
+                <span>🔴</span>
+                <span>Modo <strong>Substituir</strong>: o catálogo atual será <strong>completamente substituído</strong> pelos dados da planilha. Esta ação não pode ser desfeita.</span>
+              </div>
+            )}
+
+            <div style={{overflowX:'auto',maxHeight:340,overflowY:'auto'}}>
+              <table className="import-preview-table">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Nome do Produto</th><th>Spec</th>
+                    <th>Qtd</th><th>R$/1un</th><th>R$/5un</th><th>R$/10un</th><th>Modal.</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {preview.map((p,i) => (
+                    <tr key={i} className={rowClass(p)}>
+                      <td style={{color:'var(--slate)',fontSize:10}}>{p._linha}</td>
+                      <td style={{fontWeight:700,color:'var(--navy)'}}>{p.nome}</td>
+                      <td style={{fontSize:11,color:'var(--slate)'}}>{p.spec||'—'}</td>
+                      <td style={{textAlign:'center'}}>
+                        <span className={`qtd-badge ${p.qtdEstoque===0?'zero':p.qtdEstoque<=3?'low':'ok'}`}>
+                          {p.qtdEstoque}
+                        </span>
+                      </td>
+                      <td style={{textAlign:'center',fontSize:11}}>{p.precos[1]>0?R$(p.precos[1]):<span style={{color:'var(--warn)'}}>—</span>}</td>
+                      <td style={{textAlign:'center',fontSize:11}}>{p.precos[5]>0?R$(p.precos[5]):<span style={{color:'var(--slate)'}}>—</span>}</td>
+                      <td style={{textAlign:'center',fontSize:11}}>{p.precos[10]>0?R$(p.precos[10]):<span style={{color:'var(--slate)'}}>—</span>}</td>
+                      <td><span className="badge badge-blue">{p.modalidade}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="modal-btns" style={{marginTop:16}}>
+              <button className="btn btn-outline" style={{flex:1}} onClick={()=>setEtapa(2)}>← Voltar</button>
+              <button className="btn btn-success" style={{flex:2}} onClick={confirmarImportacao}
+                disabled={preview.length===0}>
+                ✅ Importar {preview.length} Produto(s)
+              </button>
+            </div>
           </div>
-          <div className="modal-btns" style={{marginTop:16}}>
-            <button className="btn btn-outline" style={{flex:1}} onClick={()=>setEtapa(2)}>← Voltar</button>
-            <button className="btn btn-success" style={{flex:2}} onClick={confirmarImportacao} disabled={preview.length===0}>✅ Importar {preview.length} Produto(s)</button>
-          </div>
-        </div>
-      )}
+        )}
     </Wrapper>
   );
 }
 
 /* ══════════════════════════════════════════
-   TELA ESTOQUE
+   TELA ESTOQUE — com importação de planilha
 ══════════════════════════════════════════ */
-function TelaEstoque({catalogo,setCatalogo,config,toast}){
-  const [editando,setEditando]=useState(null);
-  const [busca,setBusca]=useState('');
-  const [confirmDel,setConfirmDel]=useState(null);
-  const [abaAtiva,setAbaAtiva]=useState('catalogo');
-  const [confirmLimpar,setConfirmLimpar]=useState(false);
-  const minEstoque=config.alertaEstoqueMinimoQtd||3;
+function TelaEstoque({catalogo, setCatalogo, config, toast}) {
+  const [editando,    setEditando]    = useState(null);
+  const [busca,       setBusca]       = useState('');
+  const [confirmDel,  setConfirmDel]  = useState(null);
+  const [abaAtiva,    setAbaAtiva]    = useState('catalogo'); // 'catalogo' | 'importar'
+  const [confirmLimpar, setConfirmLimpar] = useState(false);
+  const minEstoque = config.alertaEstoqueMinimoQtd || 3;
 
-  const filtrados=catalogo.filter(p=>p.nome.toLowerCase().includes(busca.toLowerCase())||(p.spec||'').toLowerCase().includes(busca.toLowerCase()));
-  const handleSave=(prod)=>{setCatalogo(prev=>prev.some(p=>p.id===prod.id)?prev.map(p=>p.id===prod.id?prod:p):[...prev,prod]);setEditando(null);toast('Produto salvo!','success');};
-  const handleDelete=(id)=>{setCatalogo(prev=>prev.filter(p=>p.id!==id));setConfirmDel(null);toast('Produto removido.','info');};
-  const handleImportar=(produtos,modo)=>{
-    if(modo==='substituir'){setCatalogo(produtos);toast(`✅ ${produtos.length} produto(s) importado(s).`,'success');}
-    else{setCatalogo(prev=>{const nomes=prev.map(p=>p.nome.toLowerCase().trim());const novos=produtos.filter(p=>!nomes.includes(p.nome.toLowerCase().trim()));const atu=produtos.filter(p=>nomes.includes(p.nome.toLowerCase().trim()));const cat=prev.map(ex=>{const imp=atu.find(a=>a.nome.toLowerCase().trim()===ex.nome.toLowerCase().trim());return imp?{...ex,qtdEstoque:imp.qtdEstoque,precos:imp.precos,descontos:imp.descontos,spec:imp.spec||ex.spec,modalidade:imp.modalidade||ex.modalidade}:ex;});return[...cat,...novos];});toast(`✅ Mesclado! ${produtos.length} produto(s) processado(s).`,'success');}
+  const filtrados = catalogo.filter(p =>
+    p.nome.toLowerCase().includes(busca.toLowerCase()) ||
+    (p.spec||'').toLowerCase().includes(busca.toLowerCase())
+  );
+
+  const handleSave = (prod) => {
+    setCatalogo(prev => prev.some(p=>p.id===prod.id) ? prev.map(p=>p.id===prod.id?prod:p) : [...prev, prod]);
+    setEditando(null);
+    toast('Produto salvo!', 'success');
+  };
+
+  const handleDelete = (id) => {
+    setCatalogo(prev => prev.filter(p=>p.id!==id));
+    setConfirmDel(null);
+    toast('Produto removido.', 'info');
+  };
+
+  const handleImportar = (produtos, modo) => {
+    if (modo === 'substituir') {
+      setCatalogo(produtos);
+      toast(`✅ Catálogo substituído! ${produtos.length} produto(s) importado(s).`, 'success');
+    } else {
+      // Mesclar: adiciona os que não existem pelo nome (case-insensitive)
+      setCatalogo(prev => {
+        const nomesExistentes = prev.map(p=>p.nome.toLowerCase().trim());
+        const novos = produtos.filter(p => !nomesExistentes.includes(p.nome.toLowerCase().trim()));
+        const atualizados = produtos.filter(p => nomesExistentes.includes(p.nome.toLowerCase().trim()));
+        // Para os que já existem, atualiza qtd e preços mas mantém o id original
+        const catalogoAtualizado = prev.map(ex => {
+          const imp = atualizados.find(a=>a.nome.toLowerCase().trim()===ex.nome.toLowerCase().trim());
+          return imp ? {...ex, qtdEstoque:imp.qtdEstoque, precos:imp.precos, spec:imp.spec||ex.spec, modalidade:imp.modalidade||ex.modalidade} : ex;
+        });
+        return [...catalogoAtualizado, ...novos];
+      });
+      toast(`✅ Mesclado! ${produtos.length} produto(s) processado(s).`, 'success');
+    }
     setAbaAtiva('catalogo');
   };
-  const exportarCatalogo=()=>{
-    const rows=catalogo.map(p=>({Nome:p.nome,Especificacao:p.spec||'',Qtd_Estoque:p.qtdEstoque,Preco_1_4_un:p.precos[1]||0,Preco_5_9_un:p.precos[5]||0,Preco_10_mais_un:p.precos[10]||0,Desc5_pct:p.descontos?.desc5||0,Desc10_pct:p.descontos?.desc10||0,Modalidade:p.modalidade}));
-    const ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=[{wch:30},{wch:35},{wch:12},{wch:14},{wch:14},{wch:16},{wch:10},{wch:10},{wch:12}];
-    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Estoque');
-    XLSX.writeFile(wb,`estoque_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.xlsx`);
-    toast('📥 Exportado!','success');
-  };
-  const qtdBadge=(qtd)=>{
-    if(qtd===0) return<span className="qtd-badge zero">⚠️ Sem estoque</span>;
-    if(qtd<=minEstoque) return<span className="qtd-badge low">🟡 {qtd} un — baixo</span>;
-    return<span className="qtd-badge ok">✅ {qtd} un</span>;
-  };
-  const totalProdutos=catalogo.length;
-  const totalUnidades=catalogo.reduce((s,p)=>s+p.qtdEstoque,0);
-  const semEstoqueN=catalogo.filter(p=>p.qtdEstoque===0).length;
-  const estoqueBaixoN=catalogo.filter(p=>p.qtdEstoque>0&&p.qtdEstoque<=minEstoque).length;
 
-  return(
+  // Exportar catálogo atual para Excel
+  const exportarCatalogo = () => {
+    const rows = catalogo.map(p => ({
+      Nome:         p.nome,
+      Especificacao: p.spec || '',
+      Qtd_Estoque:  p.qtdEstoque,
+      Preco_1_4_un: p.precos[1] || 0,
+      Preco_5_9_un: p.precos[5] || 0,
+      Preco_10_mais_un: p.precos[10] || 0,
+      Modalidade:   p.modalidade,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    // Larguras de coluna
+    ws['!cols'] = [{wch:30},{wch:35},{wch:12},{wch:14},{wch:14},{wch:16},{wch:12}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Estoque');
+    XLSX.writeFile(wb, `estoque_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.xlsx`);
+    toast('📥 Planilha exportada!', 'success');
+  };
+
+  const qtdBadge = (qtd) => {
+    if (qtd === 0) return <span className="qtd-badge zero">⚠️ Sem estoque</span>;
+    if (qtd <= minEstoque) return <span className="qtd-badge low">🟡 {qtd} un — baixo</span>;
+    return <span className="qtd-badge ok">✅ {qtd} un</span>;
+  };
+
+  // Stats rápidas
+  const totalProdutos  = catalogo.length;
+  const totalUnidades  = catalogo.reduce((s,p)=>s+p.qtdEstoque,0);
+  const semEstoqueN    = catalogo.filter(p=>p.qtdEstoque===0).length;
+  const estoqueBaixoN  = catalogo.filter(p=>p.qtdEstoque>0&&p.qtdEstoque<=minEstoque).length;
+
+  return (
     <div className="main">
+
+      {/* ── STATS ── */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:10,marginBottom:14}}>
-        {[{v:totalProdutos,l:'Produtos',cor:'var(--navy)'},{v:totalUnidades,l:'Unidades',cor:'var(--electric)'},{v:semEstoqueN,l:'Sem Estoque',cor:semEstoqueN>0?'var(--danger)':'var(--success)'},{v:estoqueBaixoN,l:'Est. Baixo',cor:estoqueBaixoN>0?'var(--warn)':'var(--success)'}].map((s,i)=>(
-          <div key={i} className="metric-box"><div className="ml">{s.l}</div><div className="mv" style={{color:s.cor}}>{s.v}</div></div>
+        {[
+          {v:totalProdutos, l:'Produtos',    cor:'var(--navy)'},
+          {v:totalUnidades, l:'Unidades',    cor:'var(--electric)'},
+          {v:semEstoqueN,   l:'Sem Estoque', cor:semEstoqueN>0?'var(--danger)':'var(--success)'},
+          {v:estoqueBaixoN, l:'Est. Baixo',  cor:estoqueBaixoN>0?'var(--warn)':'var(--success)'},
+        ].map((s,i)=>(
+          <div key={i} className="metric-box">
+            <div className="ml">{s.l}</div>
+            <div className="mv" style={{color:s.cor}}>{s.v}</div>
+          </div>
         ))}
       </div>
+
+      {/* ── ABAS ── */}
       <div className="tabs" style={{marginBottom:14}}>
-        <button className={`tab${abaAtiva==='catalogo'?' active':''}`} onClick={()=>setAbaAtiva('catalogo')}>📦 Catálogo ({catalogo.length})</button>
-        <button className={`tab${abaAtiva==='importar'?' active':''}`} onClick={()=>setAbaAtiva('importar')}>📊 Importar Planilha</button>
+        <button className={`tab${abaAtiva==='catalogo'?' active':''}`} onClick={()=>setAbaAtiva('catalogo')}>
+          📦 Catálogo ({catalogo.length})
+        </button>
+        <button className={`tab${abaAtiva==='importar'?' active':''}`} onClick={()=>setAbaAtiva('importar')}>
+          📊 Importar Planilha
+        </button>
       </div>
-      {abaAtiva==='catalogo'&&(
+
+      {/* ══════════ ABA CATÁLOGO ══════════ */}
+      {abaAtiva === 'catalogo' && (
         <div className="card">
+          {/* Barra de ações */}
           <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:14,flexWrap:'wrap'}}>
-            <div style={{flex:1,minWidth:180}}><input className="input" placeholder="🔍 Buscar produto..." value={busca} onChange={e=>setBusca(e.target.value)}/></div>
+            <div style={{flex:1,minWidth:180}}>
+              <input className="input" placeholder="🔍 Buscar produto..." value={busca} onChange={e=>setBusca(e.target.value)}/>
+            </div>
             <button className="btn btn-success" onClick={()=>setEditando({})}>➕ Novo</button>
-            <button className="btn btn-outline" onClick={exportarCatalogo}>📥 Exportar .xlsx</button>
-            <button className="btn btn-danger btn-sm" onClick={()=>setConfirmLimpar(true)}>🗑️ Limpar</button>
+            <button className="btn btn-outline" onClick={exportarCatalogo} title="Exportar para Excel">📥 Exportar .xlsx</button>
+            <button className="btn btn-danger btn-sm" onClick={()=>setConfirmLimpar(true)} title="Limpar catálogo">🗑️ Limpar</button>
           </div>
-          {filtrados.length===0?(
+
+          {filtrados.length === 0 ? (
             <div className="empty">
               <div className="eicon">📦</div>
-              <p>{catalogo.length===0?'Catálogo vazio. Importe uma planilha ou adicione manualmente.':'Nenhum produto encontrado.'}</p>
-              {catalogo.length===0&&<button className="btn btn-primary" style={{marginTop:12}} onClick={()=>setAbaAtiva('importar')}>📊 Importar Planilha</button>}
+              <p>{catalogo.length===0?'Catálogo vazio. Importe uma planilha ou adicione produtos manualmente.':'Nenhum produto encontrado para essa busca.'}</p>
+              {catalogo.length===0 && (
+                <button className="btn btn-primary" style={{marginTop:12}} onClick={()=>setAbaAtiva('importar')}>
+                  📊 Importar Planilha
+                </button>
+              )}
             </div>
-          ):(
+          ) : (
             <div className="estoque-grid">
-              {filtrados.map(prod=>{
-                const cls=prod.qtdEstoque===0?'sem-estoque':prod.qtdEstoque<=minEstoque?'estoque-baixo':'';
-                const base=prod.precos[1]||0;
-                return(
+              {filtrados.map(prod => {
+                const cls = prod.qtdEstoque===0?'sem-estoque':prod.qtdEstoque<=minEstoque?'estoque-baixo':'';
+                return (
                   <div key={prod.id} className={`estoque-item ${cls}`}>
                     <div className="ei-info">
                       <div style={{display:'flex',alignItems:'center',gap:7,flexWrap:'wrap'}}>
@@ -996,16 +1579,19 @@ function TelaEstoque({catalogo,setCatalogo,config,toast}){
                         <span className="badge badge-blue">{prod.modalidade}</span>
                         {qtdBadge(prod.qtdEstoque)}
                       </div>
-                      {prod.spec&&<div className="ei-spec">{prod.spec}</div>}
+                      {prod.spec && <div className="ei-spec">{prod.spec}</div>}
                       <div className="ei-meta">
-                        {/* CORREÇÃO: mostra % de desconto por faixa */}
-                        {Object.entries(prod.precos).filter(([,v])=>v>0).sort(([a],[b])=>Number(a)-Number(b)).map(([f,p])=>{
-                          const desc=base>0&&Number(f)>1?Math.round((1-p/base)*100*10)/10:0;
-                          const label=Number(f)>=10?'10+ un':Number(f)>=5?'5–9 un':'1–4 un';
-                          return(
-                            <div key={f} className="estoque-meta-box">
+                        {/* Usa faixas novas se existir, senão fallback legado */}
+                        {(prod.faixas && prod.faixas.length > 0 ? prod.faixas : Object.entries(prod.precos||{}).filter(([,v])=>v>0).sort(([a],[b])=>Number(a)-Number(b)).map(([k,v])=>({qtdMin:Number(k),qtdMax:9999,preco:v}))).map((f, i, arr) => {
+                          const p = f.preco || 0;
+                          const base = arr[0]?.preco || 0;
+                          const desc = base > 0 && i > 0 && p > 0 ? Math.round((1 - p/base)*100*10)/10 : 0;
+                          const isUlt = i === arr.length - 1;
+                          const label = isUlt ? `${f.qtdMin}+ un` : `${f.qtdMin}–${f.qtdMax} un`;
+                          return (
+                            <div key={i} className="estoque-meta-box">
                               <div className="mval">{R$(p)}</div>
-                              {desc>0&&<div style={{fontSize:9,color:'var(--success)',fontWeight:700}}>-{desc}%</div>}
+                              {desc > 0 && <div style={{fontSize:9,color:'var(--success)',fontWeight:700,lineHeight:1.2}}>-{desc}%</div>}
                               <div className="mlabel">{label}/mês</div>
                             </div>
                           );
@@ -1023,13 +1609,25 @@ function TelaEstoque({catalogo,setCatalogo,config,toast}){
           )}
         </div>
       )}
-      {abaAtiva==='importar'&&<ModalImportarPlanilha onImportar={handleImportar} onClose={()=>setAbaAtiva('catalogo')} inline={true}/>}
-      {editando!==null&&<ModalEditarProduto prod={editando} onSave={handleSave} onClose={()=>setEditando(null)}/>}
-      {confirmDel&&(
+
+      {/* ══════════ ABA IMPORTAR ══════════ */}
+      {abaAtiva === 'importar' && (
+        <ModalImportarPlanilha
+          onImportar={handleImportar}
+          onClose={()=>setAbaAtiva('catalogo')}
+          inline={true}
+        />
+      )}
+
+      {/* Modais */}
+      {editando !== null && (
+        <ModalEditarProduto prod={editando} onSave={handleSave} onClose={()=>setEditando(null)}/>
+      )}
+      {confirmDel && (
         <div className="overlay" onClick={()=>setConfirmDel(null)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <div className="modal-title">🗑️ Remover Produto</div>
-            <div className="modal-sub">Remover <strong>{confirmDel.nome}</strong>?</div>
+            <div className="modal-sub">Remover <strong>{confirmDel.nome}</strong> do catálogo?</div>
             <div className="modal-btns">
               <button className="btn btn-outline" style={{flex:1}} onClick={()=>setConfirmDel(null)}>Cancelar</button>
               <button className="btn btn-danger" style={{flex:1}} onClick={()=>handleDelete(confirmDel.id)}>Remover</button>
@@ -1037,11 +1635,11 @@ function TelaEstoque({catalogo,setCatalogo,config,toast}){
           </div>
         </div>
       )}
-      {confirmLimpar&&(
+      {confirmLimpar && (
         <div className="overlay" onClick={()=>setConfirmLimpar(false)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
             <div className="modal-title">🗑️ Limpar Catálogo</div>
-            <div className="modal-sub">Remove <strong>todos os {catalogo.length} produtos</strong>. Não pode ser desfeito.</div>
+            <div className="modal-sub">Isso vai remover <strong>todos os {catalogo.length} produtos</strong> do catálogo. Essa ação não pode ser desfeita.</div>
             <div className="modal-btns">
               <button className="btn btn-outline" style={{flex:1}} onClick={()=>setConfirmLimpar(false)}>Cancelar</button>
               <button className="btn btn-danger" style={{flex:2}} onClick={()=>{setCatalogo([]);setConfirmLimpar(false);toast('Catálogo limpo.','info')}}>🗑️ Limpar Tudo</button>
@@ -1055,50 +1653,66 @@ function TelaEstoque({catalogo,setCatalogo,config,toast}){
 
 /* ══════════════════════════════════════════
    TELA CONFIGURAÇÕES
+   (com upload de logo para o PDF)
 ══════════════════════════════════════════ */
-function TelaConfiguracoes({config,setConfig,toast}){
-  const [form,setForm]=useState({...config});
-  const set=(k,v)=>setForm(p=>({...p,[k]:v}));
-  const fileInputRef=useRef(null);
-  const handleLogoUpload=(e)=>{
-    const file=e.target.files[0];
-    if(!file) return;
-    if(file.size>500000){toast('Logo muito grande. Use imagem menor que 500KB.','error');return;}
-    const reader=new FileReader();
-    reader.onload=(ev)=>{set('logoBase64',ev.target.result);toast('Logo carregada!','success');};
+function TelaConfiguracoes({config, setConfig, toast}) {
+  const [form, setForm] = useState({...config});
+  const set = (k,v) => setForm(p=>({...p,[k]:v}));
+  const fileInputRef = useRef(null);
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 500000) { toast('Logo muito grande. Use imagem menor que 500KB.','error'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      set('logoBase64', ev.target.result);
+      toast('Logo carregada! Salve as configurações.','success');
+    };
     reader.readAsDataURL(file);
   };
-  const handleSave=()=>{setConfig(form);saveLS('nb_config',form);toast('Configurações salvas!','success');};
-  return(
+
+  const handleSave = () => { setConfig(form); saveLS('nb_config', form); toast('Configurações salvas!','success'); };
+
+  return (
     <div className="main">
       <div className="card">
         <div className="card-title"><div className="icon">🏢</div>Dados da Empresa</div>
+        <div className="ibox blue" style={{marginBottom:14}}>
+          <span>💡</span> Estas informações aparecem no cabeçalho e rodapé do PDF da proposta.
+        </div>
+
+        {/* UPLOAD DO LOGO */}
         <div className="settings-section">
-          <div className="settings-section-title">Logo (aparece no PDF)</div>
+          <div className="settings-section-title">Logo da Empresa (aparece no PDF)</div>
           <div style={{display:'flex',gap:16,alignItems:'flex-start',flexWrap:'wrap'}}>
             <div>
-              {form.logoBase64?(
+              {form.logoBase64 ? (
                 <div style={{textAlign:'center'}}>
                   <img src={form.logoBase64} className="logo-preview" alt="Logo"/>
                   <div style={{marginTop:8,display:'flex',gap:6,justifyContent:'center'}}>
                     <button className="btn btn-warn btn-sm" onClick={()=>fileInputRef.current?.click()}>🔄 Trocar</button>
-                    <button className="btn btn-danger btn-sm" onClick={()=>{set('logoBase64','');toast('Logo removida.','info')}}>🗑️</button>
+                    <button className="btn btn-danger btn-sm" onClick={()=>{set('logoBase64','');toast('Logo removida.','info')}}>🗑️ Remover</button>
                   </div>
                 </div>
-              ):(
+              ) : (
                 <div className="logo-upload-area" style={{width:220}} onClick={()=>fileInputRef.current?.click()}>
                   <div style={{fontSize:28,marginBottom:6}}>🖼️</div>
                   <div style={{fontSize:12,fontWeight:700,color:'var(--navy)'}}>Clique para fazer upload</div>
                   <div style={{fontSize:11,color:'var(--slate)',marginTop:4}}>PNG ou JPG · Máx 500KB</div>
                 </div>
               )}
-              <input ref={fileInputRef} type="file" accept="image/png,image/jpeg" style={{display:'none'}} onChange={handleLogoUpload}/>
+              <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/jpg" style={{display:'none'}} onChange={handleLogoUpload}/>
             </div>
-            <div className="ibox blue" style={{flex:1,minWidth:180,fontSize:11}}>
-              <span>💡</span><span>Se não tiver logo, o <strong>nome da empresa</strong> em vermelho aparecerá no PDF.</span>
+            <div style={{flex:1,minWidth:200}}>
+              <div className="ibox blue" style={{fontSize:11}}>
+                <span>💡</span>
+                <span>Se não tiver logo, o <strong>nome da empresa</strong> em texto aparecerá no PDF. O logo substitui o nome no cabeçalho.</span>
+              </div>
             </div>
           </div>
         </div>
+
         <div className="settings-section">
           <div className="settings-section-title">Dados Cadastrais</div>
           <div className="form-row c2" style={{marginBottom:10}}>
@@ -1106,12 +1720,15 @@ function TelaConfiguracoes({config,setConfig,toast}){
             <Inp label="CNPJ" value={form.cnpjEmpresa} onChange={e=>set('cnpjEmpresa',formatCNPJ(e.target.value))} placeholder="00.000.000/0001-00"/>
           </div>
           <div className="form-row" style={{marginBottom:10}}>
-            <Inp label="Endereço (rodapé PDF)" value={form.enderecoEmpresa} onChange={e=>set('enderecoEmpresa',e.target.value)} placeholder="Ex: Av. Francisco Matarazzo, 404 — São Paulo/SP"/>
+            <Inp label="Endereço Completo (rodapé PDF)" value={form.enderecoEmpresa} onChange={e=>set('enderecoEmpresa',e.target.value)} placeholder="Ex: Av. Francisco Matarazzo, 404 — São Paulo/SP"/>
           </div>
         </div>
+
         <div className="settings-section">
           <div className="settings-section-title">Responsável / Vendedor</div>
-          <div className="ibox blue" style={{marginBottom:10,fontSize:11}}><span>👤</span> Aparece na assinatura do PDF e mensagem WhatsApp.</div>
+          <div className="ibox blue" style={{marginBottom:10}}>
+            <span>👤</span> Aparece na assinatura do PDF e na mensagem do WhatsApp.
+          </div>
           <div className="form-row c3" style={{marginBottom:10}}>
             <Inp label="Nome" value={form.responsavelNome} onChange={e=>set('responsavelNome',e.target.value)} placeholder="Ex: Guilherme Gomes"/>
             <Inp label="Celular / WhatsApp" value={form.responsavelCelular} onChange={e=>set('responsavelCelular',formatPhone(e.target.value))} placeholder="(11) 99999-0000"/>
@@ -1119,28 +1736,37 @@ function TelaConfiguracoes({config,setConfig,toast}){
           </div>
         </div>
       </div>
+
       <div className="card">
         <div className="card-title"><div className="icon">📄</div>Textos da Proposta (PDF)</div>
+        <div className="ibox blue" style={{marginBottom:14}}>
+          <span>✍️</span> Personalize o texto de apresentação e de conclusão. Os subtítulos das cláusulas (Seleção de Equipamentos, Personalização, etc.) são fixos e aparecem automaticamente.
+        </div>
         <div className="form-group" style={{marginBottom:12}}>
-          <div className="label">Texto de Abertura</div>
+          <div className="label">Texto de Abertura <span style={{color:'var(--slate)',textTransform:'none',fontWeight:400,fontSize:10}}>(aparece após o "Prezado(a)")</span></div>
           <textarea className="input" rows={5} value={form.textoIntro} onChange={e=>set('textoIntro',e.target.value)}/>
         </div>
         <div className="form-group">
-          <div className="label">Texto de Conclusão</div>
+          <div className="label">Texto de Conclusão <span style={{color:'var(--slate)',textTransform:'none',fontWeight:400,fontSize:10}}>(aparece após as cláusulas)</span></div>
           <textarea className="input" rows={5} value={form.textoConclusao} onChange={e=>set('textoConclusao',e.target.value)}/>
         </div>
       </div>
+
       <div className="card">
         <div className="card-title"><div className="icon">🤖</div>Agente de Alertas</div>
         <div className="form-row c2" style={{marginBottom:10}}>
           <FG label="Alertar contratos X dias antes do vencimento" hint="Ex: 30 = avisa 1 mês antes">
             <input className="input" type="number" min="1" value={form.alertaDiasContrato} onChange={e=>set('alertaDiasContrato',parseInt(e.target.value)||30)}/>
           </FG>
-          <FG label="Estoque crítico abaixo de X unidades">
+          <FG label="Estoque crítico abaixo de X unidades" hint="Ex: 3 = avisa quando restar ≤3 un">
             <input className="input" type="number" min="1" value={form.alertaEstoqueMinimoQtd} onChange={e=>set('alertaEstoqueMinimoQtd',parseInt(e.target.value)||3)}/>
           </FG>
         </div>
+        <div className="ibox warn">
+          <span>💡</span> Os alertas aparecem como faixa vermelha/amarela no topo do app sempre que há situações críticas.
+        </div>
       </div>
+
       <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>
         <button className="btn btn-outline btn-lg" onClick={()=>setForm({...config})}>Descartar</button>
         <button className="btn btn-primary btn-lg" onClick={handleSave}>💾 Salvar Configurações</button>
@@ -1152,56 +1778,64 @@ function TelaConfiguracoes({config,setConfig,toast}){
 /* ══════════════════════════════════════════
    PASSO 1 — CLIENTE
 ══════════════════════════════════════════ */
-function Passo1({dados,onChange,onNext,toast}){
-  const [loading,setLoading]=useState(false);
-  const [cnpjStatus,setCnpjStatus]=useState(null);
-  const [errors,setErrors]=useState({});
-  const consultarCNPJ=async()=>{
-    const raw=dados.cnpj.replace(/\D/g,'');
-    if(raw.length!==14){toast('CNPJ precisa ter 14 dígitos.','error');return;}
-    setLoading(true);setCnpjStatus(null);
-    try{
-      const res=await fetch(`https://brasilapi.com.br/api/cnpj/v1/${raw}`);
-      if(!res.ok) throw new Error();
-      const d=await res.json();
-      const telFmt=d.ddd_telefone_1?formatPhone(d.ddd_telefone_1.replace(/\D/g,'')):'';;
-      onChange({razaoSocial:d.razao_social||'',nomeFantasia:d.nome_fantasia||'',statusReceita:d.descricao_situacao_cadastral||'ATIVA',email:dados.email||d.email||'',telefone:dados.telefone||telFmt,cidade:d.municipio||'',uf:d.uf||''});
-      setCnpjStatus('ok');toast('Empresa encontrada!','success');
-    }catch{setCnpjStatus('error');toast('CNPJ não encontrado. Preencha manualmente.','error');}
-    finally{setLoading(false);}
+function Passo1({dados, onChange, onNext, toast}) {
+  const [loading, setLoading] = useState(false);
+  const [cnpjStatus, setCnpjStatus] = useState(null);
+  const [errors, setErrors] = useState({});
+
+  const consultarCNPJ = async () => {
+    const raw = dados.cnpj.replace(/\D/g,'');
+    if (raw.length !== 14) { toast('CNPJ precisa ter 14 dígitos.','error'); return; }
+    setLoading(true); setCnpjStatus(null);
+    try {
+      const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${raw}`);
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      const telFmt = d.ddd_telefone_1 ? formatPhone(d.ddd_telefone_1.replace(/\D/g,'')) : '';
+      onChange({ razaoSocial:d.razao_social||'', nomeFantasia:d.nome_fantasia||'', statusReceita:d.descricao_situacao_cadastral||'ATIVA',
+        email:dados.email||d.email||'', telefone:dados.telefone||telFmt, cidade:d.municipio||'', uf:d.uf||'' });
+      setCnpjStatus('ok'); toast('Empresa encontrada!','success');
+    } catch { setCnpjStatus('error'); toast('CNPJ não encontrado. Preencha manualmente.','error'); }
+    finally { setLoading(false); }
   };
-  const validate=()=>{
-    const e={};
-    if(!dados.cnpj||dados.cnpj.replace(/\D/g,'').length<14) e.cnpj='CNPJ obrigatório (14 dígitos)';
-    if(!dados.responsavel?.trim()) e.responsavel='Campo obrigatório';
-    if(!dados.email?.trim()) e.email='Campo obrigatório';
-    else if(!/\S+@\S+\.\S+/.test(dados.email)) e.email='E-mail inválido';
-    if(!dados.telefone?.trim()) e.telefone='Campo obrigatório';
-    setErrors(e);return Object.keys(e).length===0;
+
+  const validate = () => {
+    const e = {};
+    if (!dados.cnpj || dados.cnpj.replace(/\D/g,'').length < 14) e.cnpj = 'CNPJ obrigatório (14 dígitos)';
+    if (!dados.responsavel?.trim()) e.responsavel = 'Campo obrigatório';
+    if (!dados.email?.trim()) e.email = 'Campo obrigatório';
+    else if (!/\S+@\S+\.\S+/.test(dados.email)) e.email = 'E-mail inválido';
+    if (!dados.telefone?.trim()) e.telefone = 'Campo obrigatório';
+    setErrors(e); return Object.keys(e).length === 0;
   };
-  const statusMap={'ATIVA':'badge-ok','BAIXADA':'badge-err','SUSPENSA':'badge-warn','INAPTA':'badge-err'};
-  return(
+
+  const statusMap = {'ATIVA':'badge-ok','BAIXADA':'badge-err','SUSPENSA':'badge-warn','INAPTA':'badge-err'};
+  return (
     <div>
       <div className="card">
         <div className="card-title"><div className="icon">🏢</div>Dados da Empresa</div>
         <div className="form-row" style={{marginBottom:10}}>
           <FG label="CNPJ" req err={errors.cnpj}>
             <div className="input-group">
-              <input className={`input${errors.cnpj?' err':''}`} placeholder="00.000.000/0001-00" value={dados.cnpj} onChange={e=>onChange({cnpj:formatCNPJ(e.target.value)})} onKeyDown={e=>e.key==='Enter'&&consultarCNPJ()}/>
-              <button className="btn btn-primary" onClick={consultarCNPJ} disabled={loading} style={{flexShrink:0}}>{loading?<><div className="spinner"/>Buscando</>:'🔍 Consultar'}</button>
+              <input className={`input${errors.cnpj?' err':''}`} placeholder="00.000.000/0001-00" value={dados.cnpj}
+                onChange={e=>onChange({cnpj:formatCNPJ(e.target.value)})} onKeyDown={e=>e.key==='Enter'&&consultarCNPJ()}/>
+              <button className="btn btn-primary" onClick={consultarCNPJ} disabled={loading} style={{flexShrink:0}}>
+                {loading?<><div className="spinner"/>Buscando</>:'🔍 Consultar'}
+              </button>
             </div>
           </FG>
         </div>
-        {cnpjStatus==='ok'&&dados.razaoSocial&&(
+        {cnpjStatus==='ok' && dados.razaoSocial && (
           <div className="ibox green" style={{marginBottom:12}}>
             <span>✅</span>
-            <div><strong>{dados.razaoSocial}</strong>{dados.nomeFantasia&&` — ${dados.nomeFantasia}`}
-              {dados.statusReceita&&<span className={`badge ${statusMap[dados.statusReceita?.toUpperCase()]||'badge-warn'}`} style={{marginLeft:8}}>{dados.statusReceita}</span>}
-              {dados.cidade&&<><br/><span style={{fontSize:11,color:'#065f46'}}>📍 {dados.cidade}/{dados.uf}</span></>}
+            <div>
+              <strong>{dados.razaoSocial}</strong>{dados.nomeFantasia && ` — ${dados.nomeFantasia}`}
+              {dados.statusReceita && <span className={`badge ${statusMap[dados.statusReceita?.toUpperCase()]||'badge-warn'}`} style={{marginLeft:8}}>{dados.statusReceita}</span>}
+              {dados.cidade && <><br/><span style={{fontSize:11,color:'#065f46'}}>📍 {dados.cidade}/{dados.uf}</span></>}
             </div>
           </div>
         )}
-        {cnpjStatus==='error'&&<div className="ibox warn" style={{marginBottom:12}}><span>⚠️</span> CNPJ não encontrado. Preencha manualmente.</div>}
+        {cnpjStatus==='error' && <div className="ibox warn" style={{marginBottom:12}}><span>⚠️</span> CNPJ não encontrado. Preencha manualmente.</div>}
         <div className="form-row c2">
           <Inp label="Razão Social" value={dados.razaoSocial} onChange={e=>onChange({razaoSocial:e.target.value})} readOnly={cnpjStatus==='ok'}/>
           <Inp label="Nome Fantasia" value={dados.nomeFantasia} onChange={e=>onChange({nomeFantasia:e.target.value})} readOnly={cnpjStatus==='ok'}/>
@@ -1225,69 +1859,77 @@ function Passo1({dados,onChange,onNext,toast}){
 /* ══════════════════════════════════════════
    PASSO 2 — PRODUTOS
 ══════════════════════════════════════════ */
-function Passo2({catalogo,itens,onAddItem,onRemoveItem,onEditItem,onBack,onNext,toast}){
-  const [aba,setAba]=useState('estoque');
-  const [prodSel,setProdSel]=useState('');
-  const [nome,setNome]=useState('');
-  const [spec,setSpec]=useState('');
-  const [fornecedor,setFornecedor]=useState('');
-  const [precoManual,setPrecoManual]=useState('');
-  const [qtd,setQtd]=useState(1);
-  const [prazos,setPrazos]=useState([]);
-  const [prazoCustom,setPrazoCustom]=useState('');
-  const [descTipo,setDescTipo]=useState('%');
-  const [descVal,setDescVal]=useState('');
-  const [preview,setPreview]=useState({});
-  const [editItem,setEditItem]=useState(null);
-  const disponiveis=catalogo.filter(p=>p.qtdEstoque>0);
-  const semEstoque=catalogo.filter(p=>p.qtdEstoque===0);
-  useEffect(()=>{
-    const dv=parseFloat(descVal.replace(',','.'))||0;
-    const pv={};
-    const pc=[...new Set([...prazos,...(prazoCustom?[parseInt(prazoCustom)]:[])])].filter(Boolean);
-    if(aba==='estoque'&&prodSel){
-      const prod=catalogo.find(p=>p.id===prodSel);
-      if(prod) pc.forEach(p=>{pv[p]=aplicaDesc(lookupPreco(prod,qtd),descTipo,dv);});
-    }else if(aba==='sob'&&precoManual){
-      const base=parseFloat(precoManual.replace(',','.'))||0;
-      pc.forEach(p=>{pv[p]=aplicaDesc(base,descTipo,dv);});
+function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, onNext, toast}) {
+  const [aba, setAba]                 = useState('estoque');
+  const [prodSel, setProdSel]         = useState('');
+  const [nome, setNome]               = useState('');
+  const [spec, setSpec]               = useState('');
+  const [fornecedor, setFornecedor]   = useState('');
+  const [precoManual, setPrecoManual] = useState('');
+  const [qtd, setQtd]                 = useState(1);
+  const [prazos, setPrazos]           = useState([]);
+  const [prazoCustom, setPrazoCustom] = useState('');
+  const [descTipo, setDescTipo]       = useState('%');
+  const [descVal, setDescVal]         = useState('');
+  const [preview, setPreview]         = useState({});
+  const [editItem, setEditItem]       = useState(null);
+
+  const disponiveis = catalogo.filter(p => p.qtdEstoque > 0);
+  const semEstoque  = catalogo.filter(p => p.qtdEstoque === 0);
+
+  useEffect(() => {
+    const dv = parseFloat(descVal.replace(',','.')) || 0;
+    const pv = {};
+    const pc = [...new Set([...prazos, ...(prazoCustom?[parseInt(prazoCustom)]:[])])].filter(Boolean);
+    if (aba==='estoque' && prodSel) {
+      const prod = catalogo.find(p=>p.id===prodSel);
+      if (prod) pc.forEach(p => { pv[p] = aplicaDesc(lookupPreco(prod, qtd), descTipo, dv); });
+    } else if (aba==='sob' && precoManual) {
+      const base = parseFloat(precoManual.replace(',','.')) || 0;
+      pc.forEach(p => { pv[p] = aplicaDesc(base, descTipo, dv); });
     }
     setPreview(pv);
-  },[aba,prodSel,qtd,prazos,prazoCustom,precoManual,descTipo,descVal,catalogo]);
-  const togglePrazo=p=>setPrazos(prev=>prev.includes(p)?prev.filter(x=>x!==p):[...prev,p]);
-  const prazosFinais=()=>{const s=new Set([...prazos]);if(prazoCustom&&parseInt(prazoCustom)>0) s.add(parseInt(prazoCustom));return[...s].sort((a,b)=>a-b);};
-  const handleAdd=()=>{
-    const pf=prazosFinais();
-    if(pf.length===0){toast('Selecione ao menos um prazo.','error');return;}
-    let idProd=null,nomeProd='',specProd='',fornProd='',precoBase=0;
-    if(aba==='estoque'){
-      if(!prodSel){toast('Selecione um produto.','error');return;}
-      const prod=catalogo.find(p=>p.id===prodSel);
-      if(prod.qtdEstoque===0){toast('⛔ Produto sem estoque! Use Sob Demanda.','error');return;}
-      const jaUsado=itens.filter(i=>i.idProd===prodSel&&i.prazo===pf[0]).reduce((s,i)=>s+i.quantidade,0);
-      if(qtd>prod.qtdEstoque-jaUsado){toast(`Estoque insuficiente. Disponível: ${prod.qtdEstoque-jaUsado} un.`,'error');return;}
-      idProd=prod.id;nomeProd=prod.nome;specProd=prod.spec;precoBase=lookupPreco(prod,qtd);
-    }else{
-      if(!nome.trim()){toast('Informe o nome.','error');return;}
-      if(!precoManual){toast('Informe o preço.','error');return;}
-      nomeProd=nome.trim();specProd=spec.trim();fornProd=fornecedor.trim();
+  }, [aba, prodSel, qtd, prazos, prazoCustom, precoManual, descTipo, descVal, catalogo]);
+
+  const togglePrazo = p => setPrazos(prev => prev.includes(p)?prev.filter(x=>x!==p):[...prev,p]);
+  const prazosFinais = () => { const s = new Set([...prazos]); if (prazoCustom && parseInt(prazoCustom) > 0) s.add(parseInt(prazoCustom)); return [...s].sort((a,b)=>a-b); };
+
+  const handleAdd = () => {
+    const pf = prazosFinais();
+    if (pf.length === 0) { toast('Selecione ao menos um prazo.','error'); return; }
+    let idProd=null, nomeProd='', specProd='', fornProd='', precoBase=0;
+    if (aba==='estoque') {
+      if (!prodSel) { toast('Selecione um produto.','error'); return; }
+      const prod = catalogo.find(p=>p.id===prodSel);
+      if (prod.qtdEstoque === 0) { toast('⛔ Produto sem estoque! Use Sob Demanda.','error'); return; }
+      const jaUsado = itens.filter(i=>i.idProd===prodSel&&i.prazo===pf[0]).reduce((s,i)=>s+i.quantidade,0);
+      if (qtd > prod.qtdEstoque - jaUsado) { toast(`Estoque insuficiente. Disponível: ${prod.qtdEstoque - jaUsado} un.`,'error'); return; }
+      idProd=prod.id; nomeProd=prod.nome; specProd=prod.spec; precoBase=lookupPreco(prod,qtd);
+    } else {
+      if (!nome.trim()) { toast('Informe o nome.','error'); return; }
+      if (!precoManual) { toast('Informe o preço.','error'); return; }
+      nomeProd=nome.trim(); specProd=spec.trim(); fornProd=fornecedor.trim();
       precoBase=parseFloat(precoManual.replace(',','.'))||0;
     }
-    const dv=parseFloat(descVal.replace(',','.'))||0;
-    pf.forEach(prazo=>{
-      const precoFinal=aplicaDesc(precoBase,descTipo,dv);
-      onAddItem({id:uid(),idProd,nome:nomeProd,spec:specProd,fornecedor:fornProd,origem:aba==='estoque'?'Em Estoque':'Sob Demanda',quantidade:qtd,prazo,precoBase,descTipo,descValor:dv,precoFinal,valorMensal:precoFinal*qtd,valorTotal:precoFinal*qtd*prazo});
+    const dv = parseFloat(descVal.replace(',','.')) || 0;
+    pf.forEach(prazo => {
+      const precoFinal = aplicaDesc(precoBase, descTipo, dv);
+      onAddItem({ id:uid(), idProd, nome:nomeProd, spec:specProd, fornecedor:fornProd,
+        origem: aba==='estoque'?'Em Estoque':'Sob Demanda', quantidade:qtd, prazo, precoBase,
+        descTipo, descValor:dv, precoFinal, valorMensal:precoFinal*qtd, valorTotal:precoFinal*qtd*prazo });
     });
     toast(`${nomeProd} adicionado!`,'success');
-    setProdSel('');setNome('');setSpec('');setFornecedor('');setPrecoManual('');setQtd(1);setPrazos([]);setPrazoCustom('');setDescVal('');
+    setProdSel(''); setNome(''); setSpec(''); setFornecedor(''); setPrecoManual(''); setQtd(1); setPrazos([]); setPrazoCustom(''); setDescVal('');
   };
-  const estoqueDoProd=prodSel?catalogo.find(p=>p.id===prodSel)?.qtdEstoque??0:0;
-  const prodSelecionado=prodSel?catalogo.find(p=>p.id===prodSel):null;
-  return(
+
+  const estoqueDoProd = prodSel ? catalogo.find(p=>p.id===prodSel)?.qtdEstoque??0 : 0;
+
+  return (
     <div>
-      {semEstoque.length>0&&(
+      {semEstoque.length > 0 && (
         <div className="ibox red" style={{marginBottom:12}}>
-          <span>⛔</span><div><strong>Sem estoque:</strong> {semEstoque.map(p=>p.nome).join(', ')}. Use <strong>Sob Demanda</strong>.</div>
+          <span>⛔</span>
+          <div><strong>Sem estoque:</strong> {semEstoque.map(p=>p.nome).join(', ')}. Use <strong>Sob Demanda</strong> para incluí-los.</div>
         </div>
       )}
       <div className="card">
@@ -1296,25 +1938,61 @@ function Passo2({catalogo,itens,onAddItem,onRemoveItem,onEditItem,onBack,onNext,
           <button className={`tab${aba==='estoque'?' active':''}`} onClick={()=>setAba('estoque')}>📦 Em Estoque</button>
           <button className={`tab${aba==='sob'?' active':''}`} onClick={()=>setAba('sob')}>✏️ Sob Demanda</button>
         </div>
-        {aba==='estoque'?(
+        {aba==='estoque' ? (
           <div>
             <FG label="Produto do Catálogo" req>
               <select className="input" value={prodSel} onChange={e=>setProdSel(e.target.value)}>
                 <option value="">— Selecione —</option>
-                {disponiveis.map(p=><option key={p.id} value={p.id}>{p.nome} — {p.spec} ({p.qtdEstoque} un)</option>)}
+                {disponiveis.map(p => <option key={p.id} value={p.id}>{p.nome} — {p.spec} ({p.qtdEstoque} un)</option>)}
               </select>
             </FG>
-            {prodSel&&prodSelecionado&&(
-              <div className="ibox blue" style={{marginTop:8,fontSize:11}}>
+            {prodSel && (
+              <div className="ibox blue" style={{marginTop:8, fontSize:11}}>
                 <span>📦</span>
-                <div>
-                  Estoque: <strong>{estoqueDoProd} un</strong> · Preço p/ {qtd}un: <strong>{R$(lookupPreco(prodSelecionado,qtd))}/un/mês</strong>
-                  {prodSelecionado.descontos?.desc5>0&&qtd>=5&&<> · <span style={{color:'var(--success)',fontWeight:700}}>Desconto {qtd>=10?prodSelecionado.descontos.desc10:prodSelecionado.descontos.desc5}% aplicado!</span></>}
+                <div style={{flex:1}}>
+                  {(() => {
+                    const prod = catalogo.find(p=>p.id===prodSel);
+                    if (!prod) return null;
+                    const precoAtual = lookupPreco(prod, qtd);
+                    const faixaAtiva = getFaixaAtiva(prod, qtd);
+                    const descPerc   = calcDescPerc(prod, faixaAtiva||{preco:precoAtual});
+                    const faixaBase  = prod.faixas ? [...prod.faixas].sort((a,b)=>a.qtdMin-b.qtdMin)[0] : null;
+                    return (
+                      <>
+                        <span>Estoque: <strong>{estoqueDoProd} un</strong> · Preço p/ {qtd}un: <strong>{R$(precoAtual)}/un/mês</strong></span>
+                        {descPerc > 0 && (
+                          <span style={{marginLeft:8, background:'var(--success-bg)', color:'var(--success)', borderRadius:20, padding:'1px 8px', fontWeight:700, fontSize:11}}>
+                            🏷️ -{descPerc}% desconto volume
+                          </span>
+                        )}
+                        {/* Mini tabela de faixas disponíveis */}
+                        {prod.faixas && prod.faixas.length > 1 && (
+                          <div style={{display:'flex', gap:6, marginTop:6, flexWrap:'wrap'}}>
+                            {prod.faixas.map((f, i, arr) => {
+                              const ativa = qtd >= f.qtdMin && (i===arr.length-1 || qtd <= f.qtdMax);
+                              const isUlt = i === arr.length-1;
+                              const d = faixaBase && i>0 && f.preco>0 ? Math.round((1-f.preco/faixaBase.preco)*100*10)/10 : 0;
+                              return (
+                                <div key={i} style={{
+                                  padding:'3px 9px', borderRadius:20, fontSize:10, fontWeight:700,
+                                  background: ativa ? 'var(--electric)' : 'rgba(37,99,235,.08)',
+                                  color: ativa ? 'white' : 'var(--electric)',
+                                  border: `1px solid ${ativa?'var(--electric)':'rgba(37,99,235,.2)'}`,
+                                }}>
+                                  {isUlt?`${f.qtdMin}+`:`${f.qtdMin}–${f.qtdMax}`} un → {R$(f.preco)}{d>0?` (-${d}%)`:''}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             )}
           </div>
-        ):(
+        ) : (
           <div>
             <div className="form-row c2" style={{marginBottom:10}}>
               <Inp label="Nome do Produto" req value={nome} onChange={e=>setNome(e.target.value)} placeholder="Ex: Notebook Asus Vivobook"/>
@@ -1336,10 +2014,12 @@ function Passo2({catalogo,itens,onAddItem,onRemoveItem,onEditItem,onBack,onNext,
           <span className="qty-val">{qtd}</span>
           <button className="qty-btn" onClick={()=>setQtd(q=>q+1)}>+</button>
         </div>
-        {aba==='estoque'&&prodSel&&qtd>estoqueDoProd&&<div className="ibox red" style={{marginTop:8,fontSize:11}}><span>⚠️</span>Qtd ({qtd}) supera o estoque ({estoqueDoProd} un).</div>}
+        {aba==='estoque' && prodSel && qtd > estoqueDoProd && (
+          <div className="ibox red" style={{marginTop:8,fontSize:11}}><span>⚠️</span>Qtd ({qtd}) supera o estoque ({estoqueDoProd} un).</div>
+        )}
       </div>
       <div className="card">
-        <div className="card-title"><div className="icon">🏷️</div>Desconto Adicional <span style={{fontSize:11,fontWeight:400,color:'var(--slate)'}}>(opcional — sobre o preço da faixa)</span></div>
+        <div className="card-title"><div className="icon">🏷️</div>Desconto <span style={{fontSize:11,fontWeight:400,color:'var(--slate)'}}>(opcional)</span></div>
         <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
           <button className={`btn btn-sm${descTipo==='%'?' btn-primary':' btn-outline'}`} onClick={()=>setDescTipo('%')}>% Percentual</button>
           <button className={`btn btn-sm${descTipo==='$'?' btn-primary':' btn-outline'}`} onClick={()=>setDescTipo('$')}>R$ Nominal</button>
@@ -1350,10 +2030,10 @@ function Passo2({catalogo,itens,onAddItem,onRemoveItem,onEditItem,onBack,onNext,
         <div className="card-title"><div className="icon">📅</div>Prazo(s) do Contrato</div>
         <p style={{fontSize:11,color:'var(--slate)',marginBottom:10}}>Múltiplos prazos geram tabela comparativa no PDF.</p>
         <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}}>
-          {[1,3,6,12,24,36,48].map(p=>(
+          {[1,3,6,12,24,36,48].map(p => (
             <div key={p} className={`prazo-chip${prazos.includes(p)?' sel':''}`} onClick={()=>togglePrazo(p)}>
               {prazos.includes(p)?'✓':''} {p}m
-              {preview[p]!=null&&<span style={{fontSize:10,color:'var(--success)',fontWeight:700}}>{R$(preview[p])}/un</span>}
+              {preview[p]!=null && <span style={{fontSize:10,color:'var(--success)',fontWeight:700}}>{R$(preview[p])}/un</span>}
             </div>
           ))}
         </div>
@@ -1364,31 +2044,38 @@ function Passo2({catalogo,itens,onAddItem,onRemoveItem,onEditItem,onBack,onNext,
       <button className="btn btn-success btn-lg" style={{width:'100%',marginBottom:14}} onClick={handleAdd}>＋ Adicionar à Lista</button>
       <div className="card">
         <div className="card-title"><div className="icon">📋</div>Itens do Orçamento ({itens.length})</div>
-        {itens.length===0?(
+        {itens.length===0 ? (
           <div className="empty"><div className="eicon">📭</div><p>Nenhum item adicionado ainda.</p></div>
-        ):(
+        ) : (
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
-            {itens.map(item=>(
+            {itens.map(item => {
+              const descPerc = item.precoBase > 0 && item.precoFinal < item.precoBase
+                ? Math.round((1-item.precoFinal/item.precoBase)*100*10)/10 : 0;
+              return (
               <div key={item.id} className="produto-row">
                 <div className="produto-info">
                   <div className="produto-nome">{item.nome}</div>
                   <div className="produto-sub">
-                    {item.spec&&<>{item.spec} · </>}Qtd: {item.quantidade} ·
+                    {item.spec&&<>{item.spec} · </>}
                     <span className="badge badge-blue" style={{margin:'0 4px'}}>{item.prazo}m</span>
-                    {item.origem==='Sob Demanda'&&<span className="badge badge-ok" style={{marginRight:4}}>Sob Demanda</span>}
-                    {item.fornecedor&&<span style={{fontSize:10,color:'var(--slate)'}}>📍{item.fornecedor}</span>}
-                    {item.descValor>0&&<span style={{fontSize:10,color:'var(--warn)'}}> desc.{item.descTipo==='%'?`${item.descValor}%`:`R$${item.descValor}`}</span>}
+                    {item.origem==='Sob Demanda' && <span className="badge badge-ok" style={{marginRight:4}}>Sob Demanda</span>}
+                    {item.fornecedor && <span style={{fontSize:10,color:'var(--slate)'}}>📍{item.fornecedor}</span>}
+                  </div>
+                  {/* Linha de preços clara: un × qtd = subtotal */}
+                  <div style={{display:'flex',gap:6,marginTop:4,flexWrap:'wrap',alignItems:'center'}}>
+                    <span style={{fontSize:12,fontWeight:800,color:'var(--navy)'}}>{R$(item.precoFinal)}<span style={{fontSize:10,fontWeight:400,color:'var(--slate)'}}>/un</span></span>
+                    {descPerc > 0 && <span style={{fontSize:10,background:'var(--success-bg)',color:'var(--success)',borderRadius:20,padding:'1px 7px',fontWeight:700}}>-{descPerc}% vol.</span>}
+                    <span style={{fontSize:11,color:'var(--slate-light)'}}>×</span>
+                    <span style={{fontSize:11,fontWeight:700,color:'var(--slate)'}}>{item.quantidade} un</span>
+                    <span style={{fontSize:11,color:'var(--slate-light)'}}>=</span>
+                    <span style={{fontSize:12,fontWeight:800,color:'var(--electric)'}}>{R$(item.valorMensal)}<span style={{fontSize:10,fontWeight:400,color:'var(--slate)'}}>/mês</span></span>
+                    {item.descValor>0 && <span style={{fontSize:10,color:'var(--warn)',borderRadius:20,padding:'1px 7px',background:'var(--warn-bg)',fontWeight:700}}>-{item.descTipo==='%'?`${item.descValor}%`:`R$${item.descValor}`} extra</span>}
                   </div>
                 </div>
-                <div className="produto-valor">
-                  {/* CORREÇÃO: mostra preço unitário */}
-                  <div className="val">{R$(item.precoFinal)}<span style={{fontSize:9,fontWeight:400,color:'var(--slate)'}}>/un</span></div>
-                  <div className="sub">{R$(item.valorMensal)}/mês</div>
-                </div>
-                <button className="btn btn-warn btn-icon" onClick={()=>setEditItem(item)}>✏️</button>
-                <button className="btn btn-ghost btn-icon" onClick={()=>onRemoveItem(item.id)}>🗑️</button>
+                <button className="btn btn-warn btn-icon" onClick={()=>setEditItem(item)} title="Editar">✏️</button>
+                <button className="btn btn-ghost btn-icon" onClick={()=>onRemoveItem(item.id)} title="Remover">🗑️</button>
               </div>
-            ))}
+            );})}
           </div>
         )}
       </div>
@@ -1396,7 +2083,11 @@ function Passo2({catalogo,itens,onAddItem,onRemoveItem,onEditItem,onBack,onNext,
         <button className="btn btn-outline btn-lg" onClick={onBack}>← Voltar</button>
         <button className="btn btn-primary btn-lg" onClick={()=>{if(itens.length===0){toast('Adicione ao menos um produto.','error');return;}onNext();}}>Ver Resumo →</button>
       </div>
-      {editItem&&<ModalEditarItem item={editItem} onSave={u=>{onEditItem(u);setEditItem(null);toast('Item atualizado!','success')}} onClose={()=>setEditItem(null)}/>}
+      {editItem && (
+        <ModalEditarItem item={editItem}
+          onSave={u=>{onEditItem(u);setEditItem(null);toast('Item atualizado!','success')}}
+          onClose={()=>setEditItem(null)}/>
+      )}
     </div>
   );
 }
@@ -1404,39 +2095,52 @@ function Passo2({catalogo,itens,onAddItem,onRemoveItem,onEditItem,onBack,onNext,
 /* ══════════════════════════════════════════
    PASSO 3 — RESUMO + PDF
 ══════════════════════════════════════════ */
-function Passo3({cliente,itens,catalogo,setCatalogo,config,onBack,toast}){
-  const [pdfGerado,setPdfGerado]=useState(false);
-  const [pdfUrl,setPdfUrl]=useState(null);
-  const [loading,setLoading]=useState(false);
-  const [id]=useState(orcId);
-  const prazos=[...new Set(itens.map(i=>i.prazo))].sort((a,b)=>a-b);
-  const produtos=[...new Map(itens.map(i=>[i.idProd||i.nome,i])).values()];
-  const totais=prazos.map(p=>{const ip=itens.filter(i=>i.prazo===p);const m=ip.reduce((s,i)=>s+i.valorMensal,0);return{prazo:p,mensal:m,total:m*p};});
-  const handlePDF=()=>{
+function Passo3({cliente, itens, catalogo, setCatalogo, config, onBack, toast}) {
+  const [pdfGerado, setPdfGerado] = useState(false);
+  const [pdfUrl,    setPdfUrl]    = useState(null);
+  const [loading,   setLoading]   = useState(false);
+  const [id] = useState(orcId);
+
+  const prazos   = [...new Set(itens.map(i=>i.prazo))].sort((a,b)=>a-b);
+  const produtos = [...new Map(itens.map(i=>[i.idProd||i.nome, i])).values()];
+  const totais   = prazos.map(p => { const ip=itens.filter(i=>i.prazo===p); const m=ip.reduce((s,i)=>s+i.valorMensal,0); return {prazo:p,mensal:m,total:m*p}; });
+
+  const handlePDF = () => {
     setLoading(true);
     setTimeout(()=>{
-      try{const doc=gerarPDF({id},cliente,itens,config);const url=URL.createObjectURL(doc.output('blob'));setPdfUrl(url);setPdfGerado(true);toast('PDF gerado!','success');}
-      catch(e){toast('Erro ao gerar PDF.','error');}
-      finally{setLoading(false);}
-    },500);
+      try {
+        const doc = gerarPDF({id}, cliente, itens, config);
+        const url = URL.createObjectURL(doc.output('blob'));
+        setPdfUrl(url); setPdfGerado(true); toast('PDF gerado!','success');
+      } catch(e) { toast('Erro ao gerar PDF.','error'); }
+      finally { setLoading(false); }
+    }, 500);
   };
-  const handleFecharOrc=()=>{
-    const ag={};
-    itens.filter(i=>i.idProd).forEach(i=>{ag[i.idProd]=Math.max(ag[i.idProd]||0,i.quantidade);});
-    setCatalogo(prev=>prev.map(p=>ag[p.id]?{...p,qtdEstoque:Math.max(0,p.qtdEstoque-ag[p.id])}:p));
+
+  const handleFecharOrc = () => {
+    const ag = {};
+    itens.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = Math.max(ag[i.idProd]||0, i.quantidade); });
+    setCatalogo(prev => prev.map(p => ag[p.id] ? {...p, qtdEstoque:Math.max(0,p.qtdEstoque-ag[p.id])} : p));
     toast('✅ Orçamento fechado! Estoque atualizado.','success');
   };
-  const handleDownload=()=>{
+
+  const handleDownload = () => {
     if(!pdfUrl) return;
-    const a=document.createElement('a');a.href=pdfUrl;
+    const a=document.createElement('a'); a.href=pdfUrl;
     a.download=`${id}_${(cliente.nomeFantasia||cliente.razaoSocial||'cliente').replace(/\s+/g,'-')}.pdf`;
     a.click();
   };
-  const handleWhatsApp=()=>{
-    const msg=encodeURIComponent(`Olá, ${cliente.responsavel}! 😊\n\nSegue a proposta *${id}* referente à locação de notebooks.\n\n📊 ${prazos.length} opção(ões) de prazo para comparar!\n\nGerada em ${new Date().toLocaleDateString('pt-BR')}. Qualquer dúvida estou à disposição!\n\n${config.responsavelNome||''}${config.responsavelCelular?'\n'+config.responsavelCelular:''}`);
-    window.open(`https://wa.me/55${cliente.telefone.replace(/\D/g,'')}?text=${msg}`,'_blank');
+
+  const handleWhatsApp = () => {
+    const msg = encodeURIComponent(
+      `Olá, ${cliente.responsavel}! 😊\n\nSegue a proposta *${id}* referente à locação de notebooks.\n\n📊 ${prazos.length} opção(ões) de prazo para comparar!\n\n` +
+      `Gerada em ${new Date().toLocaleDateString('pt-BR')}. Qualquer dúvida estou à disposição!\n\n` +
+      `${config.responsavelNome||''}${config.responsavelCelular?'\n'+config.responsavelCelular:''}`
+    );
+    window.open(`https://wa.me/55${cliente.telefone.replace(/\D/g,'')}?text=${msg}`, '_blank');
   };
-  return(
+
+  return (
     <div>
       <div className="card" style={{background:'linear-gradient(135deg,var(--navy),var(--navy-light))',border:'none'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
@@ -1444,7 +2148,9 @@ function Passo3({cliente,itens,catalogo,setCatalogo,config,onBack,toast}){
             <div style={{color:'rgba(255,255,255,.6)',fontSize:10,textTransform:'uppercase',letterSpacing:'.5px',marginBottom:3}}>Proposta</div>
             <div style={{color:'white',fontWeight:800,fontSize:20,letterSpacing:'-.3px'}}>{id}</div>
             <div style={{color:'rgba(255,255,255,.5)',fontSize:11,marginTop:3}}>Válida até {new Date(Date.now()+30*86400000).toLocaleDateString('pt-BR')}</div>
-            {config.responsavelNome&&<div style={{color:'rgba(255,255,255,.7)',fontSize:12,marginTop:6,fontWeight:600}}>👤 {config.responsavelNome}{config.responsavelCelular&&` · ${config.responsavelCelular}`}</div>}
+            {config.responsavelNome && (
+              <div style={{color:'rgba(255,255,255,.7)',fontSize:12,marginTop:6,fontWeight:600}}>👤 {config.responsavelNome}{config.responsavelCelular&&` · ${config.responsavelCelular}`}</div>
+            )}
           </div>
           <div style={{textAlign:'right'}}>
             <div style={{color:'rgba(255,255,255,.5)',fontSize:10}}>Emitida em</div>
@@ -1453,15 +2159,19 @@ function Passo3({cliente,itens,catalogo,setCatalogo,config,onBack,toast}){
           </div>
         </div>
       </div>
+
       <div className="card">
         <div className="card-title"><div className="icon">🏢</div>Cliente</div>
         <div style={{fontWeight:700,fontSize:14,color:'var(--navy)',marginBottom:4}}>{cliente.razaoSocial||cliente.nomeFantasia||'—'}</div>
         {cliente.cnpj&&<div style={{fontSize:11,color:'var(--slate)',marginBottom:6}}>CNPJ: {cliente.cnpj}</div>}
         <div className="divider" style={{margin:'8px 0'}}/>
         <div style={{fontSize:12,display:'flex',gap:14,flexWrap:'wrap'}}>
-          <span>👤 {cliente.responsavel}</span><span>✉️ {cliente.email}</span><span>📱 {cliente.telefone}</span>
+          <span>👤 {cliente.responsavel}</span>
+          <span>✉️ {cliente.email}</span>
+          <span>📱 {cliente.telefone}</span>
         </div>
       </div>
+
       <div className="card">
         <div className="card-title"><div className="icon">📊</div>Tabela Comparativa</div>
         <div style={{overflowX:'auto'}}>
@@ -1478,37 +2188,55 @@ function Passo3({cliente,itens,catalogo,setCatalogo,config,onBack,toast}){
                   <td style={{fontWeight:700}}>{prod.quantidade}</td>
                   {prazos.map(p=>{
                     const item=itens.find(i=>(i.idProd||i.nome)===(prod.idProd||prod.nome)&&i.prazo===p);
-                    return<td key={p}>{item?(
-                      <>
-                        {/* CORREÇÃO: preço unitário em destaque, mensal abaixo */}
-                        <div style={{fontWeight:700,color:'var(--navy)',fontSize:11}}>{R$(item.precoFinal)}<span style={{fontSize:9,fontWeight:400,color:'var(--slate)'}}>/un</span></div>
-                        <div style={{fontSize:9,color:'var(--slate)'}}>{R$(item.valorMensal)}/mês</div>
-                      </>
-                    ):<span className="no-col">—</span>}</td>;
+                    return <td key={p}>{item ? (() => {
+                      const descP = item.precoBase>0&&item.precoFinal<item.precoBase
+                        ? Math.round((1-item.precoFinal/item.precoBase)*100*10)/10 : 0;
+                      return (
+                        <div style={{lineHeight:1.7}}>
+                          <div style={{fontWeight:800,color:'var(--navy)',fontSize:12}}>
+                            {R$(item.precoFinal)}<span style={{fontSize:9,fontWeight:400,color:'var(--slate)'}}>/un</span>
+                          </div>
+                          {descP > 0 && (
+                            <div style={{fontSize:9,background:'var(--success-bg)',color:'var(--success)',borderRadius:20,padding:'0px 6px',fontWeight:700,display:'inline-block'}}>-{descP}% vol.</div>
+                          )}
+                          <div style={{fontSize:10,color:'var(--slate)',fontWeight:600}}>{R$(item.valorMensal)}/mês</div>
+                        </div>
+                      );
+                    })() : <span className="no-col">—</span>}</td>;
                   })}
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              {/* Só aparece mensalidade total e valor total aqui — sem duplicar */}
               <tr><td colSpan={2}>Mensalidade Total</td>{totais.map(t=><td key={t.prazo} style={{fontWeight:700,color:'var(--electric)'}}>{R$(t.mensal)}</td>)}</tr>
               <tr><td colSpan={2}>Total do Contrato</td>{totais.map(t=><td key={t.prazo}>{R$(t.total)}</td>)}</tr>
             </tfoot>
           </table>
         </div>
       </div>
-      {!pdfGerado?(
+
+      {!pdfGerado ? (
         <div className="card" style={{textAlign:'center'}}>
-          <div style={{fontSize:12,color:'var(--slate)',marginBottom:18}}>O PDF usa os dados e logo configurados em ⚙️.</div>
-          {!config.responsavelNome&&<div className="ibox warn" style={{marginBottom:14,textAlign:'left'}}><span>⚠️</span> Responsável não configurado. PDF sairá sem assinatura.</div>}
-          <button className="btn btn-primary btn-xl" onClick={handlePDF} disabled={loading}>{loading?<><div className="spinner"/>Gerando...</>:'📄 Gerar PDF'}</button>
+          <div style={{fontSize:12,color:'var(--slate)',marginBottom:18}}>
+            O PDF usará os dados configurados em ⚙️ (logo, nome do responsável, textos, etc.).
+          </div>
+          {!config.responsavelNome && (
+            <div className="ibox warn" style={{marginBottom:14,textAlign:'left'}}>
+              <span>⚠️</span> Você não configurou o responsável. O PDF sairá sem assinatura. Vá em <strong>⚙️ Configurações</strong>.
+            </div>
+          )}
+          <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap'}}>
+            <button className="btn btn-primary btn-xl" onClick={handlePDF} disabled={loading}>
+              {loading?<><div className="spinner"/>Gerando...</>:'📄 Gerar PDF'}
+            </button>
+          </div>
         </div>
-      ):(
+      ) : (
         <div className="card">
           <div className="pdf-success">
             <span className="big">📄</span>
             <h3>PDF Gerado!</h3>
-            <p>Proposta <strong>{id}</strong> com logo e dados de <strong>{config.responsavelNome||'responsável'}</strong></p>
+            <p>Proposta <strong>{id}</strong> com logo e dados de <strong>{config.responsavelNome||'responsável'}</strong> — pronta!</p>
             <div className="pdf-btns">
               <button className="btn btn-primary btn-lg" onClick={handleDownload}>⬇️ Baixar PDF</button>
               <button className="btn btn-success btn-lg" onClick={handleWhatsApp}>💬 WhatsApp</button>
@@ -1518,66 +2246,90 @@ function Passo3({cliente,itens,catalogo,setCatalogo,config,onBack,toast}){
           </div>
         </div>
       )}
+
       <div className="nav-btns"><button className="btn btn-outline btn-lg" onClick={onBack}>← Voltar</button></div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════
-   WIZARD + APP ROOT
+   WIZARD
 ══════════════════════════════════════════ */
-function TelaOrcamento({catalogo,setCatalogo,config,toast}){
-  const [step,setStep]=useState(1);
-  const [cliente,setCliente]=useState(()=>loadLS('nb_cliente',{cnpj:'',razaoSocial:'',nomeFantasia:'',statusReceita:'',responsavel:'',email:'',telefone:'',cidade:'',uf:''}));
-  const [itens,setItens]=useState([]);
-  useEffect(()=>{saveLS('nb_cliente',cliente);},[cliente]);
-  const steps=[{n:1,label:'Cliente'},{n:2,label:'Produtos'},{n:3,label:'Resumo'}];
-  return(
+function TelaOrcamento({catalogo, setCatalogo, config, toast}) {
+  const [step, setStep] = useState(1);
+  const [cliente, setCliente] = useState(() => loadLS('nb_cliente', {cnpj:'',razaoSocial:'',nomeFantasia:'',statusReceita:'',responsavel:'',email:'',telefone:'',cidade:'',uf:''}));
+  const [itens, setItens] = useState([]);
+  useEffect(()=>{ saveLS('nb_cliente', cliente); }, [cliente]);
+  const steps = [{n:1,label:'Cliente'},{n:2,label:'Produtos'},{n:3,label:'Resumo'}];
+  return (
     <div>
       <div className="stepper-wrap">
         <div className="stepper">
-          {steps.map(s=>{const est=step===s.n?'active':step>s.n?'done':'';return(
-            <div key={s.n} className={`step-item ${est}`}><div className="step-circle">{step>s.n?'✓':s.n}</div><div className="step-label">{s.label}</div></div>
-          );})}
+          {steps.map(s=>{
+            const est = step===s.n?'active':step>s.n?'done':'';
+            return (<div key={s.n} className={`step-item ${est}`}><div className="step-circle">{step>s.n?'✓':s.n}</div><div className="step-label">{s.label}</div></div>);
+          })}
         </div>
       </div>
       <div className="main">
-        {step===1&&<Passo1 dados={cliente} onChange={p=>setCliente(v=>({...v,...p}))} onNext={()=>setStep(2)} toast={toast}/>}
-        {step===2&&<Passo2 catalogo={catalogo} itens={itens} onAddItem={item=>setItens(p=>[...p,item])} onRemoveItem={id=>setItens(p=>p.filter(i=>i.id!==id))} onEditItem={u=>setItens(p=>p.map(i=>i.id===u.id?u:i))} onBack={()=>setStep(1)} onNext={()=>setStep(3)} toast={toast}/>}
-        {step===3&&<Passo3 cliente={cliente} itens={itens} catalogo={catalogo} setCatalogo={setCatalogo} config={config} onBack={()=>setStep(2)} toast={toast}/>}
+        {step===1 && <Passo1 dados={cliente} onChange={p=>setCliente(v=>({...v,...p}))} onNext={()=>setStep(2)} toast={toast}/>}
+        {step===2 && <Passo2 catalogo={catalogo} itens={itens}
+          onAddItem={item=>setItens(p=>[...p,item])}
+          onRemoveItem={id=>setItens(p=>p.filter(i=>i.id!==id))}
+          onEditItem={u=>setItens(p=>p.map(i=>i.id===u.id?u:i))}
+          onBack={()=>setStep(1)} onNext={()=>setStep(3)} toast={toast}/>}
+        {step===3 && <Passo3 cliente={cliente} itens={itens} catalogo={catalogo} setCatalogo={setCatalogo} config={config} onBack={()=>setStep(2)} toast={toast}/>}
       </div>
     </div>
   );
 }
 
-function App(){
-  const [tela,setTela]=useState('orcamento');
-  const [catalogo,setCatalogoBruto]=useState(()=>loadLS('nb_catalogo',CATALOGO_INICIAL));
-  const [contratos,setContratosBruto]=useState(()=>loadLS('nb_contratos',CONTRATOS_INICIAIS));
-  const [config,setConfigBruto]=useState(()=>loadLS('nb_config',CONFIG_INICIAL));
-  const {toasts,toast}=useToast();
-  const setCatalogo=fn=>{setCatalogoBruto(prev=>{const n=typeof fn==='function'?fn(prev):fn;saveLS('nb_catalogo',n);return n;});};
-  const setContratos=fn=>{setContratosBruto(prev=>{const n=typeof fn==='function'?fn(prev):fn;saveLS('nb_contratos',n);return n;});};
-  const setConfig=val=>{setConfigBruto(val);saveLS('nb_config',val);};
-  const limite=config.alertaDiasContrato||30;
-  const numContratosAlerta=contratos.filter(c=>diasParaVencer(c.inicio,c.meses)<=limite).length;
-  const numEstoqueAlerta=catalogo.filter(p=>p.qtdEstoque===0||p.qtdEstoque<=(config.alertaEstoqueMinimoQtd||3)).length;
-  return(
+/* ══════════════════════════════════════════
+   APP ROOT
+══════════════════════════════════════════ */
+function App() {
+  const [tela, setTela] = useState('orcamento');
+  const [catalogo, setCatalogoBruto]   = useState(() => loadLS('nb_catalogo', CATALOGO_INICIAL));
+  const [contratos, setContratosBruto] = useState(() => loadLS('nb_contratos', CONTRATOS_INICIAIS));
+  const [config, setConfigBruto]       = useState(() => loadLS('nb_config', CONFIG_INICIAL));
+  const { toasts, toast } = useToast();
+
+  const setCatalogo  = fn => { setCatalogoBruto(prev=>{ const n=typeof fn==='function'?fn(prev):fn; saveLS('nb_catalogo',n); return n; }); };
+  const setContratos = fn => { setContratosBruto(prev=>{ const n=typeof fn==='function'?fn(prev):fn; saveLS('nb_contratos',n); return n; }); };
+  const setConfig    = val => { setConfigBruto(val); saveLS('nb_config',val); };
+
+  const limite = config.alertaDiasContrato || 30;
+  const numContratosAlerta = contratos.filter(c => diasParaVencer(c.inicio,c.meses) <= limite).length;
+  const numEstoqueAlerta   = catalogo.filter(p => p.qtdEstoque===0 || p.qtdEstoque<=(config.alertaEstoqueMinimoQtd||3)).length;
+
+  return (
     <div>
       <div className="topbar">
-        <div className="topbar-brand"><div className="dot">💻</div>{config.nomeEmpresa||'NB Diogo'}</div>
+        <div className="topbar-brand">
+          <div className="dot">💻</div>
+          {config.nomeEmpresa || 'NB Diogo'}
+        </div>
         <div className="topbar-nav">
           <button className={`topbar-btn${tela==='orcamento'?' active':''}`} onClick={()=>setTela('orcamento')}>📄 <span>Orçamento</span></button>
-          <button className={`topbar-btn${tela==='contratos'?' active':''}`} onClick={()=>setTela('contratos')}>📋 <span>Contratos</span>{numContratosAlerta>0&&<div className="notif-dot"/>}</button>
-          <button className={`topbar-btn${tela==='estoque'?' active':''}`} onClick={()=>setTela('estoque')}>📦 <span>Estoque</span>{numEstoqueAlerta>0&&<div className="notif-dot"/>}</button>
+          <button className={`topbar-btn${tela==='contratos'?' active':''}`} onClick={()=>setTela('contratos')}>
+            📋 <span>Contratos</span>
+            {numContratosAlerta > 0 && <div className="notif-dot"/>}
+          </button>
+          <button className={`topbar-btn${tela==='estoque'?' active':''}`} onClick={()=>setTela('estoque')}>
+            📦 <span>Estoque</span>
+            {numEstoqueAlerta > 0 && <div className="notif-dot"/>}
+          </button>
           <button className={`topbar-btn${tela==='config'?' active':''}`} onClick={()=>setTela('config')}>⚙️ <span>Config</span></button>
         </div>
       </div>
+
       <AlertBanner catalogo={catalogo} contratos={contratos} config={config}/>
-      {tela==='orcamento'&&<TelaOrcamento catalogo={catalogo} setCatalogo={setCatalogo} config={config} toast={toast}/>}
-      {tela==='contratos'&&<TelaContratos contratos={contratos} setContratos={setContratos} config={config} toast={toast}/>}
-      {tela==='estoque'&&<TelaEstoque catalogo={catalogo} setCatalogo={setCatalogo} config={config} toast={toast}/>}
-      {tela==='config'&&<TelaConfiguracoes config={config} setConfig={setConfig} toast={toast}/>}
+
+      {tela==='orcamento' && <TelaOrcamento catalogo={catalogo} setCatalogo={setCatalogo} config={config} toast={toast}/>}
+      {tela==='contratos' && <TelaContratos contratos={contratos} setContratos={setContratos} config={config} toast={toast}/>}
+      {tela==='estoque'   && <TelaEstoque   catalogo={catalogo} setCatalogo={setCatalogo}   config={config} toast={toast}/>}
+      {tela==='config'    && <TelaConfiguracoes config={config} setConfig={setConfig} toast={toast}/>}
+
       <Toast toasts={toasts}/>
     </div>
   );
