@@ -227,7 +227,7 @@ const CONFIG_INICIAL = {
   cnpjEmpresa: '',
   enderecoEmpresa: '',
   responsavelNome: '',
-  responsavelCelular: '',
+  responsavelCelular: '(11) 92191-5897',
   responsavelEmail: '',
   logoBase64: '',
   textoIntro: 'Gostaríamos de apresentar nossa proposta de locação de computadores para atender às necessidades de sua empresa. Nossa empresa é especializada em fornecer soluções de tecnologia para empresas, e disponibilizamos uma ampla variedade de equipamentos para locação, incluindo desktops, notebooks, monitores e demais periféricos.\n\nNossa proposta oferece uma solução completa, contemplando os seguintes detalhes:',
@@ -2153,12 +2153,18 @@ function Passo3({cliente, itens, catalogo, setCatalogo, config, onBack, toast}) 
   };
 
   const handleWhatsApp = () => {
+    const nomeVendedor = config.responsavelNome || '';
+    const foneVendedor = config.responsavelCelular || '(11) 92191-5897';
     const msg = encodeURIComponent(
-      `Olá, ${cliente.responsavel}! 😊\n\nSegue a proposta *${id}* referente à locação de notebooks.\n\n📊 ${prazos.length} opção(ões) de prazo para comparar!\n\n` +
-      `Gerada em ${new Date().toLocaleDateString('pt-BR')}. Qualquer dúvida estou à disposição!\n\n` +
-      `${config.responsavelNome||''}${config.responsavelCelular?'\n'+config.responsavelCelular:''}`
+      `Olá, ${cliente.responsavel}! 😊\n\nSegue a proposta *${id}* referente à locação de notebooks.\n\n` +
+      `📊 ${prazos.length} opção(ões) de prazo para comparar!\n\n` +
+      `Proposta gerada em ${new Date().toLocaleDateString('pt-BR')}. Qualquer dúvida entre em contato!\n\n` +
+      `${nomeVendedor ? `👤 ${nomeVendedor}\n` : ''}` +
+      `📱 ${foneVendedor}`
     );
-    window.open(`https://wa.me/55${cliente.telefone.replace(/\D/g,'')}?text=${msg}`, '_blank');
+    // Envia para o WhatsApp do CLIENTE com a mensagem da empresa
+    const foneCliente = cliente.telefone.replace(/\D/g,'');
+    window.open(`https://wa.me/55${foneCliente}?text=${msg}`, '_blank');
   };
 
   return (
