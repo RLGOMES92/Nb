@@ -198,8 +198,6 @@ const { useState, useEffect, useCallback, useRef } = React;
 
 /* ══════════════════════════════════════════
    FIREBASE — configuração
-   ⚠️ SUBSTITUA pelos dados do SEU projeto Firebase
-   (Console Firebase → Configurações do Projeto → Seus apps → SDK config)
 ══════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey: "AIzaSyCrVdp2y5H4mP500LwgRjKpm6N4j-Xo83g",
@@ -264,7 +262,6 @@ const uid = () => Date.now().toString(36).toUpperCase() + Math.random().toString
 const orcId = () => `ORC-${uid()}`;
 const R$ = v => v == null ? '—' : Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 
-/* Extrai o número de meses de um texto livre tipo "24 meses", "Customizado 18m", "2 anos" */
 function extrairMeses(label) {
   if (!label) return 1;
   const txt = String(label).toLowerCase();
@@ -296,10 +293,8 @@ function diasParaVencer(inicio, meses) {
 
 /* ══════════════════════════════════════════
    HOOK — Sincronização em tempo real (Firebase)
-   Substitui localStorage: escreve e escuta o
-   mesmo nó para todos os dispositivos logados.
 ══════════════════════════════════════════ */
-function useFirebaseSync(uidUser, path, defaultValue) {
+function useFirebaseSync(uidUser, path, defaultValue, onError) {
   const [data, setDataState] = useState(defaultValue);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
@@ -313,7 +308,11 @@ function useFirebaseSync(uidUser, path, defaultValue) {
         setDataState(val);
       }
       setLoaded(true);
-    }, err => { console.error('Firebase sync error', path, err); setLoaded(true); });
+    }, err => {
+      console.error('Firebase sync error', path, err);
+      setLoaded(true);
+      if (onError) onError(err, path);
+    });
     return () => ref.off('value', cb);
     // eslint-disable-next-line
   }, [uidUser, path]);
@@ -321,10 +320,15 @@ function useFirebaseSync(uidUser, path, defaultValue) {
   const update = useCallback((fnOrVal) => {
     setDataState(prev => {
       const next = typeof fnOrVal === 'function' ? fnOrVal(prev) : fnOrVal;
-      if (uidUser && db) db.ref(`usuarios/${uidUser}/${path}`).set(next);
+      if (uidUser && db) {
+        db.ref(`usuarios/${uidUser}/${path}`).set(next).catch(err => {
+          console.error('Firebase write error', path, err);
+          if (onError) onError(err, path);
+        });
+      }
       return next;
     });
-  }, [uidUser, path]);
+  }, [uidUser, path, onError]);
 
   return [data, update, loaded];
 }
@@ -340,9 +344,7 @@ function useToast() {
 }
 
 /* ══════════════════════════════════════════
-   PDF GENERATOR — LAYOUT VERMELHO MODERNO
-   ── ALTURA DA CAIXA DO CLIENTE agora é
-      CALCULADA DINAMICAMENTE (corrige texto cortado)
+   PDF GENERATOR
 ══════════════════════════════════════════ */
 function gerarPDF(orcamento, cliente, itens, config) {
   const {jsPDF} = window.jspdf;
@@ -423,8 +425,6 @@ function gerarPDF(orcamento, cliente, itens, config) {
   doc.text(`Prezado(a) ${infoCliente}`, L, y+8);
   y += 17;
 
-  // ── CAIXA DE DADOS DO CLIENTE — altura calculada dinamicamente ──
-  // (antes era fixa em 22mm e cortava o texto quando havia muitas linhas)
   doc.setFontSize(9.5); doc.setFont('helvetica','bold');
   const linhaNome = doc.splitTextToSize(nomeCliente, TW-8);
   const l2 = [cliente.cnpj && `CNPJ: ${cliente.cnpj}`, cliente.nomeFantasia && cliente.razaoSocial !== cliente.nomeFantasia && `(${cliente.nomeFantasia})`].filter(Boolean).join('  ·  ');
@@ -448,7 +448,6 @@ function gerarPDF(orcamento, cliente, itens, config) {
   if (linhaL3.length) { doc.text(linhaL3, L+4, yc); yc += linhaL3.length*4; }
   y += alturaCaixa + 6;
 
-  // ── TEXTO DE ABERTURA ─────────────────────────────────────────────
   const textoAb = config.textoIntro || '';
   if (textoAb) {
     const linhasAb = doc.splitTextToSize(textoAb, TW);
@@ -614,7 +613,7 @@ function Toast({toasts}) {
    TELA DE LOGIN (Firebase Auth)
 ══════════════════════════════════════════ */
 function TelaLogin({toast}) {
-  const [modo, setModo] = useState('entrar'); // 'entrar' | 'cadastrar'
+  const [modo, setModo] = useState('entrar');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
@@ -696,8 +695,7 @@ function AlertBanner({catalogo, contratos, config}) {
 }
 
 /* ══════════════════════════════════════════
-   MODAL EDITAR PRODUTO — Matriz de Preços 100% livre
-   (Prazo texto livre + Faixa texto livre + Valor)
+   MODAL EDITAR PRODUTO
 ══════════════════════════════════════════ */
 function ModalEditarProduto({prod, onSave, onClose}) {
   const isNovo = !prod?.id;
@@ -899,6 +897,7 @@ function TelaEstoque({catalogo, setCatalogo, config, toast}) {
   const [confirmDel,  setConfirmDel]  = useState(null);
   const [confirmLimpar, setConfirmLimpar] = useState(false);
   const minEstoque = config.alertaEstoqueMinimoQtd || 3;
+  const fileImportRef = useRef(null);
 
   const filtrados = catalogo.filter(p =>
     p.nome.toLowerCase().includes(busca.toLowerCase()) ||
@@ -925,6 +924,76 @@ function TelaEstoque({catalogo, setCatalogo, config, toast}) {
     XLSX.utils.book_append_sheet(wb, ws, 'Estoque');
     XLSX.writeFile(wb, `estoque_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.xlsx`);
     toast('📥 Planilha exportada!', 'success');
+  };
+
+  /* ── IMPORTAR .xlsx / .csv ──────────────────────────────────────
+     Espera as mesmas colunas geradas pela exportação:
+     Nome | Especificacao | Qtd_Estoque | Prazo | Faixa | Valor_Mensal | Modalidade
+     Várias linhas com o mesmo "Nome" viram um único produto com
+     várias linhas na matriz de preços. Produtos com nome já
+     existente no catálogo são atualizados (mesclados pelo nome). */
+  const dispararImportacao = () => fileImportRef.current?.click();
+
+  const importarCatalogo = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = new Uint8Array(evt.target.result);
+        const wb = XLSX.read(data, {type:'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+        if (!rows.length) { toast('Planilha vazia ou em formato não reconhecido.','error'); return; }
+
+        const agrupado = {};
+        rows.forEach(r => {
+          const nome = String(r.Nome ?? r.nome ?? '').trim();
+          if (!nome) return;
+          if (!agrupado[nome]) {
+            agrupado[nome] = {
+              id: `NB-${uid()}`,
+              nome,
+              spec: String(r.Especificacao ?? r.especificacao ?? ''),
+              qtdEstoque: parseInt(r.Qtd_Estoque ?? r.qtd_estoque ?? 0) || 0,
+              modalidade: String(r.Modalidade ?? r.modalidade ?? 'Locação') || 'Locação',
+              matrizPrecos: [],
+            };
+          }
+          const prazoLabel = String(r.Prazo ?? r.prazo ?? '').trim();
+          const valorMensal = parseFloat(String(r.Valor_Mensal ?? r.valor_mensal ?? '').toString().replace(',','.')) || 0;
+          if (prazoLabel && valorMensal > 0) {
+            agrupado[nome].matrizPrecos.push({
+              id: uid(),
+              prazoLabel,
+              faixaLabel: String(r.Faixa ?? r.faixa ?? ''),
+              valorMensal,
+            });
+          }
+        });
+
+        const novosProdutos = Object.values(agrupado);
+        if (!novosProdutos.length) { toast('Nenhum produto válido encontrado na planilha.','error'); return; }
+
+        setCatalogo(prev => {
+          const porNome = {};
+          prev.forEach(p => { porNome[p.nome.trim().toLowerCase()] = p; });
+          novosProdutos.forEach(p => {
+            const chave = p.nome.trim().toLowerCase();
+            const existente = porNome[chave];
+            porNome[chave] = existente ? {...p, id: existente.id} : p;
+          });
+          return Object.values(porNome);
+        });
+        toast(`📤 ${novosProdutos.length} produto(s) importado(s) com sucesso!`, 'success');
+      } catch (err) {
+        console.error(err);
+        toast('Erro ao ler a planilha. Verifique se o arquivo segue o modelo exportado.','error');
+      } finally {
+        e.target.value = '';
+      }
+    };
+    reader.readAsArrayBuffer(file);
   };
 
   const qtdBadge = (qtd) => {
@@ -957,12 +1026,18 @@ function TelaEstoque({catalogo, setCatalogo, config, toast}) {
             <input className="input" placeholder="🔍 Buscar produto..." value={busca} onChange={e=>setBusca(e.target.value)}/>
           </div>
           <button className="btn btn-success" onClick={()=>setEditando({})}>➕ Novo</button>
+          <button className="btn btn-outline" onClick={dispararImportacao}>📤 Importar .xlsx</button>
+          <input ref={fileImportRef} type="file" accept=".xlsx,.xls,.csv" style={{display:'none'}} onChange={importarCatalogo}/>
           <button className="btn btn-outline" onClick={exportarCatalogo}>📥 Exportar .xlsx</button>
           <button className="btn btn-danger btn-sm" onClick={()=>setConfirmLimpar(true)}>🗑️ Limpar</button>
         </div>
+        <div className="ibox blue" style={{marginBottom:14, fontSize:11}}>
+          <span>💡</span>
+          <span>A importação espera as mesmas colunas geradas pelo botão Exportar: <strong>Nome, Especificacao, Qtd_Estoque, Prazo, Faixa, Valor_Mensal, Modalidade</strong>. Linhas com o mesmo Nome viram faixas de preço do mesmo produto. Produtos com nome já existente no catálogo são atualizados (mesclados), os demais são adicionados.</span>
+        </div>
 
         {filtrados.length === 0 ? (
-          <div className="empty"><div className="eicon">📦</div><p>{catalogo.length===0?'Catálogo vazio. Adicione produtos manualmente.':'Nenhum produto encontrado para essa busca.'}</p></div>
+          <div className="empty"><div className="eicon">📦</div><p>{catalogo.length===0?'Catálogo vazio. Adicione produtos manualmente ou importe uma planilha.':'Nenhum produto encontrado para essa busca.'}</p></div>
         ) : (
           <div style={{display:'flex',flexDirection:'column',gap:10}}>
             {filtrados.map(prod => {
@@ -1028,8 +1103,11 @@ function TelaEstoque({catalogo, setCatalogo, config, toast}) {
 ══════════════════════════════════════════ */
 function TelaConfiguracoes({config, setConfig, toast, user}) {
   const [form, setForm] = useState({...config});
+  const [salvando, setSalvando] = useState(false);
   const set = (k,v) => setForm(p=>({...p,[k]:v}));
   const fileInputRef = useRef(null);
+
+  useEffect(() => { setForm({...config}); }, [config]);
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
@@ -1040,7 +1118,24 @@ function TelaConfiguracoes({config, setConfig, toast, user}) {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = () => { setConfig(form); toast('Configurações salvas e sincronizadas!','success'); };
+  const handleSave = async () => {
+    if (!user || !db) { toast('Você não está conectado à nuvem. Recarregue a página e faça login novamente.','error'); return; }
+    setSalvando(true);
+    try {
+      await db.ref(`usuarios/${user.uid}/config`).set(form);
+      setConfig(form);
+      toast('Configurações salvas e sincronizadas!','success');
+    } catch (err) {
+      console.error('Erro ao salvar configurações no Firebase:', err);
+      if (err && err.code === 'PERMISSION_DENIED') {
+        toast('❌ Permissão negada pelo Firebase. Verifique as Regras (Rules) do Realtime Database no console.','error');
+      } else {
+        toast('❌ Erro ao salvar na nuvem: ' + (err?.message||'desconhecido'),'error');
+      }
+    } finally {
+      setSalvando(false);
+    }
+  };
 
   return (
     <div className="main">
@@ -1128,8 +1223,10 @@ function TelaConfiguracoes({config, setConfig, toast, user}) {
       </div>
 
       <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>
-        <button className="btn btn-outline btn-lg" onClick={()=>setForm({...config})}>Descartar</button>
-        <button className="btn btn-primary btn-lg" onClick={handleSave}>💾 Salvar Configurações</button>
+        <button className="btn btn-outline btn-lg" onClick={()=>setForm({...config})} disabled={salvando}>Descartar</button>
+        <button className="btn btn-primary btn-lg" onClick={handleSave} disabled={salvando}>
+          {salvando?<><div className="spinner"/>Salvando...</>:'💾 Salvar Configurações'}
+        </button>
       </div>
     </div>
   );
@@ -1218,8 +1315,6 @@ function Passo1({dados, onChange, onNext, toast}) {
 
 /* ══════════════════════════════════════════
    PASSO 2 — PRODUTOS
-   Seletores de Prazo e Faixa GERADOS DINAMICAMENTE
-   a partir da matrizPrecos do produto selecionado.
 ══════════════════════════════════════════ */
 function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, onNext, toast}) {
   const [aba, setAba]                 = useState('estoque');
@@ -1723,11 +1818,18 @@ function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
 ══════════════════════════════════════════ */
 function AppLogado({user}) {
   const [tela, setTela] = useState('orcamento');
-  const [catalogo, setCatalogo, catLoaded]     = useFirebaseSync(user.uid, 'catalogo', CATALOGO_INICIAL);
-  const [contratos, setContratos, ctrLoaded]   = useFirebaseSync(user.uid, 'contratos', []);
-  const [config, setConfig, cfgLoaded]         = useFirebaseSync(user.uid, 'config', CONFIG_INICIAL);
-  const [orcamentos, setOrcamentos, orcLoaded] = useFirebaseSync(user.uid, 'orcamentos', {});
   const { toasts, toast } = useToast();
+  const onSyncError = useCallback((err, path) => {
+    if (err && err.code === 'PERMISSION_DENIED') {
+      toast(`❌ Firebase negou acesso a "${path}". Verifique as Regras (Rules) do Realtime Database.`, 'error');
+    } else {
+      toast(`❌ Erro de sincronização em "${path}": ${err?.message||'desconhecido'}`, 'error');
+    }
+  }, [toast]);
+  const [catalogo, setCatalogo, catLoaded]     = useFirebaseSync(user.uid, 'catalogo', CATALOGO_INICIAL, onSyncError);
+  const [contratos, setContratos, ctrLoaded]   = useFirebaseSync(user.uid, 'contratos', [], onSyncError);
+  const [config, setConfig, cfgLoaded]         = useFirebaseSync(user.uid, 'config', CONFIG_INICIAL, onSyncError);
+  const [orcamentos, setOrcamentos, orcLoaded] = useFirebaseSync(user.uid, 'orcamentos', {}, onSyncError);
   const [orcamentoEditando, setOrcamentoEditando] = useState(null);
 
   const limite = config.alertaDiasContrato || 30;
@@ -1784,7 +1886,7 @@ function AppLogado({user}) {
 }
 
 function App() {
-  const [user, setUser] = useState(undefined); // undefined = checando, null = deslogado
+  const [user, setUser] = useState(undefined);
   const { toasts, toast } = useToast();
 
   useEffect(() => {
