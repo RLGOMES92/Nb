@@ -104,7 +104,9 @@
     .qty-stepper{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;height:40px;width:130px}
     .qty-btn{width:38px;height:100%;background:var(--bg);border:none;font-size:18px;font-weight:700;color:var(--navy);cursor:pointer;transition:background .15s}
     .qty-btn:hover{background:var(--cyan-soft)}
-    .qty-val{flex:1;text-align:center;font-size:15px;font-weight:800;color:var(--navy);border:none;outline:none;background:white}
+    .qty-val{flex:1;text-align:center;font-size:15px;font-weight:800;color:var(--navy);border:none;outline:none;background:white;padding:0;width:100%;-moz-appearance:textfield}
+    .qty-val::-webkit-outer-spin-button,.qty-val::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    .qty-val:focus{background:var(--cyan-soft)}
     .prazo-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:2px solid var(--border);border-radius:20px;cursor:pointer;transition:all .2s;background:white;font-size:12px;font-weight:700;color:var(--slate);user-select:none}
     .prazo-chip:hover{border-color:var(--electric);color:var(--navy)}
     .prazo-chip.sel{border-color:var(--electric);background:rgba(37,99,235,.07);color:var(--electric)}
@@ -1462,9 +1464,11 @@ function Passo2({catalogo, itens, onAddItem, onRemoveItem, onEditItem, onBack, o
       <div className="card">
         <div className="card-title"><div className="icon">🔢</div>Quantidade</div>
         <div className="qty-stepper">
-          <button className="qty-btn" onClick={()=>setQtd(q=>Math.max(1,q-1))}>−</button>
-          <span className="qty-val">{qtd}</span>
-          <button className="qty-btn" onClick={()=>setQtd(q=>q+1)}>+</button>
+          <button className="qty-btn" onClick={()=>setQtd(q=>Math.max(1,(parseInt(q)||0)-1))}>−</button>
+          <input className="qty-val" type="text" inputMode="numeric" pattern="[0-9]*" value={qtd}
+            onChange={e=>{ const v=e.target.value.replace(/\D/g,''); setQtd(v===''?'':parseInt(v)); }}
+            onBlur={()=>setQtd(q=>(!q||q<1)?1:q)}/>
+          <button className="qty-btn" onClick={()=>setQtd(q=>(parseInt(q)||0)+1)}>+</button>
         </div>
         {aba==='estoque' && prodSel && qtd > estoqueDoProd && (
           <div className="ibox red" style={{marginTop:8,fontSize:11}}><span>⚠️</span>Qtd ({qtd}) supera o estoque ({estoqueDoProd} un).</div>
@@ -1542,9 +1546,11 @@ function ModalEditarItem({item, onSave, onClose}) {
           <div className="form-group">
             <div className="label">Quantidade</div>
             <div className="qty-stepper" style={{width:'100%'}}>
-              <button className="qty-btn" onClick={()=>setQtd(q=>Math.max(1,q-1))}>−</button>
-              <span className="qty-val">{qtd}</span>
-              <button className="qty-btn" onClick={()=>setQtd(q=>q+1)}>+</button>
+              <button className="qty-btn" onClick={()=>setQtd(q=>Math.max(1,(parseInt(q)||0)-1))}>−</button>
+              <input className="qty-val" type="text" inputMode="numeric" pattern="[0-9]*" value={qtd}
+                onChange={e=>{ const v=e.target.value.replace(/\D/g,''); setQtd(v===''?'':parseInt(v)); }}
+                onBlur={()=>setQtd(q=>(!q||q<1)?1:q)}/>
+              <button className="qty-btn" onClick={()=>setQtd(q=>(parseInt(q)||0)+1)}>+</button>
             </div>
           </div>
           <Inp label="Prazo (texto)" value={prazoLabel} onChange={e=>setPrazoL(e.target.value)}/>
