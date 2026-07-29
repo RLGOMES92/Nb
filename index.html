@@ -823,6 +823,7 @@ function TelaContratos({contratos, setContratos, config, toast}) {
   };
 
   const ordenados = [...contratos].sort((a,b) => diasParaVencer(a.inicio,a.meses) - diasParaVencer(b.inicio,b.meses));
+  const viaOrcamento = contratos.filter(c=>c.orcamentoId).length;
 
   const diasBadge = (dias) => {
     if (dias < 0)       return <span className="dias-badge vencido">Vencido há {Math.abs(dias)}d</span>;
@@ -833,6 +834,10 @@ function TelaContratos({contratos, setContratos, config, toast}) {
 
   return (
     <div className="main">
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:10,marginBottom:14}}>
+        <div className="metric-box"><div className="ml">Contratos</div><div className="mv" style={{color:'var(--navy)'}}>{contratos.length}</div></div>
+        <div className="metric-box"><div className="ml">Via Orçamento</div><div className="mv" style={{color:'var(--electric)'}}>{viaOrcamento}</div></div>
+      </div>
       <div className="card">
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
           <div className="card-title" style={{margin:0}}><div className="icon">📋</div>Contratos Ativos</div>
@@ -853,7 +858,10 @@ function TelaContratos({contratos, setContratos, config, toast}) {
               return (
                 <div key={c.id} className={`contract-row ${cls}`}>
                   <div className="contract-info">
-                    <div className="contract-nome">{c.cliente}</div>
+                    <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+                      <div className="contract-nome">{c.cliente}</div>
+                      {c.orcamentoId && <span className="badge badge-blue">📝 via {c.orcamentoId}</span>}
+                    </div>
                     <div className="contract-sub">{c.produto} · {c.qtd} un · {c.meses} meses · {R$(c.mensalidade)}/mês</div>
                     <div className="contract-meta">
                       {diasBadge(dias)}
@@ -1579,11 +1587,13 @@ function ModalEditarItem({item, onSave, onClose}) {
 /* ══════════════════════════════════════════
    PASSO 3 — RESUMO + PDF + SALVAR NO HISTÓRICO
 ══════════════════════════════════════════ */
-function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onBack, onSalvarHistorico, toast}) {
+function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onBack, onSalvarHistorico, onGerarContrato, toast}) {
   const [pdfGerado, setPdfGerado] = useState(false);
   const [pdfUrl,    setPdfUrl]    = useState(null);
   const [loading,   setLoading]   = useState(false);
   const [salvo, setSalvo] = useState(false);
+  const [modalContrato, setModalContrato] = useState(false);
+  const [contratoGerado, setContratoGerado] = useState(false);
 
   const prazos   = [...new Set(itens.map(i=>i.prazoLabel))];
   const produtos = [...new Map(itens.map(i=>[i.idProd||i.nome, i])).values()];
@@ -1601,11 +1611,25 @@ function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onB
     }, 500);
   };
 
-  const handleFecharOrc = () => {
+  const handleAbrirGerarContrato = () => {
+    if (prazos.length <= 1) { confirmarContrato(prazos[0]); return; }
+    setModalContrato(true);
+  };
+
+  const confirmarContrato = (prazoEscolhido) => {
+    const itensDoPrazo = itens.filter(i=>i.prazoLabel===prazoEscolhido);
+    const totalDoPrazo = totais.find(t=>t.prazo===prazoEscolhido)?.mensal || 0;
+    // reduz estoque só das quantidades referentes ao prazo que o cliente realmente fechou
     const ag = {};
-    itens.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = (ag[i.idProd]||0) + i.quantidade; });
+    itensDoPrazo.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = (ag[i.idProd]||0) + i.quantidade; });
     setCatalogo(prev => prev.map(p => ag[p.id] ? {...p, qtdEstoque:Math.max(0,p.qtdEstoque-ag[p.id])} : p));
-    toast('✅ Orçamento fechado! Estoque atualizado.','success');
+    onGerarContrato(
+      { id:orcamentoId, cliente, itens, criadoEm:new Date().toISOString(), totalMensal: totais[0]?.mensal||0, prazos },
+      prazoEscolhido, itensDoPrazo, totalDoPrazo
+    );
+    setModalContrato(false);
+    setContratoGerado(true);
+    toast('📝 Contrato gerado a partir do orçamento! Estoque atualizado.','success');
   };
 
   const handleSalvarHistorico = () => {
@@ -1719,11 +1743,33 @@ function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onB
               <button className="btn btn-primary btn-lg" onClick={handleDownload}>⬇️ Baixar PDF</button>
               <button className="btn btn-success btn-lg" onClick={handleWhatsApp}>💬 WhatsApp</button>
               <a href={pdfUrl} target="_blank" rel="noreferrer"><button className="btn btn-outline btn-lg">🔍 Visualizar</button></a>
-              <button className="btn btn-warn btn-lg" onClick={handleFecharOrc}>✅ Fechar Orçamento</button>
+              <button className="btn btn-warn btn-lg" onClick={handleAbrirGerarContrato} disabled={contratoGerado}>
+                {contratoGerado ? '✅ Contrato Gerado' : '📝 Gerar Contrato'}
+              </button>
             </div>
           </div>
         )}
       </div>
+
+      {modalContrato && (
+        <div className="overlay" onClick={()=>setModalContrato(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-title">📝 Gerar Contrato</div>
+            <div className="modal-sub">Qual opção de prazo o cliente fechou?</div>
+            <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:6}}>
+              {totais.map(t => (
+                <button key={t.prazo} className="btn btn-outline" style={{width:'100%',justifyContent:'space-between',height:'auto',padding:'12px 14px'}} onClick={()=>confirmarContrato(t.prazo)}>
+                  <span style={{fontWeight:700}}>{t.prazo}</span>
+                  <span style={{fontWeight:800,color:'var(--electric)'}}>{R$(t.mensal)}/mês</span>
+                </button>
+              ))}
+            </div>
+            <div className="modal-btns">
+              <button className="btn btn-outline" style={{flex:1}} onClick={()=>setModalContrato(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="nav-btns"><button className="btn btn-outline btn-lg" onClick={onBack}>← Voltar</button></div>
     </div>
@@ -1733,7 +1779,7 @@ function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onB
 /* ══════════════════════════════════════════
    WIZARD DE ORÇAMENTO
 ══════════════════════════════════════════ */
-function TelaOrcamento({catalogo, setCatalogo, config, toast, orcamentoEditando, onSalvarHistorico, onLimparEdicao}) {
+function TelaOrcamento({catalogo, setCatalogo, config, toast, orcamentoEditando, onSalvarHistorico, onGerarContrato, onLimparEdicao}) {
   const [step, setStep] = useState(1);
   const [orcId_, setOrcId_] = useState(() => orcamentoEditando?.id || orcId());
   const [cliente, setCliente] = useState(() => orcamentoEditando?.cliente || {cnpj:'',razaoSocial:'',nomeFantasia:'',statusReceita:'',responsavel:'',email:'',telefone:'',cidade:'',uf:''});
@@ -1768,7 +1814,7 @@ function TelaOrcamento({catalogo, setCatalogo, config, toast, orcamentoEditando,
           onRemoveItem={id=>setItens(p=>p.filter(i=>i.id!==id))}
           onEditItem={u=>setItens(p=>p.map(i=>i.id===u.id?u:i))}
           onBack={()=>setStep(1)} onNext={()=>setStep(3)} toast={toast}/>}
-        {step===3 && <Passo3 orcamentoId={orcId_} cliente={cliente} itens={itens} catalogo={catalogo} setCatalogo={setCatalogo} config={config} onBack={()=>setStep(2)} onSalvarHistorico={onSalvarHistorico} toast={toast}/>}
+        {step===3 && <Passo3 orcamentoId={orcId_} cliente={cliente} itens={itens} catalogo={catalogo} setCatalogo={setCatalogo} config={config} onBack={()=>setStep(2)} onSalvarHistorico={onSalvarHistorico} onGerarContrato={onGerarContrato} toast={toast}/>}
       </div>
     </div>
   );
@@ -1780,6 +1826,7 @@ function TelaOrcamento({catalogo, setCatalogo, config, toast, orcamentoEditando,
 function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
   const [confirmDel, setConfirmDel] = useState(null);
   const lista = Object.values(orcamentos||{}).sort((a,b)=> new Date(b.criadoEm||0) - new Date(a.criadoEm||0));
+  const convertidos = lista.filter(o=>o.contratoGerado).length;
 
   const handleDelete = (id) => {
     setOrcamentos(prev => { const n = {...prev}; delete n[id]; return n; });
@@ -1789,6 +1836,12 @@ function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
 
   return (
     <div className="main">
+      {lista.length > 0 && (
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(110px,1fr))',gap:10,marginBottom:14}}>
+          <div className="metric-box"><div className="ml">Orçamentos</div><div className="mv" style={{color:'var(--navy)'}}>{lista.length}</div></div>
+          <div className="metric-box"><div className="ml">Viraram Contrato</div><div className="mv" style={{color:'var(--success)'}}>{convertidos}</div></div>
+        </div>
+      )}
       <div className="card">
         <div className="card-title"><div className="icon">🗂️</div>Histórico de Orçamentos ({lista.length})</div>
         <div className="ibox blue" style={{marginBottom:14}}>
@@ -1801,7 +1854,10 @@ function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
             <div key={o.id} className="hist-card">
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:10,flexWrap:'wrap'}}>
                 <div>
-                  <div style={{fontWeight:800,color:'var(--navy)',fontSize:13}}>{o.id}</div>
+                  <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+                    <div style={{fontWeight:800,color:'var(--navy)',fontSize:13}}>{o.id}</div>
+                    {o.contratoGerado && <span className="badge badge-ok">✅ Contrato {o.contratoId}</span>}
+                  </div>
                   <div style={{fontSize:12,color:'var(--text-mid)',marginTop:2}}>{o.cliente?.razaoSocial || o.cliente?.nomeFantasia || 'Cliente sem nome'}</div>
                   <div style={{fontSize:11,color:'var(--slate)',marginTop:2}}>
                     {(o.itens||[]).length} item(ns) · {(o.prazos||[]).join(', ')} · criado em {o.criadoEm?new Date(o.criadoEm).toLocaleDateString('pt-BR'):'—'}
@@ -1859,6 +1915,23 @@ function AppLogado({user}) {
   const salvarNoHistorico = (orc) => {
     setOrcamentos(prev => ({...(prev||{}), [orc.id]: orc}));
   };
+  const criarContratoDoOrcamento = (orcamento, prazoEscolhido, itensDoPrazo, totalMensalDoPrazo) => {
+    const novoContrato = {
+      id: `CTR-${uid()}`,
+      cliente: orcamento.cliente.razaoSocial || orcamento.cliente.nomeFantasia || 'Cliente',
+      produto: itensDoPrazo.map(i=>i.nome).join(', '),
+      qtd: itensDoPrazo.reduce((s,i)=>s+i.quantidade,0),
+      meses: extrairMeses(prazoEscolhido),
+      mensalidade: totalMensalDoPrazo,
+      inicio: new Date().toISOString().slice(0,10),
+      orcamentoId: orcamento.id,
+    };
+    setContratos(prev => [...prev, novoContrato]);
+    setOrcamentos(prev => ({
+      ...(prev||{}),
+      [orcamento.id]: { ...orcamento, contratoGerado:true, contratoId:novoContrato.id, prazoFechado:prazoEscolhido }
+    }));
+  };
   const editarOrcamento = (orc) => { setOrcamentoEditando(orc); setTela('orcamento'); };
 
   const tudoCarregado = catLoaded && ctrLoaded && cfgLoaded && orcLoaded;
@@ -1890,7 +1963,7 @@ function AppLogado({user}) {
       ) : (
         <>
           {tela==='orcamento' && <TelaOrcamento catalogo={catalogo} setCatalogo={setCatalogo} config={config} toast={toast}
-            orcamentoEditando={orcamentoEditando} onSalvarHistorico={salvarNoHistorico} onLimparEdicao={()=>setOrcamentoEditando(null)}/>}
+            orcamentoEditando={orcamentoEditando} onSalvarHistorico={salvarNoHistorico} onGerarContrato={criarContratoDoOrcamento} onLimparEdicao={()=>setOrcamentoEditando(null)}/>}
           {tela==='historico' && <TelaHistorico orcamentos={orcamentos} setOrcamentos={setOrcamentos} onEditar={editarOrcamento} toast={toast}/>}
           {tela==='contratos' && <TelaContratos contratos={contratos} setContratos={setContratos} config={config} toast={toast}/>}
           {tela==='estoque'   && <TelaEstoque   catalogo={catalogo} setCatalogo={setCatalogo}   config={config} toast={toast}/>}
