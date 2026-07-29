@@ -1823,8 +1823,9 @@ function TelaOrcamento({catalogo, setCatalogo, config, toast, orcamentoEditando,
 /* ══════════════════════════════════════════
    TELA HISTÓRICO — lista, editar, excluir
 ══════════════════════════════════════════ */
-function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
+function TelaHistorico({orcamentos, setOrcamentos, catalogo, setCatalogo, onEditar, onGerarContrato, toast}) {
   const [confirmDel, setConfirmDel] = useState(null);
+  const [orcParaContrato, setOrcParaContrato] = useState(null);
   const lista = Object.values(orcamentos||{}).sort((a,b)=> new Date(b.criadoEm||0) - new Date(a.criadoEm||0));
   const convertidos = lista.filter(o=>o.contratoGerado).length;
 
@@ -1832,6 +1833,32 @@ function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
     setOrcamentos(prev => { const n = {...prev}; delete n[id]; return n; });
     setConfirmDel(null);
     toast('Orçamento removido do histórico.','info');
+  };
+
+  const totaisDoOrc = (o) => {
+    const prazos = o.prazos && o.prazos.length ? o.prazos : [...new Set((o.itens||[]).map(i=>i.prazoLabel))];
+    return prazos.map(pz => {
+      const ip = (o.itens||[]).filter(i=>i.prazoLabel===pz);
+      const m  = ip.reduce((s,i)=>s+i.valorMensal,0);
+      return {prazo:pz, mensal:m};
+    });
+  };
+
+  const abrirGerarContrato = (o) => {
+    const totais = totaisDoOrc(o);
+    if (totais.length <= 1) { confirmarContrato(o, totais[0]?.prazo); return; }
+    setOrcParaContrato(o);
+  };
+
+  const confirmarContrato = (o, prazoEscolhido) => {
+    const itensDoPrazo = (o.itens||[]).filter(i=>i.prazoLabel===prazoEscolhido);
+    const totalDoPrazo = totaisDoOrc(o).find(t=>t.prazo===prazoEscolhido)?.mensal || 0;
+    const ag = {};
+    itensDoPrazo.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = (ag[i.idProd]||0) + i.quantidade; });
+    setCatalogo(prev => prev.map(p => ag[p.id] ? {...p, qtdEstoque:Math.max(0,p.qtdEstoque-ag[p.id])} : p));
+    onGerarContrato(o, prazoEscolhido, itensDoPrazo, totalDoPrazo);
+    setOrcParaContrato(null);
+    toast('📝 Contrato ativado a partir do orçamento! Estoque atualizado.','success');
   };
 
   return (
@@ -1845,7 +1872,7 @@ function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
       <div className="card">
         <div className="card-title"><div className="icon">🗂️</div>Histórico de Orçamentos ({lista.length})</div>
         <div className="ibox blue" style={{marginBottom:14}}>
-          <span>☁️</span><span>Todos os orçamentos salvos aqui sincronizam automaticamente entre seus dispositivos. Clique em <strong>Editar</strong> para carregar um orçamento e alterá-lo.</span>
+          <span>☁️</span><span>Cliente fechou depois? Clique em <strong>Gerar Contrato</strong> no orçamento salvo, sem precisar reescrever nada.</span>
         </div>
         {lista.length===0 ? (
           <div className="empty"><div className="eicon">🗂️</div><p>Nenhum orçamento salvo ainda. Salve um na aba Orçamento, Passo 3.</p></div>
@@ -1864,7 +1891,10 @@ function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
                   </div>
                   {o.totalMensal>0 && <div style={{fontSize:12,fontWeight:700,color:'var(--electric)',marginTop:4}}>{R$(o.totalMensal)}/mês</div>}
                 </div>
-                <div style={{display:'flex',gap:6}}>
+                <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'flex-end'}}>
+                  {!o.contratoGerado && (
+                    <button className="btn btn-success btn-sm" onClick={()=>abrirGerarContrato(o)}>📝 Gerar Contrato</button>
+                  )}
                   <button className="btn btn-warn btn-sm" onClick={()=>onEditar(o)}>✏️ Editar</button>
                   <button className="btn btn-danger btn-sm" onClick={()=>setConfirmDel(o)}>🗑️</button>
                 </div>
@@ -1873,6 +1903,25 @@ function TelaHistorico({orcamentos, setOrcamentos, onEditar, toast}) {
           ))
         )}
       </div>
+      {orcParaContrato && (
+        <div className="overlay" onClick={()=>setOrcParaContrato(null)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-title">📝 Gerar Contrato</div>
+            <div className="modal-sub">Qual opção de prazo o cliente fechou — {orcParaContrato.id}?</div>
+            <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:6}}>
+              {totaisDoOrc(orcParaContrato).map(t => (
+                <button key={t.prazo} className="btn btn-outline" style={{width:'100%',justifyContent:'space-between',height:'auto',padding:'12px 14px'}} onClick={()=>confirmarContrato(orcParaContrato, t.prazo)}>
+                  <span style={{fontWeight:700}}>{t.prazo}</span>
+                  <span style={{fontWeight:800,color:'var(--electric)'}}>{R$(t.mensal)}/mês</span>
+                </button>
+              ))}
+            </div>
+            <div className="modal-btns">
+              <button className="btn btn-outline" style={{flex:1}} onClick={()=>setOrcParaContrato(null)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
       {confirmDel && (
         <div className="overlay" onClick={()=>setConfirmDel(null)}>
           <div className="modal" onClick={e=>e.stopPropagation()}>
@@ -1964,7 +2013,7 @@ function AppLogado({user}) {
         <>
           {tela==='orcamento' && <TelaOrcamento catalogo={catalogo} setCatalogo={setCatalogo} config={config} toast={toast}
             orcamentoEditando={orcamentoEditando} onSalvarHistorico={salvarNoHistorico} onGerarContrato={criarContratoDoOrcamento} onLimparEdicao={()=>setOrcamentoEditando(null)}/>}
-          {tela==='historico' && <TelaHistorico orcamentos={orcamentos} setOrcamentos={setOrcamentos} onEditar={editarOrcamento} toast={toast}/>}
+          {tela==='historico' && <TelaHistorico orcamentos={orcamentos} setOrcamentos={setOrcamentos} catalogo={catalogo} setCatalogo={setCatalogo} onEditar={editarOrcamento} onGerarContrato={criarContratoDoOrcamento} toast={toast}/>}
           {tela==='contratos' && <TelaContratos contratos={contratos} setContratos={setContratos} config={config} toast={toast}/>}
           {tela==='estoque'   && <TelaEstoque   catalogo={catalogo} setCatalogo={setCatalogo}   config={config} toast={toast}/>}
           {tela==='config'    && <TelaConfiguracoes config={config} setConfig={setConfig} toast={toast} user={user}/>}
