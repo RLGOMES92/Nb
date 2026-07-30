@@ -863,6 +863,14 @@ function TelaContratos({contratos, setContratos, config, toast}) {
                       {c.orcamentoId && <span className="badge badge-blue">📝 via {c.orcamentoId}</span>}
                     </div>
                     <div className="contract-sub">{c.produto} · {c.qtd} un · {c.meses} meses · {R$(c.mensalidade)}/mês</div>
+                    <div style={{fontSize:11,fontWeight:700,color:'var(--electric)',marginTop:2}}>Valor total do contrato: {R$(c.valorTotal ?? (c.mensalidade*c.meses))}</div>
+                    {c.itensFechados && c.itensFechados.length>0 && (
+                      <div className="ei-meta" style={{marginTop:6}}>
+                        {c.itensFechados.map((it,idx) => (
+                          <div key={idx} className="matriz-chip">{it.nome} · {it.quantidade} un: <b>{R$(it.valorMensal)}/mês</b></div>
+                        ))}
+                      </div>
+                    )}
                     <div className="contract-meta">
                       {diasBadge(dias)}
                       <span style={{fontSize:10,color:'var(--slate)'}}>Início: {new Date(c.inicio+'T12:00').toLocaleDateString('pt-BR')}</span>
@@ -1585,6 +1593,85 @@ function ModalEditarItem({item, onSave, onClose}) {
 }
 
 /* ══════════════════════════════════════════
+   MODAL GERAR CONTRATO
+   Permite escolher o prazo fechado e, dentro dele,
+   marcar quais itens/produtos o cliente realmente
+   fechou (às vezes é só um dos equipamentos, às
+   vezes são todos). Mostra mensalidade e valor
+   total do contrato em tempo real.
+══════════════════════════════════════════ */
+function ModalGerarContrato({itens, onConfirm, onClose}) {
+  const prazos = [...new Set(itens.map(i=>i.prazoLabel))];
+  const [prazoSel, setPrazoSel] = useState(prazos[0] || '');
+  const itensDoPrazo = itens.filter(i=>i.prazoLabel===prazoSel);
+  const [checked, setChecked] = useState(() => Object.fromEntries(itensDoPrazo.map(i=>[i.id,true])));
+
+  useEffect(() => {
+    setChecked(Object.fromEntries(itens.filter(i=>i.prazoLabel===prazoSel).map(i=>[i.id,true])));
+    // eslint-disable-next-line
+  }, [prazoSel]);
+
+  const toggle = (id) => setChecked(prev=>({...prev,[id]:!prev[id]}));
+  const selecionados = itensDoPrazo.filter(i=>checked[i.id]);
+  const totalMensal = selecionados.reduce((s,i)=>s+i.valorMensal,0);
+  const meses = extrairMeses(prazoSel);
+  const totalContrato = totalMensal * meses;
+
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" style={{maxWidth:520}} onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">📝 Gerar Contrato</div>
+        <div className="modal-sub">Marque quais itens o cliente realmente fechou</div>
+
+        {prazos.length > 1 && (
+          <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:14}}>
+            {prazos.map(pz => (
+              <div key={pz} className={`prazo-chip${prazoSel===pz?' sel':''}`} onClick={()=>setPrazoSel(pz)}>{pz}</div>
+            ))}
+          </div>
+        )}
+
+        <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:12,maxHeight:280,overflowY:'auto'}}>
+          {itensDoPrazo.map(i => (
+            <label key={i.id} className="produto-row" style={{cursor:'pointer',alignItems:'flex-start'}}>
+              <input type="checkbox" checked={!!checked[i.id]} onChange={()=>toggle(i.id)} style={{width:18,height:18,flexShrink:0,marginTop:2,cursor:'pointer'}}/>
+              <div className="produto-info">
+                <div className="produto-nome">{i.nome}</div>
+                <div className="produto-sub">{i.spec}</div>
+                <div style={{display:'flex',gap:6,marginTop:3,flexWrap:'wrap',alignItems:'center'}}>
+                  <span style={{fontSize:11,fontWeight:700,color:'var(--slate)'}}>{i.quantidade} un</span>
+                  <span style={{fontSize:11,color:'var(--slate-light)'}}>·</span>
+                  <span style={{fontSize:11,fontWeight:700,color:'var(--navy)'}}>{R$(i.precoFinal)}/un</span>
+                  <span style={{fontSize:11,color:'var(--slate-light)'}}>·</span>
+                  <span style={{fontSize:11,fontWeight:800,color:'var(--electric)'}}>{R$(i.valorMensal)}/mês</span>
+                </div>
+              </div>
+            </label>
+          ))}
+          {itensDoPrazo.length===0 && <div style={{fontSize:12,color:'var(--slate)'}}>Nenhum item nesse prazo.</div>}
+        </div>
+
+        <div className="ibox green" style={{marginBottom:6}}>
+          <span>📊</span>
+          <div>
+            {selecionados.length} item(ns) selecionado(s) · Prazo: <strong>{prazoSel}</strong><br/>
+            Mensalidade: <strong>{R$(totalMensal)}</strong> · Valor total do contrato: <strong>{R$(totalContrato)}</strong>
+          </div>
+        </div>
+
+        <div className="modal-btns">
+          <button className="btn btn-outline" style={{flex:1}} onClick={onClose}>Cancelar</button>
+          <button className="btn btn-primary" style={{flex:2}} disabled={selecionados.length===0}
+            onClick={()=>onConfirm(selecionados, prazoSel, totalMensal, totalContrato)}>
+            📝 Gerar Contrato
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
    PASSO 3 — RESUMO + PDF + SALVAR NO HISTÓRICO
 ══════════════════════════════════════════ */
 function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onBack, onSalvarHistorico, onGerarContrato, toast}) {
@@ -1612,20 +1699,17 @@ function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onB
   };
 
   const handleAbrirGerarContrato = () => {
-    if (prazos.length <= 1) { confirmarContrato(prazos[0]); return; }
     setModalContrato(true);
   };
 
-  const confirmarContrato = (prazoEscolhido) => {
-    const itensDoPrazo = itens.filter(i=>i.prazoLabel===prazoEscolhido);
-    const totalDoPrazo = totais.find(t=>t.prazo===prazoEscolhido)?.mensal || 0;
-    // reduz estoque só das quantidades referentes ao prazo que o cliente realmente fechou
+  const confirmarContrato = (itensSelecionados, prazoEscolhido, totalMensalSel, totalContratoSel) => {
+    // reduz estoque só das quantidades dos itens que o cliente realmente fechou
     const ag = {};
-    itensDoPrazo.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = (ag[i.idProd]||0) + i.quantidade; });
+    itensSelecionados.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = (ag[i.idProd]||0) + i.quantidade; });
     setCatalogo(prev => prev.map(p => ag[p.id] ? {...p, qtdEstoque:Math.max(0,p.qtdEstoque-ag[p.id])} : p));
     onGerarContrato(
       { id:orcamentoId, cliente, itens, criadoEm:new Date().toISOString(), totalMensal: totais[0]?.mensal||0, prazos },
-      prazoEscolhido, itensDoPrazo, totalDoPrazo
+      itensSelecionados, prazoEscolhido, totalMensalSel, totalContratoSel
     );
     setModalContrato(false);
     setContratoGerado(true);
@@ -1752,23 +1836,7 @@ function Passo3({orcamentoId, cliente, itens, catalogo, setCatalogo, config, onB
       </div>
 
       {modalContrato && (
-        <div className="overlay" onClick={()=>setModalContrato(false)}>
-          <div className="modal" onClick={e=>e.stopPropagation()}>
-            <div className="modal-title">📝 Gerar Contrato</div>
-            <div className="modal-sub">Qual opção de prazo o cliente fechou?</div>
-            <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:6}}>
-              {totais.map(t => (
-                <button key={t.prazo} className="btn btn-outline" style={{width:'100%',justifyContent:'space-between',height:'auto',padding:'12px 14px'}} onClick={()=>confirmarContrato(t.prazo)}>
-                  <span style={{fontWeight:700}}>{t.prazo}</span>
-                  <span style={{fontWeight:800,color:'var(--electric)'}}>{R$(t.mensal)}/mês</span>
-                </button>
-              ))}
-            </div>
-            <div className="modal-btns">
-              <button className="btn btn-outline" style={{flex:1}} onClick={()=>setModalContrato(false)}>Cancelar</button>
-            </div>
-          </div>
-        </div>
+        <ModalGerarContrato itens={itens} onConfirm={confirmarContrato} onClose={()=>setModalContrato(false)}/>
       )}
 
       <div className="nav-btns"><button className="btn btn-outline btn-lg" onClick={onBack}>← Voltar</button></div>
@@ -1835,28 +1903,12 @@ function TelaHistorico({orcamentos, setOrcamentos, catalogo, setCatalogo, onEdit
     toast('Orçamento removido do histórico.','info');
   };
 
-  const totaisDoOrc = (o) => {
-    const prazos = o.prazos && o.prazos.length ? o.prazos : [...new Set((o.itens||[]).map(i=>i.prazoLabel))];
-    return prazos.map(pz => {
-      const ip = (o.itens||[]).filter(i=>i.prazoLabel===pz);
-      const m  = ip.reduce((s,i)=>s+i.valorMensal,0);
-      return {prazo:pz, mensal:m};
-    });
-  };
-
-  const abrirGerarContrato = (o) => {
-    const totais = totaisDoOrc(o);
-    if (totais.length <= 1) { confirmarContrato(o, totais[0]?.prazo); return; }
-    setOrcParaContrato(o);
-  };
-
-  const confirmarContrato = (o, prazoEscolhido) => {
-    const itensDoPrazo = (o.itens||[]).filter(i=>i.prazoLabel===prazoEscolhido);
-    const totalDoPrazo = totaisDoOrc(o).find(t=>t.prazo===prazoEscolhido)?.mensal || 0;
+  const confirmarContrato = (itensSelecionados, prazoEscolhido, totalMensalSel, totalContratoSel) => {
+    const o = orcParaContrato;
     const ag = {};
-    itensDoPrazo.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = (ag[i.idProd]||0) + i.quantidade; });
+    itensSelecionados.filter(i=>i.idProd).forEach(i=>{ ag[i.idProd] = (ag[i.idProd]||0) + i.quantidade; });
     setCatalogo(prev => prev.map(p => ag[p.id] ? {...p, qtdEstoque:Math.max(0,p.qtdEstoque-ag[p.id])} : p));
-    onGerarContrato(o, prazoEscolhido, itensDoPrazo, totalDoPrazo);
+    onGerarContrato(o, itensSelecionados, prazoEscolhido, totalMensalSel, totalContratoSel);
     setOrcParaContrato(null);
     toast('📝 Contrato ativado a partir do orçamento! Estoque atualizado.','success');
   };
@@ -1893,7 +1945,7 @@ function TelaHistorico({orcamentos, setOrcamentos, catalogo, setCatalogo, onEdit
                 </div>
                 <div style={{display:'flex',gap:6,flexWrap:'wrap',justifyContent:'flex-end'}}>
                   {!o.contratoGerado && (
-                    <button className="btn btn-success btn-sm" onClick={()=>abrirGerarContrato(o)}>📝 Gerar Contrato</button>
+                    <button className="btn btn-success btn-sm" onClick={()=>setOrcParaContrato(o)}>📝 Gerar Contrato</button>
                   )}
                   <button className="btn btn-warn btn-sm" onClick={()=>onEditar(o)}>✏️ Editar</button>
                   <button className="btn btn-danger btn-sm" onClick={()=>setConfirmDel(o)}>🗑️</button>
@@ -1904,23 +1956,7 @@ function TelaHistorico({orcamentos, setOrcamentos, catalogo, setCatalogo, onEdit
         )}
       </div>
       {orcParaContrato && (
-        <div className="overlay" onClick={()=>setOrcParaContrato(null)}>
-          <div className="modal" onClick={e=>e.stopPropagation()}>
-            <div className="modal-title">📝 Gerar Contrato</div>
-            <div className="modal-sub">Qual opção de prazo o cliente fechou — {orcParaContrato.id}?</div>
-            <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:6}}>
-              {totaisDoOrc(orcParaContrato).map(t => (
-                <button key={t.prazo} className="btn btn-outline" style={{width:'100%',justifyContent:'space-between',height:'auto',padding:'12px 14px'}} onClick={()=>confirmarContrato(orcParaContrato, t.prazo)}>
-                  <span style={{fontWeight:700}}>{t.prazo}</span>
-                  <span style={{fontWeight:800,color:'var(--electric)'}}>{R$(t.mensal)}/mês</span>
-                </button>
-              ))}
-            </div>
-            <div className="modal-btns">
-              <button className="btn btn-outline" style={{flex:1}} onClick={()=>setOrcParaContrato(null)}>Cancelar</button>
-            </div>
-          </div>
-        </div>
+        <ModalGerarContrato itens={orcParaContrato.itens||[]} onConfirm={confirmarContrato} onClose={()=>setOrcParaContrato(null)}/>
       )}
       {confirmDel && (
         <div className="overlay" onClick={()=>setConfirmDel(null)}>
@@ -1964,14 +2000,16 @@ function AppLogado({user}) {
   const salvarNoHistorico = (orc) => {
     setOrcamentos(prev => ({...(prev||{}), [orc.id]: orc}));
   };
-  const criarContratoDoOrcamento = (orcamento, prazoEscolhido, itensDoPrazo, totalMensalDoPrazo) => {
+  const criarContratoDoOrcamento = (orcamento, itensSelecionados, prazoEscolhido, totalMensalSel, totalContratoSel) => {
     const novoContrato = {
       id: `CTR-${uid()}`,
       cliente: orcamento.cliente.razaoSocial || orcamento.cliente.nomeFantasia || 'Cliente',
-      produto: itensDoPrazo.map(i=>i.nome).join(', '),
-      qtd: itensDoPrazo.reduce((s,i)=>s+i.quantidade,0),
+      produto: itensSelecionados.map(i=>`${i.nome} (${i.quantidade} un)`).join(', '),
+      itensFechados: itensSelecionados,
+      qtd: itensSelecionados.reduce((s,i)=>s+i.quantidade,0),
       meses: extrairMeses(prazoEscolhido),
-      mensalidade: totalMensalDoPrazo,
+      mensalidade: totalMensalSel,
+      valorTotal: totalContratoSel,
       inicio: new Date().toISOString().slice(0,10),
       orcamentoId: orcamento.id,
     };
